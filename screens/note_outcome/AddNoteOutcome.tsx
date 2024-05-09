@@ -33,12 +33,6 @@ type PostDataState = {
     jenis_kebutuhan: string;
     kategori_uang_keluar: string;
   }>;
-  nama_barang: string;
-  harga_barang: string;
-  satuan_barang: string;
-  nominal_uang_keluar: string;
-  jenis_kebutuhan: string;
-  kategori_uang_keluar: string;
 };
 
 const AddNoteOutcome = ({navigation}: any) => {
@@ -50,69 +44,112 @@ const AddNoteOutcome = ({navigation}: any) => {
   };
 
   const [sections, setSections] = useState([
-    {price: 0, amount: 1, priceAmount: 0},
+    {
+      namaBarang: '',
+      harga: 0,
+      satuan: 1,
+      jumlahHarga: 0,
+      jenisKebutuhan: 'Kebutuhan Primer',
+      kategoriUang: 'Cash',
+    },
   ]);
 
   const addSection = () => {
-    setSections([...sections, {price: 0, amount: 1, priceAmount: 0}]);
+    setSections([
+      ...sections,
+      {
+        namaBarang: '',
+        harga: 0,
+        satuan: 1,
+        jumlahHarga: 0,
+        jenisKebutuhan: 'Kebutuhan Primer',
+        kategoriUang: 'Cash',
+      },
+    ]);
+
+    setPostData(prevData => ({
+      ...prevData,
+      catatan_pengeluaran: [
+        ...prevData.catatan_pengeluaran,
+        {
+          nama_barang: '',
+          harga_barang: 'Rp 0',
+          satuan_barang: '1',
+          nominal_uang_keluar: 'Rp 0',
+          jenis_kebutuhan: 'Kebutuhan Primer',
+          kategori_uang_keluar: 'Cash',
+        },
+      ],
+    }));
   };
 
   const removeSection = (index: number) => {
     const updatedSections = [...sections];
     updatedSections.splice(index, 1);
     setSections(updatedSections);
+
+    setPostData(prevData => ({
+      ...prevData,
+      catatan_pengeluaran: prevData.catatan_pengeluaran.filter(
+        (_, i) => i !== index,
+      ),
+    }));
   };
 
-  const calcPriceAmount = (
+  const calcJumlahHarga = (
     index: number,
-    newPrice: string,
-    newAmount: string,
+    newHarga: string,
+    newSatuan: string,
   ) => {
     const updatedSections = [...sections];
-    updatedSections[index].price = parseInt(newPrice.replace(/[^\d]/g, ''), 10);
-    updatedSections[index].amount = parseInt(
-      newAmount.replace(/[^\d]/g, ''),
+    updatedSections[index].harga = parseInt(newHarga.replace(/[^\d]/g, ''), 10);
+    updatedSections[index].satuan = parseInt(
+      newSatuan.replace(/[^\d]/g, ''),
       10,
     );
-    updatedSections[index].priceAmount =
-      updatedSections[index].price * updatedSections[index].amount;
+    updatedSections[index].jumlahHarga =
+      updatedSections[index].harga * updatedSections[index].satuan;
     setSections(updatedSections);
 
-    const newPriceValue = parseInt(newPrice.replace(/[^\d]/g, ''), 10);
-    let formattedNominal = 'Rp 0';
-    if (!isNaN(newPriceValue)) {
-      formattedNominal = new Intl.NumberFormat('id-ID', {
+    const newHargaValue = parseInt(newHarga.replace(/[^\d]/g, ''), 10);
+    const newSatuanValue = parseInt(newSatuan.replace(/[^\d]/g, ''), 10);
+
+    let jumlahHarga = newHargaValue * newSatuanValue;
+
+    let formattedJumlahHarga = 'Rp 0';
+    if (!isNaN(jumlahHarga)) {
+      formattedJumlahHarga = new Intl.NumberFormat('id-ID', {
         style: 'currency',
         currency: 'IDR',
         minimumFractionDigits: 0,
         maximumFractionDigits: 0,
-      }).format(newPriceValue);
+      }).format(jumlahHarga);
     }
 
-    const newAmountValue = parseInt(newAmount.replace(/[^\d]/g, ''), 10);
-
-    let priceAmount = newPriceValue * newAmountValue;
-    let formattedPriceAmount = 'Rp 0';
-    if (!isNaN(priceAmount)) {
-      formattedPriceAmount = new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }).format(priceAmount);
-    }
-
-    const updatedPostData = {...postData};
-    updatedPostData.harga_barang = formattedNominal;
-    updatedPostData.satuan_barang = newAmount;
-    updatedPostData.nominal_uang_keluar = formattedPriceAmount;
-    setPostData(updatedPostData);
+    setPostData(prevData => ({
+      ...prevData,
+      catatan_pengeluaran: prevData.catatan_pengeluaran.map((item, idx) =>
+        idx === index
+          ? {
+              ...item,
+              harga_barang: new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+              }).format(newHargaValue),
+              satuan_barang: newSatuan,
+              nominal_uang_keluar: formattedJumlahHarga,
+            }
+          : item,
+      ),
+    }));
   };
 
   const calculateTotal = useCallback(() => {
     let total = 0;
     sections.forEach(section => {
-      total += section.priceAmount;
+      total += section.jumlahHarga;
     });
     return total;
   }, [sections]);
@@ -137,23 +174,42 @@ const AddNoteOutcome = ({navigation}: any) => {
     }));
   }, [calculateTotal]);
 
-  const [selectedCategoryOutcome, setCategoryOutcome] = useState('Cash');
+  const handleItemName = (itemName: string, index: number) => {
+    const updatedSections = [...sections];
+    updatedSections[index].namaBarang = itemName;
+    setSections(updatedSections);
 
-  const handleCategoryOutcome = (categoryOutcome: any) => {
-    setCategoryOutcome(categoryOutcome);
     setPostData(prevData => ({
       ...prevData,
-      kategori_uang_keluar: categoryOutcome,
+      catatan_pengeluaran: prevData.catatan_pengeluaran.map((item, i) =>
+        i === index ? {...item, nama_barang: itemName} : item,
+      ),
     }));
   };
 
-  const [selectedTypeOutcome, setTypeOutcome] = useState('Kebutuhan Primer');
+  const handleCategoryOutcome = (categoryOutcome: string, index: number) => {
+    const updatedSections = [...sections];
+    updatedSections[index].kategoriUang = categoryOutcome;
+    setSections(updatedSections);
 
-  const handleTypeOutcome = (typeOutcome: any) => {
-    setTypeOutcome(typeOutcome);
     setPostData(prevData => ({
       ...prevData,
-      jenis_kebutuhan: typeOutcome,
+      catatan_pengeluaran: prevData.catatan_pengeluaran.map((item, i) =>
+        i === index ? {...item, kategori_uang_keluar: categoryOutcome} : item,
+      ),
+    }));
+  };
+
+  const handleTypeOutcome = (typeOutcome: string, index: number) => {
+    const updatedSections = [...sections];
+    updatedSections[index].jenisKebutuhan = typeOutcome;
+    setSections(updatedSections);
+
+    setPostData(prevData => ({
+      ...prevData,
+      catatan_pengeluaran: prevData.catatan_pengeluaran.map((item, i) =>
+        i === index ? {...item, jenis_kebutuhan: typeOutcome} : item,
+      ),
     }));
   };
 
@@ -195,10 +251,13 @@ const AddNoteOutcome = ({navigation}: any) => {
             <TextInput
               placeholder="Masukkan nama barang atau keperluan"
               style={styles.input_primary}
-              value={postData.nama_barang}
-              onChangeText={text =>
-                setPostData({...postData, nama_barang: text})
-              }
+              value={section.namaBarang}
+              // onChangeText={text =>
+              //   setPostData({...postData, nama_barang: text})
+              // }
+              onChangeText={text => {
+                handleItemName(text, index);
+              }}
             />
           </View>
         </Card>
@@ -209,10 +268,10 @@ const AddNoteOutcome = ({navigation}: any) => {
               <TextInput
                 style={styles.input_secondary}
                 inputMode="numeric"
+                value={formatCurrency(section.harga)}
                 onChangeText={text => {
-                  calcPriceAmount(index, text, postData.satuan_barang);
+                  calcJumlahHarga(index, text, section.satuan.toString());
                 }}
-                value={postData.harga_barang}
               />
             </View>
           </Card>
@@ -223,9 +282,9 @@ const AddNoteOutcome = ({navigation}: any) => {
                 style={[styles.input_secondary, {textAlign: 'center'}]}
                 inputMode="numeric"
                 onChangeText={text => {
-                  calcPriceAmount(index, postData.harga_barang, text);
+                  calcJumlahHarga(index, section.harga.toString(), text);
                 }}
-                value={postData.satuan_barang}
+                value={section.satuan.toString()}
               />
             </View>
           </Card>
@@ -255,8 +314,8 @@ const AddNoteOutcome = ({navigation}: any) => {
                 <View style={styles.input_category}>
                   <CheckBox
                     title="Primer"
-                    checked={selectedTypeOutcome === 'Kebutuhan Primer'}
-                    onPress={() => handleTypeOutcome('Kebutuhan Primer')}
+                    checked={section.jenisKebutuhan === 'Kebutuhan Primer'}
+                    onPress={() => handleTypeOutcome('Kebutuhan Primer', index)}
                     style={{marginVertical: 0}}
                     checkedIcon={
                       <Svg viewBox="0 0 512 512" width={20} height={20}>
@@ -276,8 +335,10 @@ const AddNoteOutcome = ({navigation}: any) => {
                 <View style={styles.input_category}>
                   <CheckBox
                     title="Sekunder"
-                    checked={selectedTypeOutcome === 'Kebutuhan Sekunder'}
-                    onPress={() => handleTypeOutcome('Kebutuhan Sekunder')}
+                    checked={section.jenisKebutuhan === 'Kebutuhan Sekunder'}
+                    onPress={() =>
+                      handleTypeOutcome('Kebutuhan Sekunder', index)
+                    }
                     style={{marginVertical: 0}}
                     checkedIcon={
                       <Svg viewBox="0 0 512 512" width={20} height={20}>
@@ -297,8 +358,10 @@ const AddNoteOutcome = ({navigation}: any) => {
                 <View style={[styles.input_category, {marginBottom: 8}]}>
                   <CheckBox
                     title="Darurat"
-                    checked={selectedTypeOutcome === 'Kebutuhan Darurat'}
-                    onPress={() => handleTypeOutcome('Kebutuhan Darurat')}
+                    checked={section.kategoriUang === 'Kebutuhan Darurat'}
+                    onPress={() =>
+                      handleTypeOutcome('Kebutuhan Darurat', index)
+                    }
                     style={{marginVertical: 0}}
                     checkedIcon={
                       <Svg viewBox="0 0 512 512" width={20} height={20}>
@@ -325,8 +388,8 @@ const AddNoteOutcome = ({navigation}: any) => {
                 <View style={{marginTop: 4}}>
                   <CheckBox
                     title="Cash"
-                    checked={selectedCategoryOutcome === 'Cash'}
-                    onPress={() => handleCategoryOutcome('Cash')}
+                    checked={section.kategoriUang === 'Cash'}
+                    onPress={() => handleCategoryOutcome('Cash', index)}
                     checkedIcon={
                       <Svg viewBox="0 0 512 512" width={20} height={20}>
                         <Path
@@ -345,8 +408,8 @@ const AddNoteOutcome = ({navigation}: any) => {
                 <View style={{marginBottom: 2}}>
                   <CheckBox
                     title="Cashless"
-                    checked={selectedCategoryOutcome === 'Cashless'}
-                    onPress={() => handleCategoryOutcome('Cashless')}
+                    checked={section.kategoriUang === 'Cashless'}
+                    onPress={() => handleCategoryOutcome('Cashless', index)}
                     checkedIcon={
                       <Svg viewBox="0 0 512 512" width={20} height={20}>
                         <Path
@@ -431,7 +494,7 @@ const AddNoteOutcome = ({navigation}: any) => {
               placeholder="Jumlah Harga"
               style={[styles.input_primary, {textAlign: 'center'}]}
               readOnly={true}
-              value={postData.nominal_uang_keluar}
+              value={formatCurrency(section.jumlahHarga)}
             />
           </View>
         </Card>
@@ -446,12 +509,16 @@ const AddNoteOutcome = ({navigation}: any) => {
     deskripsi: '',
     kategori: 'Catatan Pengeluaran',
     total_uang_keluar: 'Rp 0',
-    nama_barang: '',
-    harga_barang: 'Rp 0',
-    satuan_barang: '1',
-    nominal_uang_keluar: 'Rp 0',
-    jenis_kebutuhan: 'Kebutuhan Primer',
-    kategori_uang_keluar: 'Cash',
+    catatan_pengeluaran: [
+      {
+        nama_barang: '',
+        harga_barang: 'Rp 0',
+        satuan_barang: '1',
+        nominal_uang_keluar: 'Rp 0',
+        jenis_kebutuhan: 'Kebutuhan Primer',
+        kategori_uang_keluar: 'Cash',
+      },
+    ],
   });
 
   console.log(postData);

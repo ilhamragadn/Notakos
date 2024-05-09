@@ -4,6 +4,7 @@ import axios from 'axios';
 import React, {useEffect, useState} from 'react';
 import {
   ActivityIndicator,
+  Alert,
   Modal,
   SafeAreaView,
   ScrollView,
@@ -32,13 +33,14 @@ type DataCatatan = {
 };
 
 type CatatanPengeluaran = {
-  catatan_id: number;
+  id: number;
   nama_barang: string;
   harga_barang: number;
   satuan_barang: number;
-  nominal_uang_keluar: number;
   jenis_kebutuhan: string;
   kategori_uang_keluar: string;
+  nominal_uang_keluar: number;
+  created_at: string;
 };
 
 const DetailNoteOutcome = ({navigation, route}: any) => {
@@ -52,41 +54,19 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
   const [isInfoType, setIsInfoType] = useState(false);
 
   const [data, setData] = useState<DataCatatan>();
-  const [selectedCategory, setSelectedCategory] = useState('Cash');
-  const [selectedTypeOutcome, setSelectedTypeOutcome] =
-    useState('Kebutuhan Primer');
+
+  const urlBase = 'http://192.168.43.129:8000/api/';
+  const urlKey = 'catatan/';
   const {itemId} = route.params;
 
   useEffect(() => {
     axios
-      .get('http://192.168.43.129:8000/api/catatan/' + `${itemId}`)
+      .get(urlBase + urlKey + `${itemId}`)
       .then(res => {
         if (res.data.success) {
           const catatanData = res.data.data;
           setData(catatanData);
-
-          if (catatanData.catatan_pengeluaran) {
-            const isCash = catatanData.catatan_pengeluaran.some(
-              (item: any) => item.kategori_uang_keluar === 'Cash',
-            );
-            setSelectedCategory(isCash ? 'Cash' : 'Cashless');
-
-            const isTypeOutcomePrimer = catatanData.catatan_pengeluaran.some(
-              (item: any) => item.jenis_kebutuhan === 'Kebutuhan Primer',
-            );
-
-            const isTypeOutcomeSekunder = catatanData.catatan_pengeluaran.some(
-              (item: any) => item.jenis_kebutuhan === 'Kebutuhan Sekunder',
-            );
-
-            if (isTypeOutcomePrimer) {
-              setSelectedTypeOutcome('Kebutuhan Primer');
-            } else if (isTypeOutcomeSekunder) {
-              setSelectedTypeOutcome('Kebutuhan Sekunder');
-            } else {
-              setSelectedTypeOutcome('Kebutuhan Darurat');
-            }
-          }
+          // console.log(catatanData);
         } else {
           console.error('Failed to fetch data: ', res.data.message);
         }
@@ -103,6 +83,23 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     });
+  };
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleDeleteData = async (id: any) => {
+    try {
+      setIsLoading(true);
+      const response = await axios.delete(urlBase + urlKey + `${id}`);
+      setIsLoading(false);
+      Alert.alert('Berhasil', 'Catatan telah dihapus!');
+      navigation.navigate('Home');
+      console.log(response.data);
+    } catch (error) {
+      setIsLoading(false);
+      Alert.alert('Gagal', 'Catatan gagal dihapus!');
+      console.error(error);
+    }
   };
 
   return (
@@ -138,7 +135,7 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
             </Card>
             <LineBreak />
             {data.catatan_pengeluaran.map(item => (
-              <View key={item.catatan_id}>
+              <View key={item.id}>
                 <Card>
                   <View style={styles.box}>
                     <Text style={styles.label}>Nama Barang/Keperluan</Text>
@@ -203,7 +200,9 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
                           <CheckBox
                             title="Primer"
                             style={{marginVertical: 0}}
-                            checked={selectedTypeOutcome === 'Kebutuhan Primer'}
+                            checked={
+                              item.jenis_kebutuhan === 'Kebutuhan Primer'
+                            }
                             checkedIcon={
                               <Svg viewBox="0 0 512 512" width={20} height={20}>
                                 <Path
@@ -224,7 +223,7 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
                             title="Sekunder"
                             style={{marginVertical: 0}}
                             checked={
-                              selectedTypeOutcome === 'Kebutuhan Sekunder'
+                              item.jenis_kebutuhan === 'Kebutuhan Sekunder'
                             }
                             checkedIcon={
                               <Svg viewBox="0 0 512 512" width={20} height={20}>
@@ -247,7 +246,7 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
                             title="Darurat"
                             style={{marginVertical: 0}}
                             checked={
-                              selectedTypeOutcome === 'Kebutuhan Darurat'
+                              item.jenis_kebutuhan === 'Kebutuhan Darurat'
                             }
                             checkedIcon={
                               <Svg viewBox="0 0 512 512" width={20} height={20}>
@@ -274,7 +273,7 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
                         <View style={{marginTop: 4}}>
                           <CheckBox
                             title="Cash"
-                            checked={selectedCategory === 'Cash'}
+                            checked={item.kategori_uang_keluar === 'Cash'}
                             checkedIcon={
                               <Svg viewBox="0 0 512 512" width={20} height={20}>
                                 <Path
@@ -293,7 +292,7 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
                         <View style={{marginBottom: 2}}>
                           <CheckBox
                             title="Cashless"
-                            checked={selectedCategory === 'Cashless'}
+                            checked={item.kategori_uang_keluar === 'Cashless'}
                             checkedIcon={
                               <Svg viewBox="0 0 512 512" width={20} height={20}>
                                 <Path
@@ -401,22 +400,20 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
                 </View>
               </View>
             </Card>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                marginHorizontal: 8,
-              }}>
-              <BackButton />
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <TouchableOpacity>
-                  <DeleteButton />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => navigation.navigate('EditNoteOutcome')}>
-                  <EditButton />
-                </TouchableOpacity>
+
+            <View style={{flexDirection: 'row', marginTop: 8}}>
+              <View style={{flex: 1}}>
+                <DeleteButton
+                  onPress={() => handleDeleteData(itemId)}
+                  disabled={isLoading}
+                />
               </View>
+              <View style={{flex: 1}}>
+                <EditButton />
+              </View>
+            </View>
+            <View style={{flex: 1}}>
+              <BackButton />
             </View>
           </View>
         ) : (

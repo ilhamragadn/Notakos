@@ -4,6 +4,7 @@ import axios from 'axios';
 import React, {useEffect, useState} from 'react';
 import {
   ActivityIndicator,
+  Alert,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -44,6 +45,31 @@ const DetailNoteIncome = ({navigation, route}: any) => {
     flex: 1,
   };
 
+  const [data, setData] = useState<DataCatatan>();
+
+  const urlBase = 'http://192.168.43.129:8000/api/';
+  const urlKey = 'catatan/';
+  const {itemId} = route.params;
+  console.log(itemId);
+
+  useEffect(() => {
+    const fetchDatabyID = async () => {
+      try {
+        const res = await axios.get(urlBase + urlKey + `${itemId}`);
+        if (res.data.success) {
+          const dataCatatan = res.data.data;
+          setData(dataCatatan);
+          // console.log(dataCatatan);
+        } else {
+          console.error('Failed to fetch data: ', res.data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching data: ', error);
+      }
+    };
+    fetchDatabyID();
+  }, [itemId]);
+
   const formatCurrency = (amount: number) => {
     return amount.toLocaleString('id-ID', {
       style: 'currency',
@@ -53,25 +79,22 @@ const DetailNoteIncome = ({navigation, route}: any) => {
     });
   };
 
-  const {itemId} = route.params;
-  const [data, setData] = useState<DataCatatan>();
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    axios
-      .get('http://192.168.43.129:8000/api/catatan/' + `${itemId}`)
-      .then(res => {
-        if (res.data.success) {
-          const catatanData = res.data.data;
-          setData(catatanData);
-          // console.log(catatanData);
-        } else {
-          console.error('Failed to fetch data: ', res.data.message);
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching data: ', error);
-      });
-  }, [itemId]);
+  const handleDeleteData = async (id: any) => {
+    try {
+      setIsLoading(true);
+      const response = await axios.delete(urlBase + urlKey + `${id}`);
+      setIsLoading(false);
+      Alert.alert('Berhasil', 'Catatan telah dihapus!');
+      navigation.navigate('Home');
+      console.log(response.data);
+    } catch (error) {
+      setIsLoading(false);
+      Alert.alert('Gagal', 'Catatan gagal dihapus!');
+      console.error(error);
+    }
+  };
 
   return (
     <SafeAreaView style={backgroundStyle}>
@@ -199,27 +222,13 @@ const DetailNoteIncome = ({navigation, route}: any) => {
                 </View>
               </View>
             </Card>
-            {/* <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                marginHorizontal: 8,
-              }}>
-              <BackButton />
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <TouchableOpacity>
-                  <DeleteButton />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => navigation.navigate('EditNoteIncome')}>
-                  <EditButton />
-                </TouchableOpacity>
-              </View>
-            </View> */}
 
             <View style={{flexDirection: 'row', marginTop: 8}}>
               <View style={{flex: 1}}>
-                <DeleteButton />
+                <DeleteButton
+                  onPress={() => handleDeleteData(itemId)}
+                  disabled={isLoading}
+                />
               </View>
               <View style={{flex: 1}}>
                 <EditButton />

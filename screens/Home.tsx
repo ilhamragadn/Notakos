@@ -47,16 +47,16 @@ const Home = ({navigation}: any) => {
           dataCatatan.forEach((item: any) => {
             item.catatan_pemasukan.forEach((pemasukan: any) => {
               if (pemasukan.kategori_uang_masuk === 'Cash') {
-                cash += item.total_uang_masuk;
+                cash += pemasukan.nominal_uang_masuk;
               } else {
-                cashless += item.total_uang_masuk;
+                cashless += pemasukan.nominal_uang_masuk;
               }
             });
             item.catatan_pengeluaran.forEach((pengeluaran: any) => {
               if (pengeluaran.kategori_uang_keluar === 'Cash') {
-                cash -= item.total_uang_keluar;
+                cash -= pengeluaran.nominal_uang_keluar;
               } else {
-                cashless -= item.total_uang_keluar;
+                cashless -= pengeluaran.nominal_uang_keluar;
               }
             });
           });

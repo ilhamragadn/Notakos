@@ -17,11 +17,12 @@ export type ListItems = {
 const List = ({navigation}: any) => {
   const [data, setData] = useState<ListItems>();
 
+  const urlBase = 'http://192.168.43.129:8000/api/';
+  const urlKey = 'catatan/';
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const urlBase = 'http://192.168.43.129:8000/api/';
-        const urlKey = 'catatan/';
         const res = await axios.get(urlBase + urlKey);
         if (res.data.success) {
           const dataCatatan = res.data.data;

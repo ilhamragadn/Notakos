@@ -1,11 +1,14 @@
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity} from 'react-native';
 
-const DeleteButton = () => {
+const DeleteButton = ({onPress, disabled}: any) => {
   return (
-    <View style={styles.deleteButton}>
+    <TouchableOpacity
+      style={styles.deleteButton}
+      onPress={onPress}
+      disabled={disabled}>
       <Text style={styles.buttonText}>Hapus</Text>
-    </View>
+    </TouchableOpacity>
   );
 };
 

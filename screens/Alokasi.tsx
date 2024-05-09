@@ -14,17 +14,18 @@ import {
   useColorScheme,
 } from 'react-native';
 import {PieChart} from 'react-native-gifted-charts';
+import * as Progress from 'react-native-progress';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {BottomNavbar} from '../components/BottomNavbar';
 import {Card} from '../components/Card';
 import LineBreak from '../components/LineBreak';
 import SubmitButton from '../components/SubmitButton';
 
-const topLabelComponent = () => (
-  <Text style={{color: '#0D6EFD', marginBottom: 6, fontSize: 6}}>
-    Rp 500.000
-  </Text>
-);
+// const topLabelComponent = () => (
+//   <Text style={{color: '#0D6EFD', marginBottom: 6, fontSize: 6}}>
+//     Rp 500.000
+//   </Text>
+// );
 
 const Alokasi = ({navigation}: any) => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -42,7 +43,7 @@ const Alokasi = ({navigation}: any) => {
   const [emergencyAllocation, setEmergencyAllocation] = useState(0);
   const [totalPercentageError, setTotalPercentageError] = useState(false);
 
-  // const [saldo, setSaldo] = useState(0);
+  const [saldo, setSaldo] = useState(0);
 
   const [primaryUsed, setPrimaryUsed] = useState(0);
   const [secondaryUsed, setSecondaryUsed] = useState(0);
@@ -93,24 +94,24 @@ const Alokasi = ({navigation}: any) => {
 
           dataCatatan.forEach((item: any) => {
             saldoVal += item.total_uang_masuk;
-            // saldoVal -= item.total_uang_keluar;
+            saldoVal -= item.total_uang_keluar;
 
             item.catatan_pengeluaran.forEach((pengeluaran: any) => {
               // console.log(pengeluaran);
               if (pengeluaran.jenis_kebutuhan === 'Kebutuhan Primer') {
-                primerTerpakai += item.total_uang_keluar;
+                primerTerpakai += pengeluaran.nominal_uang_keluar;
                 sisaPrimer = primaryAllocation - primerTerpakai;
               } else if (pengeluaran.jenis_kebutuhan === 'Kebutuhan Sekunder') {
-                sekunderTerpakai += item.total_uang_keluar;
+                sekunderTerpakai += pengeluaran.nominal_uang_keluar;
                 sisaSekunder = secondaryAllocation - sekunderTerpakai;
               } else if (pengeluaran.jenis_kebutuhan === 'Kebutuhan Darurat') {
-                daruratTerpakai += item.total_uang_keluar;
+                daruratTerpakai += pengeluaran.nominal_uang_keluar;
                 sisaDarurat = emergencyAllocation - daruratTerpakai;
               }
             });
           });
 
-          // setSaldo(saldoVal);
+          setSaldo(saldoVal);
 
           setPrimaryUsed(primerTerpakai);
           setRemainingPrimary(sisaPrimer);
@@ -197,25 +198,39 @@ const Alokasi = ({navigation}: any) => {
     loadValue();
   }, []);
 
-  const data = [
-    {value: 20, label: 'Sen'},
-    {value: 30, label: 'Sel'},
-    {
-      value: 50,
-      label: 'Rabu',
-      topLabelComponent: topLabelComponent,
-    },
-    {value: 40, label: 'Kam'},
-    {value: 30, label: 'Jum'},
-    {value: 25, label: 'Sab'},
-    {value: 30, label: 'Min'},
-  ];
+  let primerTakTerpakai = remainingPrimary / primaryAllocation;
+  let sekunderTakTerpakai = remainingSecondary / secondaryAllocation;
+  let daruratTakTerpakai = remainingEmergency / emergencyAllocation;
 
-  const pieData = [
-    {value: 20, color: '#5FAC84'},
-    {value: 30, color: '#AC845F'},
-    {value: 50, color: '#845FAC'},
-  ];
+  // if (!isNaN(sekunderTakTerpakai) && sekunderTakTerpakai > 0) {
+  //   console.log('sekunderTakTerpakai');
+  // } else if (isNaN(sekunderTakTerpakai)) {
+  //   console.log(0);
+  // } else {
+  //   console.log(10);
+  // }
+
+  // console.log(sekunderTakTerpakai);
+
+  // const data = [
+  //   {value: 20, label: 'Sen'},
+  //   {value: 30, label: 'Sel'},
+  //   {
+  //     value: 50,
+  //     label: 'Rabu',
+  //     topLabelComponent: topLabelComponent,
+  //   },
+  //   {value: 40, label: 'Kam'},
+  //   {value: 30, label: 'Jum'},
+  //   {value: 25, label: 'Sab'},
+  //   {value: 30, label: 'Min'},
+  // ];
+
+  // const pieData = [
+  //   {value: 20, color: '#5FAC84'},
+  //   {value: 30, color: '#AC845F'},
+  //   {value: 50, color: '#845FAC'},
+  // ];
 
   return (
     <SafeAreaView style={backgroundStyle}>
@@ -297,6 +312,29 @@ const Alokasi = ({navigation}: any) => {
             </View>
           </View>
         </Card> */}
+
+        <Card>
+          <View
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginVertical: 8,
+            }}>
+            <Text style={{fontSize: 18, fontWeight: 'bold'}}>
+              Total Saldo:{' '}
+              {saldo.toLocaleString('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+              })}
+            </Text>
+          </View>
+        </Card>
+
+        <View style={{marginVertical: 8}}>
+          <LineBreak />
+        </View>
 
         <Card>
           <View
@@ -495,18 +533,21 @@ const Alokasi = ({navigation}: any) => {
               <View
                 style={{
                   flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  alignItems: 'flex-start',
                 }}>
-                <Text style={{fontWeight: 'bold'}}>Alokasi Primer:</Text>
+                <Text style={{fontWeight: 'bold', marginLeft: 6}}>
+                  Alokasi Primer:
+                </Text>
               </View>
+
               <View
                 style={{
                   flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
+                  justifyContent: 'flex-end',
+                  alignItems: 'flex-end',
                 }}>
-                <Text style={{fontWeight: 'bold'}}>
+                <Text style={{fontWeight: 'bold', marginRight: 6}}>
                   {isNaN(primaryAllocation)
                     ? 'Rp 0'
                     : primaryAllocation.toLocaleString('id-ID', {
@@ -518,49 +559,43 @@ const Alokasi = ({navigation}: any) => {
                 </Text>
               </View>
             </View>
-            <View style={{flexDirection: 'row', marginVertical: 6}}>
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <Text style={{fontWeight: 'bold'}}>Terpakai:</Text>
-              </View>
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <Text style={{fontWeight: 'bold'}}>
-                  {isNaN(primaryUsed) || primaryUsed < 0
-                    ? 'Rp 0'
-                    : primaryUsed.toLocaleString('id-ID', {
-                        style: 'currency',
-                        currency: 'IDR',
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0,
-                      })}
-                </Text>
-              </View>
+
+            <View
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginVertical: 2,
+              }}>
+              <Progress.Bar
+                progress={
+                  !isNaN(primerTakTerpakai) && primerTakTerpakai > 0
+                    ? primerTakTerpakai
+                    : isNaN(primerTakTerpakai)
+                    ? 0
+                    : 10
+                }
+                width={320}
+                color="#845FAC"
+                unfilledColor="#e9ecef"
+              />
             </View>
+
             <View style={{flexDirection: 'row', marginVertical: 6}}>
               <View
                 style={{
                   flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  alignItems: 'flex-start',
                 }}>
-                <Text style={{fontWeight: 'bold'}}>Sisa:</Text>
+                <Text style={{fontWeight: 'bold', marginLeft: 6}}>Rp 0</Text>
               </View>
               <View
                 style={{
                   flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
+                  justifyContent: 'flex-end',
+                  alignItems: 'flex-end',
                 }}>
-                <Text style={{fontWeight: 'bold'}}>
+                <Text style={{fontWeight: 'bold', marginRight: 6}}>
                   {isNaN(remainingPrimary)
                     ? 'Rp 0'
                     : primaryUsed === 0
@@ -615,18 +650,20 @@ const Alokasi = ({navigation}: any) => {
               <View
                 style={{
                   flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  alignItems: 'flex-start',
                 }}>
-                <Text style={{fontWeight: 'bold'}}>Alokasi Sekunder:</Text>
+                <Text style={{fontWeight: 'bold', marginLeft: 6}}>
+                  Alokasi Sekunder:
+                </Text>
               </View>
               <View
                 style={{
                   flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
+                  justifyContent: 'flex-end',
+                  alignItems: 'flex-end',
                 }}>
-                <Text style={{fontWeight: 'bold'}}>
+                <Text style={{fontWeight: 'bold', marginRight: 6}}>
                   {isNaN(secondaryAllocation)
                     ? 'Rp 0'
                     : secondaryAllocation.toLocaleString('id-ID', {
@@ -638,49 +675,43 @@ const Alokasi = ({navigation}: any) => {
                 </Text>
               </View>
             </View>
-            <View style={{flexDirection: 'row', marginVertical: 6}}>
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <Text style={{fontWeight: 'bold'}}>Terpakai:</Text>
-              </View>
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <Text style={{fontWeight: 'bold'}}>
-                  {isNaN(secondaryUsed) || secondaryUsed < 0
-                    ? 'Rp 0'
-                    : secondaryUsed.toLocaleString('id-ID', {
-                        style: 'currency',
-                        currency: 'IDR',
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0,
-                      })}
-                </Text>
-              </View>
+
+            <View
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginVertical: 2,
+              }}>
+              <Progress.Bar
+                progress={
+                  !isNaN(sekunderTakTerpakai) && sekunderTakTerpakai > 0
+                    ? sekunderTakTerpakai
+                    : isNaN(sekunderTakTerpakai)
+                    ? 0
+                    : 10
+                }
+                width={320}
+                color="#AC845F"
+                unfilledColor="#e9ecef"
+              />
             </View>
+
             <View style={{flexDirection: 'row', marginVertical: 6}}>
               <View
                 style={{
                   flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  alignItems: 'flex-start',
                 }}>
-                <Text style={{fontWeight: 'bold'}}>Sisa:</Text>
+                <Text style={{fontWeight: 'bold', marginLeft: 6}}>Rp 0</Text>
               </View>
               <View
                 style={{
                   flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
+                  justifyContent: 'flex-end',
+                  alignItems: 'flex-end',
                 }}>
-                <Text style={{fontWeight: 'bold'}}>
+                <Text style={{fontWeight: 'bold', marginRight: 6}}>
                   {isNaN(remainingSecondary) || remainingSecondary < 0
                     ? 'Rp 0'
                     : secondaryUsed === 0
@@ -729,18 +760,20 @@ const Alokasi = ({navigation}: any) => {
               <View
                 style={{
                   flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  alignItems: 'flex-start',
                 }}>
-                <Text style={{fontWeight: 'bold'}}>Alokasi Darurat:</Text>
+                <Text style={{fontWeight: 'bold', marginLeft: 6}}>
+                  Alokasi Darurat:
+                </Text>
               </View>
               <View
                 style={{
                   flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
+                  justifyContent: 'flex-end',
+                  alignItems: 'flex-end',
                 }}>
-                <Text style={{fontWeight: 'bold'}}>
+                <Text style={{fontWeight: 'bold', marginRight: 6}}>
                   {isNaN(emergencyAllocation)
                     ? 'Rp 0'
                     : emergencyAllocation.toLocaleString('id-ID', {
@@ -752,52 +785,46 @@ const Alokasi = ({navigation}: any) => {
                 </Text>
               </View>
             </View>
-            <View style={{flexDirection: 'row', marginVertical: 6}}>
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <Text style={{fontWeight: 'bold'}}>Terpakai:</Text>
-              </View>
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <Text style={{fontWeight: 'bold'}}>
-                  {isNaN(emergencyUsed) || emergencyUsed < 0
-                    ? 'Rp 0'
-                    : emergencyUsed.toLocaleString('id-ID', {
-                        style: 'currency',
-                        currency: 'IDR',
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0,
-                      })}
-                </Text>
-              </View>
+
+            <View
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginVertical: 2,
+              }}>
+              <Progress.Bar
+                progress={
+                  !isNaN(daruratTakTerpakai) && daruratTakTerpakai > 0
+                    ? daruratTakTerpakai
+                    : isNaN(daruratTakTerpakai)
+                    ? 0
+                    : 10
+                }
+                width={320}
+                color="#5FAC84"
+                unfilledColor="#e9ecef"
+              />
             </View>
+
             <View style={{flexDirection: 'row', marginVertical: 6}}>
               <View
                 style={{
                   flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  alignItems: 'flex-start',
                 }}>
-                <Text style={{fontWeight: 'bold'}}>Sisa:</Text>
+                <Text style={{fontWeight: 'bold', marginLeft: 6}}>Rp 0</Text>
               </View>
               <View
                 style={{
                   flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
+                  justifyContent: 'flex-end',
+                  alignItems: 'flex-end',
                 }}>
-                <Text style={{fontWeight: 'bold'}}>
+                <Text style={{fontWeight: 'bold', marginRight: 6}}>
                   {isNaN(remainingEmergency) || remainingEmergency < 0
                     ? 'Rp 0'
-                    : remainingEmergency === 0
+                    : emergencyUsed === 0
                     ? emergencyAllocation.toLocaleString('id-ID', {
                         style: 'currency',
                         currency: 'IDR',
