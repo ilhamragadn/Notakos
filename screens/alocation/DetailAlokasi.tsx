@@ -55,7 +55,7 @@ const DetailAlokasi = () => {
     // sekunder
     {value: parseSekunder || 0, color: '#AC845F'},
     // primer
-    {value: parsePrimer || 0, color: '#845FAC'},
+    {value: parsePrimer || 0, color: '#0284C7'},
   ];
 
   const handleTotalPercentage = (value: string, setStateFunction: any) => {
@@ -196,14 +196,14 @@ const DetailAlokasi = () => {
       <StatusBar
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={
-          isDarkMode ? backgroundStyle.backgroundColor : '#845FAC'
+          isDarkMode ? backgroundStyle.backgroundColor : '#0284C7'
         }
       />
       <View
         style={[
           isDarkMode
             ? [backgroundStyle.backgroundColor, styles.boxPath]
-            : [{backgroundColor: '#845FAC'}, styles.boxPath],
+            : [{backgroundColor: '#0284C7'}, styles.boxPath],
         ]}>
         <Text style={styles.textPath}>Detail Alokasi Keuangan</Text>
       </View>
@@ -261,10 +261,10 @@ const DetailAlokasi = () => {
                         width: 18,
                         marginRight: 6,
                         borderRadius: 4,
-                        backgroundColor: '#845FAC',
+                        backgroundColor: '#0284C7',
                       }}
                     />
-                    <Text style={{color: '#845FAC', fontWeight: 'bold'}}>
+                    <Text style={{color: '#0284C7', fontWeight: 'bold'}}>
                       Primer
                     </Text>
                     <View
@@ -278,7 +278,7 @@ const DetailAlokasi = () => {
                           width: 40,
                           borderWidth: 2,
                           borderRadius: 10,
-                          borderColor: '#845FAC',
+                          borderColor: '#0284C7',
                           textAlign: 'center',
                         }}
                         value={primaryValue}
@@ -414,10 +414,10 @@ const DetailAlokasi = () => {
                   width: 18,
                   marginRight: 6,
                   borderRadius: 4,
-                  backgroundColor: '#845FAC',
+                  backgroundColor: '#0284C7',
                 }}
               />
-              <Text style={{color: '#845FAC', fontWeight: 'bold'}}>Primer</Text>
+              <Text style={{color: '#0284C7', fontWeight: 'bold'}}>Primer</Text>
             </View>
             <View style={{margin: 6}}>
               <View style={{flexDirection: 'row', marginVertical: 6}}>
@@ -777,10 +777,10 @@ const DetailAlokasi = () => {
                           width: 18,
                           marginRight: 6,
                           borderRadius: 4,
-                          backgroundColor: '#845FAC',
+                          backgroundColor: '#0284C7',
                         }}
                       />
-                      <Text style={{color: '#845FAC', fontWeight: 'bold'}}>
+                      <Text style={{color: '#0284C7', fontWeight: 'bold'}}>
                         Primer
                       </Text>
                     </View>
@@ -1148,7 +1148,7 @@ const DetailAlokasi = () => {
 
 const styles = StyleSheet.create({
   boxPath: {
-    shadowColor: '#845FAC',
+    shadowColor: '#0284C7',
     shadowOpacity: 0.25,
     shadowOffset: {width: 0, height: 10},
     shadowRadius: 4,
@@ -1169,7 +1169,7 @@ const styles = StyleSheet.create({
     margin: 5,
     padding: 10,
     borderWidth: 2,
-    borderColor: '#845FAC',
+    borderColor: '#0284C7',
     borderRadius: 10,
     // borderBottomLeftRadius: 10,
     // borderBottomRightRadius: 10,

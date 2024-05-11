@@ -9,6 +9,7 @@ import {
   View,
   useColorScheme,
 } from 'react-native';
+import {Path, Svg} from 'react-native-svg';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {BottomNavbar} from '../components/BottomNavbar';
 import {Card} from '../components/Card';
@@ -25,21 +26,332 @@ const Profil = ({navigation}: any) => {
       <StatusBar
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={
-          isDarkMode ? backgroundStyle.backgroundColor : '#845FAC'
+          isDarkMode ? backgroundStyle.backgroundColor : '#0284C7'
         }
       />
       <View
         style={[
           isDarkMode
-            ? [backgroundStyle.backgroundColor, styles.boxLogo]
-            : [{backgroundColor: '#845FAC'}, styles.boxLogo],
+            ? [backgroundStyle.backgroundColor, styles.boxPath]
+            : [{backgroundColor: '#0284C7'}, styles.boxPath],
         ]}>
-        <Text style={{fontSize: 18, color: 'white', padding: 30}}>NOTAKOS</Text>
+        <Text
+          style={[
+            {flex: 1},
+            styles.textPath,
+            isDarkMode ? {color: '#0284C7'} : {color: '#ffffff'},
+          ]}>
+          Profil
+        </Text>
+
+        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+          <View
+            style={[
+              isDarkMode
+                ? {backgroundColor: '#0284C7'}
+                : {backgroundColor: '#FFFFFF'},
+              {
+                margin: 20,
+                paddingHorizontal: 12,
+                paddingVertical: 6,
+                borderRadius: 9999,
+              },
+            ]}>
+            <Text
+              style={{
+                marginHorizontal: 8,
+                fontWeight: 'bold',
+                color: '#DC2626',
+              }}>
+              Keluar
+            </Text>
+            {/* <Svg
+              fill="none"
+              viewBox="0 0 24 24"
+              width={24}
+              height={24}
+              strokeWidth={1.8}
+              stroke="#FFFFFF">
+              <Path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"
+              />
+            </Svg> */}
+          </View>
+        </View>
       </View>
-      <ScrollView style={{flex: 1}}>
-        <View>
+      <ScrollView>
+        <View style={styles.container}>
+          <View style={[styles.box, {marginBottom: 8}]}>
+            <View
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <Svg viewBox="0 0 24 24" width={100} height={100} fill="#0284C7">
+                <Path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
+                />
+              </Svg>
+            </View>
+
+            <View
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <Text
+                style={{
+                  textTransform: 'capitalize',
+                  fontSize: 18,
+                  fontWeight: 'bold',
+                }}>
+                ilham raga danu nayoko
+              </Text>
+            </View>
+            <View
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                paddingVertical: 2,
+              }}>
+              <Text style={{fontStyle: 'italic'}}>usernotakos@gmail.com</Text>
+            </View>
+          </View>
+
+          <View style={{marginHorizontal: 0}}>
+            <Card>
+              <View style={[styles.box, {flexDirection: 'row'}]}>
+                <View
+                  style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <View
+                    style={{
+                      margin: 2,
+                      padding: 8,
+                      borderRadius: 9999,
+                      backgroundColor: '#DC2626',
+                    }}>
+                    <Svg
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      width={22}
+                      height={22}
+                      strokeWidth={2}
+                      stroke="#FFFFFF">
+                      <Path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18"
+                      />
+                    </Svg>
+                  </View>
+                </View>
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginRight: 0.5,
+                    borderRightWidth: 0.5,
+                  }}>
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      borderBottomWidth: 0.5,
+                    }}>
+                    <Text
+                      style={{
+                        fontWeight: 'bold',
+                      }}>
+                      Total Pengeluaran
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontSize: 12}}>Nominal Uang Keluar</Text>
+                  </View>
+                </View>
+
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginLeft: 0.5,
+                    borderLeftWidth: 0.5,
+                  }}>
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      borderBottomWidth: 0.5,
+                    }}>
+                    <Text
+                      style={{
+                        fontWeight: 'bold',
+                      }}>
+                      Total Pemasukan
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{fontSize: 12}}>Nominal Uang Masuk</Text>
+                  </View>
+                </View>
+                <View
+                  style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <View
+                    style={{
+                      margin: 2,
+                      padding: 8,
+                      borderRadius: 9999,
+                      backgroundColor: '#16A34A',
+                    }}>
+                    <Svg
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      width={22}
+                      height={22}
+                      strokeWidth={2}
+                      stroke="#FFFFFF">
+                      <Path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"
+                      />
+                    </Svg>
+                  </View>
+                </View>
+              </View>
+            </Card>
+          </View>
+
           <Card>
-            <Text>Profil Screen</Text>
+            <View style={[styles.box, {flexDirection: 'row'}]}>
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  paddingVertical: 2,
+                }}>
+                <Svg
+                  viewBox="0 0 640 512"
+                  width={30}
+                  height={30}
+                  fill="#0284C7">
+                  <Path d="M224 0a128 128 0 1 1 0 256A128 128 0 1 1 224 0zM178.3 304h91.4c11.8 0 23.4 1.2 34.5 3.3c-2.1 18.5 7.4 35.6 21.8 44.8c-16.6 10.6-26.7 31.6-20 53.3c4 12.9 9.4 25.5 16.4 37.6s15.2 23.1 24.4 33c15.7 16.9 39.6 18.4 57.2 8.7v.9c0 9.2 2.7 18.5 7.9 26.3H29.7C13.3 512 0 498.7 0 482.3C0 383.8 79.8 304 178.3 304zM436 218.2c0-7 4.5-13.3 11.3-14.8c10.5-2.4 21.5-3.7 32.7-3.7s22.2 1.3 32.7 3.7c6.8 1.5 11.3 7.8 11.3 14.8v17.7c0 7.8 4.8 14.8 11.6 18.7c6.8 3.9 15.1 4.5 21.8 .6l13.8-7.9c6.1-3.5 13.7-2.7 18.5 2.4c7.6 8.1 14.3 17.2 20.1 27.2s10.3 20.4 13.5 31c2.1 6.7-1.1 13.7-7.2 17.2l-14.4 8.3c-6.5 3.7-10 10.9-10 18.4s3.5 14.7 10 18.4l14.4 8.3c6.1 3.5 9.2 10.5 7.2 17.2c-3.3 10.6-7.8 21-13.5 31s-12.5 19.1-20.1 27.2c-4.8 5.1-12.5 5.9-18.5 2.4l-13.8-7.9c-6.7-3.9-15.1-3.3-21.8 .6c-6.8 3.9-11.6 10.9-11.6 18.7v17.7c0 7-4.5 13.3-11.3 14.8c-10.5 2.4-21.5 3.7-32.7 3.7s-22.2-1.3-32.7-3.7c-6.8-1.5-11.3-7.8-11.3-14.8V467.8c0-7.9-4.9-14.9-11.7-18.9c-6.8-3.9-15.2-4.5-22-.6l-13.5 7.8c-6.1 3.5-13.7 2.7-18.5-2.4c-7.6-8.1-14.3-17.2-20.1-27.2s-10.3-20.4-13.5-31c-2.1-6.7 1.1-13.7 7.2-17.2l14-8.1c6.5-3.8 10.1-11.1 10.1-18.6s-3.5-14.8-10.1-18.6l-14-8.1c-6.1-3.5-9.2-10.5-7.2-17.2c3.3-10.6 7.7-21 13.5-31s12.5-19.1 20.1-27.2c4.8-5.1 12.4-5.9 18.5-2.4l13.6 7.8c6.8 3.9 15.2 3.3 22-.6c6.9-3.9 11.7-11 11.7-18.9V218.2zm92.1 133.5a48.1 48.1 0 1 0 -96.1 0 48.1 48.1 0 1 0 96.1 0z" />
+                </Svg>
+              </View>
+              <View
+                style={{
+                  flex: 6,
+                  justifyContent: 'center',
+                  alignItems: 'flex-start',
+                  marginHorizontal: 6,
+                  paddingHorizontal: 6,
+                }}>
+                <View>
+                  <Text style={{fontSize: 16, fontWeight: 'bold'}}>
+                    Pengaturan Profil
+                  </Text>
+                </View>
+              </View>
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Svg
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  width={24}
+                  height={24}
+                  strokeWidth={2}
+                  stroke="#000000">
+                  <Path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                  />
+                </Svg>
+              </View>
+            </View>
+          </Card>
+
+          <Card>
+            <View style={[styles.box, {flexDirection: 'row'}]}>
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  paddingVertical: 2,
+                }}>
+                <Svg fill="#0284C7" viewBox="0 0 24 24" width={30} height={30}>
+                  <Path
+                    fillRule="evenodd"
+                    clipRule="evenodd"
+                    d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm11.378-3.917c-.89-.777-2.366-.777-3.255 0a.75.75 0 0 1-.988-1.129c1.454-1.272 3.776-1.272 5.23 0 1.513 1.324 1.513 3.518 0 4.842a3.75 3.75 0 0 1-.837.552c-.676.328-1.028.774-1.028 1.152v.75a.75.75 0 0 1-1.5 0v-.75c0-1.279 1.06-2.107 1.875-2.502.182-.088.351-.199.503-.331.83-.727.83-1.857 0-2.584ZM12 18a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z"
+                  />
+                </Svg>
+              </View>
+              <View
+                style={{
+                  flex: 6,
+                  justifyContent: 'center',
+                  alignItems: 'flex-start',
+                  marginHorizontal: 6,
+                  paddingHorizontal: 6,
+                }}>
+                <View>
+                  <Text style={{fontSize: 16, fontWeight: 'bold'}}>
+                    Pertanyaan Umum
+                  </Text>
+                </View>
+              </View>
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Svg
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  width={24}
+                  height={24}
+                  strokeWidth={2}
+                  stroke="#000000">
+                  <Path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                  />
+                </Svg>
+              </View>
+            </View>
           </Card>
         </View>
       </ScrollView>
@@ -57,12 +369,19 @@ const Profil = ({navigation}: any) => {
 };
 
 const styles = StyleSheet.create({
-  boxLogo: {
-    shadowColor: '#845FAC',
+  boxPath: {
+    shadowColor: '#0284C7',
     shadowOpacity: 0.25,
     shadowOffset: {width: 0, height: 10},
     shadowRadius: 4,
     elevation: 3,
+    flexDirection: 'row',
+  },
+  textPath: {fontSize: 18, fontWeight: 'bold', padding: 30, flex: 1},
+  container: {margin: 5},
+  box: {
+    marginVertical: 2,
+    padding: 5,
   },
 });
 

@@ -16,6 +16,7 @@ import {
 import {Path, Svg} from 'react-native-svg';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {BottomNavbar} from '../../components/BottomNavbar';
+import LineBreak from '../../components/LineBreak';
 
 type LiteraturItem = {
   id: number;
@@ -55,6 +56,29 @@ const Literatur = ({navigation}: any) => {
     fetchData();
   }, []);
 
+  const fetchData = async () => {
+    try {
+      const urlBase = 'http://192.168.43.129:8000/api/';
+      const urlKey = 'literatur/';
+      const res = await axios.get(urlBase + urlKey);
+
+      if (res.data.success) {
+        setData(res.data.data);
+      } else {
+        console.error('Failed to fetch data: ', res.data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching data: ', error);
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchData();
+    });
+    return unsubscribe;
+  }, [navigation]);
+
   // console.log(data.link);
 
   const handleLink = (datas: LiteraturItem) => {
@@ -71,25 +95,25 @@ const Literatur = ({navigation}: any) => {
       <StatusBar
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={
-          isDarkMode ? backgroundStyle.backgroundColor : '#845FAC'
+          isDarkMode ? backgroundStyle.backgroundColor : '#0284C7'
         }
       />
       <View
         style={[
           isDarkMode
             ? [backgroundStyle.backgroundColor, styles.boxPath]
-            : [{backgroundColor: '#845FAC'}, styles.boxPath],
+            : [{backgroundColor: '#0284C7'}, styles.boxPath],
         ]}>
         <Text
           style={[
             styles.textPath,
-            isDarkMode ? {color: '#845FAC'} : {color: '#ffffff'},
+            isDarkMode ? {color: '#0284C7'} : {color: '#ffffff'},
           ]}>
-          NOTAKOS
+          Literatur
         </Text>
       </View>
-      <ScrollView style={{flex: 1}}>
-        <View style={{marginBottom: 12}}>
+      <ScrollView>
+        {/* <View style={{marginBottom: 12}}>
           <Text
             style={{
               fontSize: 18,
@@ -99,13 +123,13 @@ const Literatur = ({navigation}: any) => {
             }}>
             Literatur
           </Text>
-        </View>
+        </View> */}
         {Array.isArray(data) && data.length > 0 ? (
           data.map(item => (
             <Pressable
               key={item.id}
               style={({pressed}) => [
-                {backgroundColor: pressed ? '#d9d9d9' : '#fafafa'},
+                {backgroundColor: pressed ? '#ffffff' : '#f2f2f2'},
               ]}
               onPress={() => handleLink(item)}>
               <View style={styles.list}>
@@ -113,14 +137,14 @@ const Literatur = ({navigation}: any) => {
                   <Svg
                     fill="none"
                     viewBox="0 0 24 24"
-                    stroke="#000000"
+                    stroke="#ffffff"
                     strokeWidth={2}
                     width={30}
                     height={30}>
                     <Path
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12"
+                      d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
                     />
                   </Svg>
                 </View>
@@ -141,9 +165,27 @@ const Literatur = ({navigation}: any) => {
               marginTop: 10,
               justifyContent: 'center',
             }}>
-            <ActivityIndicator size="large" color="#845FAC" />
+            <ActivityIndicator size="large" color="#0284C7" />
           </View>
         )}
+
+        <View style={{marginVertical: 8}}>
+          <LineBreak />
+        </View>
+
+        <View
+          style={{
+            alignItems: 'center',
+            paddingTop: 10,
+            paddingHorizontal: 20,
+            backgroundColor: '#f2f2f2',
+          }}>
+          <Text style={{textAlign: 'center'}}>
+            Kelola uang jadi seru dan mudah dengan{' '}
+            <Text style={{fontWeight: 'bold', color: '#0284C7'}}>NOTAKOS.</Text>
+            Yuk, mulai catat sekarang!
+          </Text>
+        </View>
       </ScrollView>
       <View
         style={{
@@ -160,7 +202,7 @@ const Literatur = ({navigation}: any) => {
 
 const styles = StyleSheet.create({
   boxPath: {
-    shadowColor: '#845FAC',
+    shadowColor: '#0284C7',
     shadowOpacity: 0.25,
     shadowOffset: {width: 0, height: 10},
     shadowRadius: 4,
@@ -171,14 +213,15 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    height: 60,
+    // height: 60,
     borderWidth: 0.5,
-    borderColor: '#d9d9d9',
+    borderColor: '#f2f2f2',
+    paddingVertical: 6,
     // backgroundColor: '#fafafa',
     // marginHorizontal: 10,
   },
   listItem: {
-    backgroundColor: '#eaeaea',
+    backgroundColor: '#64748B',
     borderRadius: 5,
     paddingVertical: 12,
     paddingHorizontal: 30,
@@ -194,8 +237,8 @@ const styles = StyleSheet.create({
   },
   // bgIcon: {borderRadius: 5, padding: 5},
   title: {
-    fontWeight: '500',
-    fontSize: 15,
+    fontWeight: 'bold',
+    fontSize: 16,
     marginBottom: 4,
   },
 });

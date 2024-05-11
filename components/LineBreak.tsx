@@ -8,7 +8,7 @@ const LineBreak = () => {
 const styles = StyleSheet.create({
   lineBreak: {
     borderWidth: 1,
-    borderColor: '#dddddd',
+    borderColor: '#64748B',
     borderRadius: 10,
     // marginVertical: 6,
   },

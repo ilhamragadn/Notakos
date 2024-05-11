@@ -43,7 +43,8 @@ const Alokasi = ({navigation}: any) => {
   const [emergencyAllocation, setEmergencyAllocation] = useState(0);
   const [totalPercentageError, setTotalPercentageError] = useState(false);
 
-  const [saldo, setSaldo] = useState(0);
+  const [saldoTeralokasi, setSaldoTeralokasi] = useState(0);
+  const [saldoTerkini, setSaldoTerkini] = useState(0);
 
   const [primaryUsed, setPrimaryUsed] = useState(0);
   const [secondaryUsed, setSecondaryUsed] = useState(0);
@@ -57,12 +58,12 @@ const Alokasi = ({navigation}: any) => {
   let parseDarurat = parseInt(emergencyValue, 10);
 
   const allocationData = [
-    // darurat
-    {value: parseDarurat || 0, color: '#5FAC84'},
     // sekunder
-    {value: parseSekunder || 0, color: '#AC845F'},
+    {value: parseSekunder || 0, color: '#A802C7'},
+    // darurat
+    {value: parseDarurat || 0, color: '#C74502'},
     // primer
-    {value: parsePrimer || 0, color: '#845FAC'},
+    {value: parsePrimer || 0, color: '#0284C7'},
   ];
 
   const handleTotalPercentage = (value: string, setStateFunction: any) => {
@@ -84,7 +85,8 @@ const Alokasi = ({navigation}: any) => {
           const dataCatatan = res.data.data;
           // console.log(dataCatatan);
 
-          let saldoVal = 0;
+          let saldoTeralokasiVal = 0;
+          let saldoTerkiniVal = 0;
           let primerTerpakai = 0;
           let sekunderTerpakai = 0;
           let daruratTerpakai = 0;
@@ -93,8 +95,10 @@ const Alokasi = ({navigation}: any) => {
           let sisaDarurat = 0;
 
           dataCatatan.forEach((item: any) => {
-            saldoVal += item.total_uang_masuk;
-            saldoVal -= item.total_uang_keluar;
+            saldoTeralokasiVal += item.total_uang_masuk;
+
+            saldoTerkiniVal += item.total_uang_masuk;
+            saldoTerkiniVal -= item.total_uang_keluar;
 
             item.catatan_pengeluaran.forEach((pengeluaran: any) => {
               // console.log(pengeluaran);
@@ -111,7 +115,8 @@ const Alokasi = ({navigation}: any) => {
             });
           });
 
-          setSaldo(saldoVal);
+          setSaldoTeralokasi(saldoTeralokasiVal);
+          setSaldoTerkini(saldoTerkiniVal);
 
           setPrimaryUsed(primerTerpakai);
           setRemainingPrimary(sisaPrimer);
@@ -137,9 +142,12 @@ const Alokasi = ({navigation}: any) => {
             let secondaryPercentageValue = inputSekunder / totalPercentageValue;
             let emergencyPercentageValue = inputDarurat / totalPercentageValue;
 
-            let primaryAllocationValue = primaryPercentageValue * saldoVal;
-            let secondaryAllocationValue = secondaryPercentageValue * saldoVal;
-            let emergencyAllocationValue = emergencyPercentageValue * saldoVal;
+            let primaryAllocationValue =
+              primaryPercentageValue * saldoTeralokasiVal;
+            let secondaryAllocationValue =
+              secondaryPercentageValue * saldoTeralokasiVal;
+            let emergencyAllocationValue =
+              emergencyPercentageValue * saldoTeralokasiVal;
 
             setPrimaryAllocation(primaryAllocationValue);
             setSecondaryAllocation(secondaryAllocationValue);
@@ -229,7 +237,7 @@ const Alokasi = ({navigation}: any) => {
   // const pieData = [
   //   {value: 20, color: '#5FAC84'},
   //   {value: 30, color: '#AC845F'},
-  //   {value: 50, color: '#845FAC'},
+  //   {value: 50, color: '#0284C7'},
   // ];
 
   return (
@@ -237,25 +245,25 @@ const Alokasi = ({navigation}: any) => {
       <StatusBar
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={
-          isDarkMode ? backgroundStyle.backgroundColor : '#845FAC'
+          isDarkMode ? backgroundStyle.backgroundColor : '#0284C7'
         }
       />
       <View
         style={[
           isDarkMode
             ? [backgroundStyle.backgroundColor, styles.boxPath]
-            : [{backgroundColor: '#845FAC'}, styles.boxPath],
+            : [{backgroundColor: '#0284C7'}, styles.boxPath],
         ]}>
         <Text
           style={[
             styles.textPath,
-            isDarkMode ? {color: '#845FAC'} : {color: '#ffffff'},
+            isDarkMode ? {color: '#0284C7'} : {color: '#ffffff'},
           ]}>
-          NOTAKOS
+          Alokasi
         </Text>
       </View>
-      <ScrollView style={{flex: 1}}>
-        <View style={{marginTop: 4, marginBottom: 6}}>
+      <ScrollView>
+        {/* <View style={{marginTop: 4, marginBottom: 6}}>
           <Text
             style={{
               fontSize: 18,
@@ -265,7 +273,7 @@ const Alokasi = ({navigation}: any) => {
             }}>
             Alokasi
           </Text>
-        </View>
+        </View> */}
         {/* <Card>
           <View style={{flexDirection: 'row'}}>
             <View style={{margin: 10, justifyContent: 'center'}}>
@@ -278,7 +286,7 @@ const Alokasi = ({navigation}: any) => {
                   style={{
                     flexDirection: 'row',
                     justifyContent: 'center',
-                    backgroundColor: '#845FAC',
+                    backgroundColor: '#0284C7',
                     marginVertical: 2,
                     marginHorizontal: 6,
                     paddingVertical: 6,
@@ -316,19 +324,65 @@ const Alokasi = ({navigation}: any) => {
         <Card>
           <View
             style={{
-              justifyContent: 'center',
-              alignItems: 'center',
               marginVertical: 8,
             }}>
-            <Text style={{fontSize: 18, fontWeight: 'bold'}}>
-              Total Saldo:{' '}
-              {saldo.toLocaleString('id-ID', {
-                style: 'currency',
-                currency: 'IDR',
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0,
-              })}
-            </Text>
+            <View style={{flexDirection: 'row'}}>
+              <View
+                style={{
+                  flex: 1,
+                  marginLeft: 32,
+                }}>
+                <Text style={{fontSize: 16, fontWeight: 'bold'}}>
+                  Saldo Teralokasi:
+                </Text>
+              </View>
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Text style={{fontSize: 16, fontWeight: 'bold'}}>
+                  {saldoTeralokasi.toLocaleString('id-ID', {
+                    style: 'currency',
+                    currency: 'IDR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                  })}
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View
+            style={{
+              marginVertical: 8,
+            }}>
+            <View style={{flexDirection: 'row'}}>
+              <View
+                style={{
+                  flex: 1,
+                  marginLeft: 32,
+                }}>
+                <Text style={{fontSize: 16, fontWeight: 'bold'}}>
+                  Saldo Terkini:
+                </Text>
+              </View>
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Text style={{fontSize: 16, fontWeight: 'bold'}}>
+                  {saldoTerkini.toLocaleString('id-ID', {
+                    style: 'currency',
+                    currency: 'IDR',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                  })}
+                </Text>
+              </View>
+            </View>
           </View>
         </Card>
 
@@ -370,10 +424,10 @@ const Alokasi = ({navigation}: any) => {
                       width: 18,
                       marginRight: 6,
                       borderRadius: 4,
-                      backgroundColor: '#845FAC',
+                      backgroundColor: '#0284C7',
                     }}
                   />
-                  <Text style={{color: '#845FAC', fontWeight: 'bold'}}>
+                  <Text style={{color: '#0284C7', fontWeight: 'bold'}}>
                     Primer
                   </Text>
                   <View
@@ -387,7 +441,7 @@ const Alokasi = ({navigation}: any) => {
                         width: 40,
                         borderWidth: 2,
                         borderRadius: 10,
-                        borderColor: '#845FAC',
+                        borderColor: '#0284C7',
                         textAlign: 'center',
                       }}
                       value={primaryValue}
@@ -411,12 +465,12 @@ const Alokasi = ({navigation}: any) => {
                       width: 18,
                       marginRight: 6,
                       borderRadius: 4,
-                      backgroundColor: '#AC845F',
+                      backgroundColor: '#A802C7',
                     }}
                   />
                   <Text
                     style={{
-                      color: '#AC845F',
+                      color: '#A802C7',
                       fontWeight: 'bold',
                     }}>
                     Sekunder
@@ -432,7 +486,7 @@ const Alokasi = ({navigation}: any) => {
                         width: 40,
                         borderWidth: 2,
                         borderRadius: 10,
-                        borderColor: '#AC845F',
+                        borderColor: '#A802C7',
                         textAlign: 'center',
                       }}
                       value={secondaryValue}
@@ -456,10 +510,10 @@ const Alokasi = ({navigation}: any) => {
                       width: 18,
                       marginRight: 6,
                       borderRadius: 4,
-                      backgroundColor: '#5FAC84',
+                      backgroundColor: '#C74502',
                     }}
                   />
-                  <Text style={{color: '#5FAC84', fontWeight: 'bold'}}>
+                  <Text style={{color: '#C74502', fontWeight: 'bold'}}>
                     Darurat
                   </Text>
                   <View
@@ -473,7 +527,7 @@ const Alokasi = ({navigation}: any) => {
                         width: 40,
                         borderWidth: 2,
                         borderRadius: 10,
-                        borderColor: '#5FAC84',
+                        borderColor: '#C74502',
                         textAlign: 'center',
                       }}
                       value={emergencyValue}
@@ -493,7 +547,7 @@ const Alokasi = ({navigation}: any) => {
               totalPercentageError && (
                 <Text
                   style={{
-                    color: '#DC3545',
+                    color: '#DC2626',
                     textAlign: 'center',
                     marginBottom: 6,
                   }}>
@@ -523,10 +577,10 @@ const Alokasi = ({navigation}: any) => {
                 width: 18,
                 marginRight: 6,
                 borderRadius: 4,
-                backgroundColor: '#845FAC',
+                backgroundColor: '#0284C7',
               }}
             />
-            <Text style={{color: '#845FAC', fontWeight: 'bold'}}>Primer</Text>
+            <Text style={{color: '#0284C7', fontWeight: 'bold'}}>Primer</Text>
           </View>
           <View style={{margin: 6}}>
             <View style={{flexDirection: 'row', marginVertical: 6}}>
@@ -575,7 +629,7 @@ const Alokasi = ({navigation}: any) => {
                     : 10
                 }
                 width={320}
-                color="#845FAC"
+                color="#0284C7"
                 unfilledColor="#e9ecef"
               />
             </View>
@@ -634,12 +688,12 @@ const Alokasi = ({navigation}: any) => {
                 width: 18,
                 marginRight: 6,
                 borderRadius: 4,
-                backgroundColor: '#AC845F',
+                backgroundColor: '#A802C7',
               }}
             />
             <Text
               style={{
-                color: '#AC845F',
+                color: '#A802C7',
                 fontWeight: 'bold',
               }}>
               Sekunder
@@ -691,7 +745,7 @@ const Alokasi = ({navigation}: any) => {
                     : 10
                 }
                 width={320}
-                color="#AC845F"
+                color="#A802C7"
                 unfilledColor="#e9ecef"
               />
             </View>
@@ -750,10 +804,10 @@ const Alokasi = ({navigation}: any) => {
                 width: 18,
                 marginRight: 6,
                 borderRadius: 4,
-                backgroundColor: '#5FAC84',
+                backgroundColor: '#C74502',
               }}
             />
-            <Text style={{color: '#5FAC84', fontWeight: 'bold'}}>Darurat</Text>
+            <Text style={{color: '#C74502', fontWeight: 'bold'}}>Darurat</Text>
           </View>
           <View style={{margin: 6}}>
             <View style={{flexDirection: 'row', marginVertical: 6}}>
@@ -801,7 +855,7 @@ const Alokasi = ({navigation}: any) => {
                     : 10
                 }
                 width={320}
-                color="#5FAC84"
+                color="#C74502"
                 unfilledColor="#e9ecef"
               />
             </View>
@@ -887,7 +941,7 @@ const Alokasi = ({navigation}: any) => {
           }}>
           <Text style={{textAlign: 'center'}}>
             Kelola uang jadi seru dan mudah dengan{' '}
-            <Text style={{fontWeight: 'bold', color: '#845FAC'}}>NOTAKOS.</Text>
+            <Text style={{fontWeight: 'bold', color: '#0284C7'}}>NOTAKOS.</Text>
             Yuk, mulai catat sekarang!
           </Text>
         </View>
@@ -907,7 +961,7 @@ const Alokasi = ({navigation}: any) => {
 
 const styles = StyleSheet.create({
   boxPath: {
-    shadowColor: '#845FAC',
+    shadowColor: '#0284C7',
     shadowOpacity: 0.25,
     shadowOffset: {width: 0, height: 10},
     shadowRadius: 4,

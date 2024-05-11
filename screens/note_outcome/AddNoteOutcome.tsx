@@ -226,7 +226,7 @@ const AddNoteOutcome = ({navigation}: any) => {
           <TouchableOpacity
             onPress={() => removeSection(index)}
             style={{
-              backgroundColor: '#DC3545',
+              backgroundColor: '#DC2626',
               borderRadius: 6,
               paddingHorizontal: 10,
               paddingVertical: 4,
@@ -252,9 +252,6 @@ const AddNoteOutcome = ({navigation}: any) => {
               placeholder="Masukkan nama barang atau keperluan"
               style={styles.input_primary}
               value={section.namaBarang}
-              // onChangeText={text =>
-              //   setPostData({...postData, nama_barang: text})
-              // }
               onChangeText={text => {
                 handleItemName(text, index);
               }}
@@ -469,14 +466,20 @@ const AddNoteOutcome = ({navigation}: any) => {
                 </View>
               </View>
               <TouchableOpacity
-                style={{alignItems: 'center', marginVertical: 4}}
+                style={{
+                  alignItems: 'center',
+                  marginVertical: 4,
+                  paddingVertical: 6,
+                  borderRadius: 8,
+                  backgroundColor: '#DC2626',
+                }}
                 onPress={() => setIsInfoType(!isInfoType)}>
                 <Svg
                   width={25}
                   height={25}
                   viewBox="0 0 24 24"
                   strokeWidth={2}
-                  stroke="#000000">
+                  stroke="#ffffff">
                   <Path
                     d="M6 18 18 6M6 6l12 12"
                     strokeLinecap="round"
@@ -548,14 +551,14 @@ const AddNoteOutcome = ({navigation}: any) => {
       <StatusBar
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={
-          isDarkMode ? backgroundStyle.backgroundColor : '#845FAC'
+          isDarkMode ? backgroundStyle.backgroundColor : '#0284C7'
         }
       />
       <View
         style={[
           isDarkMode
             ? [backgroundStyle.backgroundColor, styles.boxPath]
-            : [{backgroundColor: '#845FAC'}, styles.boxPath],
+            : [{backgroundColor: '#0284C7'}, styles.boxPath],
         ]}>
         <View style={{flexDirection: 'row'}}>
           <Text style={styles.textPath}>Buat Catatan Pengeluaran</Text>
@@ -598,7 +601,7 @@ const AddNoteOutcome = ({navigation}: any) => {
                     height={20}
                     viewBox="0 0 24 24"
                     strokeWidth={3}
-                    stroke="#000000">
+                    stroke="#ffffff">
                     <Path
                       d="M12 4.5v15m7.5-7.5h-15"
                       strokeLinecap="round"
@@ -638,7 +641,7 @@ const AddNoteOutcome = ({navigation}: any) => {
 
 const styles = StyleSheet.create({
   boxPath: {
-    shadowColor: '#845FAC',
+    shadowColor: '#0284C7',
     shadowOpacity: 0.25,
     shadowOffset: {width: 0, height: 10},
     shadowRadius: 4,
@@ -683,7 +686,7 @@ const styles = StyleSheet.create({
     margin: 5,
     padding: 10,
     borderBottomWidth: 2,
-    borderBottomColor: '#845FAC',
+    borderBottomColor: '#0284C7',
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
     color: '#000000',
@@ -694,7 +697,7 @@ const styles = StyleSheet.create({
     margin: 5,
     padding: 10,
     borderWidth: 2,
-    borderColor: '#845FAC',
+    borderColor: '#0284C7',
     borderRadius: 10,
     textAlignVertical: 'top',
   },
@@ -707,7 +710,7 @@ const styles = StyleSheet.create({
     margin: 5,
     padding: 10,
     borderBottomWidth: 2,
-    borderBottomColor: '#845FAC',
+    borderBottomColor: '#0284C7',
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
   },
@@ -715,7 +718,7 @@ const styles = StyleSheet.create({
     margin: 5,
     padding: 10,
     borderWidth: 2,
-    borderColor: '#845FAC',
+    borderColor: '#0284C7',
     borderRadius: 10,
     textAlignVertical: 'top',
   },
@@ -724,7 +727,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginLeft: 6,
     borderBottomWidth: 2,
-    borderBottomColor: '#845FAC',
+    borderBottomColor: '#0284C7',
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
   },
@@ -738,7 +741,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   addButton: {
-    backgroundColor: '#dddddd',
+    backgroundColor: '#64748B',
     padding: 8,
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,

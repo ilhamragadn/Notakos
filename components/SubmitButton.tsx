@@ -12,7 +12,7 @@ const SubmitButton = ({onPress}: any) => {
 const styles = StyleSheet.create({
   submitButton: {
     alignItems: 'center',
-    backgroundColor: '#198754',
+    backgroundColor: '#16A34A',
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 12,

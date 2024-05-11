@@ -78,8 +78,8 @@ const ModalChoose = ({navigation}: any) => {
             width: 60,
             height: 60,
             borderRadius: 30,
-            backgroundColor: '#845FAC',
-            shadowColor: '#845FAC',
+            backgroundColor: '#0284C7',
+            shadowColor: '#0284C7',
             shadowOffset: {
               width: 0,
               height: 10,
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginHorizontal: 5,
     elevation: 2,
-    backgroundColor: '#845FAC',
+    backgroundColor: '#0284C7',
   },
   modalText: {
     marginBottom: 15,

@@ -52,14 +52,14 @@ const EditNoteOutcome = () => {
       <StatusBar
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={
-          isDarkMode ? backgroundStyle.backgroundColor : '#845FAC'
+          isDarkMode ? backgroundStyle.backgroundColor : '#0284C7'
         }
       />
       <View
         style={[
           isDarkMode
             ? [backgroundStyle.backgroundColor, styles.boxPath]
-            : [{backgroundColor: '#845FAC'}, styles.boxPath],
+            : [{backgroundColor: '#0284C7'}, styles.boxPath],
         ]}>
         <Text style={styles.textPath}>Edit Catatan Pengeluaran</Text>
       </View>
@@ -271,7 +271,7 @@ const EditNoteOutcome = () => {
 
 const styles = StyleSheet.create({
   boxPath: {
-    shadowColor: '#845FAC',
+    shadowColor: '#0284C7',
     shadowOpacity: 0.25,
     shadowOffset: {width: 0, height: 10},
     shadowRadius: 4,
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
     margin: 5,
     padding: 10,
     borderBottomWidth: 2,
-    borderBottomColor: '#845FAC',
+    borderBottomColor: '#0284C7',
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
   },
@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
     height: 40,
     width: 160,
     borderBottomWidth: 2,
-    borderBottomColor: '#845FAC',
+    borderBottomColor: '#0284C7',
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
   },
@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
     margin: 5,
     padding: 10,
     borderWidth: 2,
-    borderColor: '#845FAC',
+    borderColor: '#0284C7',
     borderRadius: 10,
     textAlignVertical: 'top',
   },
@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginLeft: 6,
     borderBottomWidth: 2,
-    borderBottomColor: '#845FAC',
+    borderBottomColor: '#0284C7',
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
   },

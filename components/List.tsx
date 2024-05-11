@@ -38,17 +38,49 @@ const List = ({navigation}: any) => {
     fetchData();
   }, []);
 
+  const fetchData = async () => {
+    try {
+      const res = await axios.get(urlBase + urlKey);
+      if (res.data.success) {
+        const dataCatatan = res.data.data;
+        setData(dataCatatan);
+        // console.log(dataCatatan);
+      } else {
+        console.error('Failed to fetch data: ', res.data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching data: ', error);
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchData();
+    });
+    return unsubscribe;
+  }, [navigation]);
+
   // console.log(data);
 
   const formatDateTime = (dateTimeString: string) => {
     const dateObject = new Date(dateTimeString);
-    const day = dateObject.getDate().toString().padStart(2, '0');
+    const dayIndex = dateObject.getDay();
+    const dayNames = [
+      'Minggu',
+      'Senin',
+      'Selasa',
+      'Rabu',
+      'Kamis',
+      'Jumat',
+      'Sabtu',
+    ];
+    const day = dayNames[dayIndex];
+    const dayOfMonth = dateObject.getDate().toString().padStart(2, '0');
     const monthIndex = dateObject.getMonth();
     const year = dateObject.getFullYear();
     const hours = dateObject.getHours().toString().padStart(2, '0');
     const minutes = dateObject.getMinutes().toString().padStart(2, '0');
 
-    // Nama bulan dalam bahasa Inggris
     const monthNames = [
       'Jan',
       'Feb',
@@ -65,13 +97,14 @@ const List = ({navigation}: any) => {
     ];
     const month = monthNames[monthIndex];
 
-    return `${day} ${month} ${year} • ${hours}:${minutes}`;
+    return `${day}, ${dayOfMonth} ${month} ${year} • ${hours}:${minutes}`;
   };
 
   return (
     <View>
       {Array.isArray(data) && data.length > 0 ? (
         data.map(item => (
+          // <View></View>
           <Pressable
             key={item.id}
             style={({pressed}) => [
@@ -133,8 +166,8 @@ const List = ({navigation}: any) => {
                   style={[
                     styles.nominal,
                     item.kategori === 'Catatan Pemasukan'
-                      ? {color: '#198754'}
-                      : {color: '#DC3545'},
+                      ? {color: '#16A34A'}
+                      : {color: '#DC2626'},
                   ]}>
                   {item.kategori === 'Catatan Pemasukan' ? '+ ' : '- '}
                   {item.kategori === 'Catatan Pemasukan'
@@ -157,7 +190,7 @@ const List = ({navigation}: any) => {
                     : 'Tidak ada deskripsi'}
                 </Text>
               </View>
-              <View style={[styles.listItem, {width: 110}]}>
+              <View style={[styles.listItem, {width: 120}]}>
                 <Text style={{textAlign: 'left'}}>
                   {formatDateTime(item.created_at)}
                 </Text>
@@ -171,7 +204,7 @@ const List = ({navigation}: any) => {
             marginVertical: 10,
             justifyContent: 'center',
           }}>
-          <ActivityIndicator size="large" color="#845FAC" />
+          <ActivityIndicator size="large" color="#0284C7" />
         </View>
       )}
     </View>

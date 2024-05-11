@@ -12,7 +12,7 @@ const EditButton = () => {
 const styles = StyleSheet.create({
   editButton: {
     alignItems: 'center',
-    backgroundColor: '#0D6EFD',
+    backgroundColor: '#EAB308',
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 12,

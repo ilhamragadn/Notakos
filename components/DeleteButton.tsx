@@ -15,7 +15,7 @@ const DeleteButton = ({onPress, disabled}: any) => {
 const styles = StyleSheet.create({
   deleteButton: {
     alignItems: 'center',
-    backgroundColor: '#DC3545',
+    backgroundColor: '#DC2626',
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 12,

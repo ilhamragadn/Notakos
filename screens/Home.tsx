@@ -26,20 +26,20 @@ const Home = ({navigation}: any) => {
     flex: 1,
   };
 
-  // const [data, setData] = useState<ListItem>();
-  const [, setData] = useState([]);
+  // const [, setData] = useState([]);
   const [saldoCash, setSaldoCash] = useState(0);
   const [saldoCashless, setSaldoCashless] = useState(0);
+
+  const urlBase = 'http://192.168.43.129:8000/api/';
+  const urlKey = 'catatan/';
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const urlBase = 'http://192.168.43.129:8000/api/';
-        const urlKey = 'catatan/';
         const res = await axios.get(urlBase + urlKey);
         if (res.data.success) {
           const dataCatatan = res.data.data;
-          setData(dataCatatan);
+          // setData(dataCatatan);
 
           let cash = 0;
           let cashless = 0;
@@ -72,6 +72,47 @@ const Home = ({navigation}: any) => {
     fetchData();
   }, []);
 
+  const fetchData = async () => {
+    try {
+      const res = await axios.get(urlBase + urlKey);
+      if (res.data.success) {
+        const dataCatatan = res.data.data;
+        let cash = 0;
+        let cashless = 0;
+
+        dataCatatan.forEach((item: any) => {
+          item.catatan_pemasukan.forEach((pemasukan: any) => {
+            if (pemasukan.kategori_uang_masuk === 'Cash') {
+              cash += pemasukan.nominal_uang_masuk;
+            } else {
+              cashless += pemasukan.nominal_uang_masuk;
+            }
+          });
+          item.catatan_pengeluaran.forEach((pengeluaran: any) => {
+            if (pengeluaran.kategori_uang_keluar === 'Cash') {
+              cash -= pengeluaran.nominal_uang_keluar;
+            } else {
+              cashless -= pengeluaran.nominal_uang_keluar;
+            }
+          });
+        });
+        setSaldoCash(cash);
+        setSaldoCashless(cashless);
+      } else {
+        console.error('Failed to fetch data: ', res.data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching data: ', error);
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchData();
+    });
+    return unsubscribe;
+  }, [navigation]);
+
   // const [searchInput, setSearchInput] = useState('');
   // const [searchResults, setSearchResults] = useState([]);
 
@@ -91,21 +132,21 @@ const Home = ({navigation}: any) => {
       <StatusBar
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={
-          isDarkMode ? backgroundStyle.backgroundColor : '#845FAC'
+          isDarkMode ? backgroundStyle.backgroundColor : '#0284C7'
         }
       />
       <View
         style={[
           isDarkMode
             ? [backgroundStyle.backgroundColor, styles.boxPath]
-            : [{backgroundColor: '#845FAC'}, styles.boxPath],
+            : [{backgroundColor: '#0284C7'}, styles.boxPath],
         ]}>
         <Text
           style={[
             styles.textPath,
-            isDarkMode ? {color: '#845FAC'} : {color: '#ffffff'},
+            isDarkMode ? {color: '#0284C7'} : {color: '#ffffff'},
           ]}>
-          NOTAKOS
+          Beranda
         </Text>
         <View
           style={{flex: 1, alignItems: 'flex-end', justifyContent: 'center'}}>
@@ -177,7 +218,7 @@ const Home = ({navigation}: any) => {
           </View>
         </View>
       </View>
-      <ScrollView style={{flex: 1}}>
+      <ScrollView>
         <View style={{alignItems: 'center'}}>
           <Card>
             <View
@@ -240,10 +281,15 @@ const Home = ({navigation}: any) => {
             keyExtractor={(item, index) => index.toString()}
           />
         )} */}
+
         <View>
           <List navigation={navigation} />
         </View>
-        <LineBreak />
+
+        <View style={{marginVertical: 8}}>
+          <LineBreak />
+        </View>
+
         <View
           style={{
             alignItems: 'center',
@@ -253,7 +299,7 @@ const Home = ({navigation}: any) => {
           }}>
           <Text style={{textAlign: 'center'}}>
             Kelola uang jadi seru dan mudah dengan{' '}
-            <Text style={{fontWeight: 'bold', color: '#845FAC'}}>NOTAKOS.</Text>
+            <Text style={{fontWeight: 'bold', color: '#0284C7'}}>NOTAKOS.</Text>
             Yuk, mulai catat sekarang!
           </Text>
         </View>
@@ -273,7 +319,7 @@ const Home = ({navigation}: any) => {
 
 const styles = StyleSheet.create({
   boxPath: {
-    shadowColor: '#845FAC',
+    shadowColor: '#0284C7',
     shadowOpacity: 0.25,
     shadowOffset: {width: 0, height: 10},
     shadowRadius: 4,

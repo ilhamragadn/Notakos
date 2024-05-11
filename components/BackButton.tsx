@@ -16,7 +16,7 @@ export const BackButton = () => {
 const styles = StyleSheet.create({
   backButton: {
     alignItems: 'center',
-    backgroundColor: '#d9d9d9',
+    backgroundColor: '#64748B',
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 12,
@@ -33,6 +33,6 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontWeight: '600',
-    color: '#000000',
+    color: '#ffffff',
   },
 });
