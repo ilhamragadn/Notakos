@@ -1,13 +1,17 @@
 /* eslint-disable react-native/no-inline-styles */
-import axios from 'axios';
+// import axios from 'axios';
 import React, {useEffect, useState} from 'react';
 import {
   ActivityIndicator,
   Pressable,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
+import {Path, Svg} from 'react-native-svg';
+import apiClient from '../api/apiClient';
+import {Card} from './Card';
 
 export type ListItems = {
   kategori: string;
@@ -17,13 +21,13 @@ export type ListItems = {
 const List = ({navigation}: any) => {
   const [data, setData] = useState<ListItems>();
 
-  const urlBase = 'http://192.168.43.129:8000/api/';
+  // const urlBase = 'http://192.168.1.223:8000/api/';
   const urlKey = 'catatan/';
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(urlBase + urlKey);
+        const res = await apiClient.get(urlKey);
         if (res.data.success) {
           const dataCatatan = res.data.data;
           setData(dataCatatan);
@@ -40,7 +44,7 @@ const List = ({navigation}: any) => {
 
   const fetchData = async () => {
     try {
-      const res = await axios.get(urlBase + urlKey);
+      const res = await apiClient.get(urlKey);
       if (res.data.success) {
         const dataCatatan = res.data.data;
         setData(dataCatatan);
@@ -59,8 +63,6 @@ const List = ({navigation}: any) => {
     });
     return unsubscribe;
   }, [navigation]);
-
-  // console.log(data);
 
   const formatDateTime = (dateTimeString: string) => {
     const dateObject = new Date(dateTimeString);
@@ -100,11 +102,123 @@ const List = ({navigation}: any) => {
     return `${day}, ${dayOfMonth} ${month} ${year} • ${hours}:${minutes}`;
   };
 
+  const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
+  const [cardMonth, setCardMonth] = useState(false);
+  const toggleCardMonth = () => {
+    setCardMonth(!cardMonth);
+  };
+
+  const filterByMonth = (datas: any, month: number | null) => {
+    if (month === null) {
+      return datas;
+    }
+    return datas.filter((item: any) => {
+      const itemMonth = new Date(item.created_at).getMonth() + 1;
+      return itemMonth === month;
+    });
+  };
+
+  console.log(data);
+
+  const filteredData = data ? filterByMonth(data, selectedMonth) : [];
+
+  const monthNames = [
+    'Semua',
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'Mei',
+    'Juni',
+    'Juli',
+    'Ags',
+    'Sep',
+    'Okt',
+    'Nov',
+    'Des',
+  ];
+
+  const handleMonthSelect = (month: number | null) => {
+    setSelectedMonth(month);
+    setCardMonth(false);
+  };
+
   return (
     <View>
-      {Array.isArray(data) && data.length > 0 ? (
-        data.map(item => (
-          // <View></View>
+      <View style={{marginVertical: 6, alignItems: 'flex-start'}}>
+        <TouchableOpacity
+          onPress={toggleCardMonth}
+          style={{
+            width: 100,
+            flexDirection: 'row',
+            marginHorizontal: 24,
+            paddingVertical: 12,
+            paddingHorizontal: 8,
+            borderWidth: 1.5,
+            borderRadius: 8,
+            borderColor: '#0284C7',
+            backgroundColor: '#F0F9FF',
+            shadowColor: '#0284C7',
+            shadowOpacity: 0.25,
+            shadowRadius: 3.5,
+            shadowOffset: {width: 0, height: 10},
+            elevation: 3,
+          }}>
+          <View
+            style={{
+              flex: 2,
+              alignItems: 'center',
+            }}>
+            <Text
+              style={{
+                fontWeight: 'bold',
+                color: '#0284C7',
+              }}>
+              {selectedMonth === null ? 'Semua' : monthNames[selectedMonth]}
+            </Text>
+          </View>
+          <View
+            style={{
+              flex: 1,
+              alignItems: 'flex-end',
+              justifyContent: 'center',
+            }}>
+            <Svg viewBox="0 0 320 512" width={16} height={16} fill="#0284C7">
+              <Path d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z" />
+            </Svg>
+          </View>
+        </TouchableOpacity>
+      </View>
+
+      {cardMonth && (
+        <View style={{position: 'absolute', left: 22, top: 52, zIndex: 1}}>
+          <View style={{width: 105}}>
+            <Card>
+              <View>
+                {monthNames.map((month, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() =>
+                      handleMonthSelect(index === 0 ? null : index)
+                    }>
+                    <Text
+                      style={{
+                        marginVertical: 2,
+                        paddingVertical: 2,
+                        textAlign: 'center',
+                      }}>
+                      {month}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </Card>
+          </View>
+        </View>
+      )}
+
+      {Array.isArray(filteredData) && filteredData.length > 0 ? (
+        filteredData.map(item => (
           <Pressable
             key={item.id}
             style={({pressed}) => [
@@ -120,47 +234,6 @@ const List = ({navigation}: any) => {
                     })
             }>
             <View style={styles.list}>
-              {/* <View style={[styles.listItem, {alignItems: 'center'}]}>
-                {item.kategori === 'Catatan Pemasukan' ? (
-                  <View
-                    style={{
-                      backgroundColor: '#ffffff',
-                      borderRadius: 20,
-                      padding: 5,
-                    }}>
-                    <Svg
-                      viewBox="0 0 24 24"
-                      width={30}
-                      height={30}
-                      fill="#198754">
-                      <Path
-                        fillRule="evenodd"
-                        clipRule="evenodd"
-                        d="M15.22 6.268a.75.75 0 0 1 .968-.431l5.942 2.28a.75.75 0 0 1 .431.97l-2.28 5.94a.75.75 0 1 1-1.4-.537l1.63-4.251-1.086.484a11.2 11.2 0 0 0-5.45 5.173.75.75 0 0 1-1.199.19L9 12.312l-6.22 6.22a.75.75 0 0 1-1.06-1.061l6.75-6.75a.75.75 0 0 1 1.06 0l3.606 3.606a12.695 12.695 0 0 1 5.68-4.974l1.086-.483-4.251-1.632a.75.75 0 0 1-.432-.97Z"
-                      />
-                    </Svg>
-                  </View>
-                ) : (
-                  <View
-                    style={{
-                      backgroundColor: '#ffffff',
-                      borderRadius: 20,
-                      padding: 5,
-                    }}>
-                    <Svg
-                      viewBox="0 0 24 24"
-                      width={30}
-                      height={30}
-                      fill="#DC3545">
-                      <Path
-                        fillRule="evenodd"
-                        clipRule="evenodd"
-                        d="M1.72 5.47a.75.75 0 0 1 1.06 0L9 11.69l3.756-3.756a.75.75 0 0 1 .985-.066 12.698 12.698 0 0 1 4.575 6.832l.308 1.149 2.277-3.943a.75.75 0 1 1 1.299.75l-3.182 5.51a.75.75 0 0 1-1.025.275l-5.511-3.181a.75.75 0 0 1 .75-1.3l3.943 2.277-.308-1.149a11.194 11.194 0 0 0-3.528-5.617l-3.809 3.81a.75.75 0 0 1-1.06 0L1.72 6.53a.75.75 0 0 1 0-1.061Z"
-                      />
-                    </Svg>
-                  </View>
-                )}
-              </View> */}
               <View style={[styles.listContent, {marginLeft: 24}]}>
                 <Text
                   style={[

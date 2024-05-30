@@ -1,10 +1,16 @@
 import React from 'react';
 import {StyleSheet, Text, TouchableOpacity} from 'react-native';
 
-const SubmitButton = ({onPress}: any) => {
+const SubmitButton = ({
+  onPress,
+  textButton,
+}: {
+  onPress: any;
+  textButton: string;
+}) => {
   return (
     <TouchableOpacity style={styles.submitButton} onPress={onPress}>
-      <Text style={styles.buttonText}>Simpan</Text>
+      <Text style={styles.buttonText}>{textButton}</Text>
     </TouchableOpacity>
   );
 };

@@ -133,6 +133,6 @@ const styles = StyleSheet.create({
   addButton: {
     alignItems: 'center',
     bottom: 5,
-    left: 26,
+    left: 27,
   },
 });

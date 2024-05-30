@@ -1,5 +1,4 @@
 /* eslint-disable react-native/no-inline-styles */
-import axios from 'axios';
 import React, {useEffect, useState} from 'react';
 import {
   SafeAreaView,
@@ -7,14 +6,13 @@ import {
   StatusBar,
   StyleSheet,
   Text,
-  TextInput,
   View,
   useColorScheme,
 } from 'react-native';
 import {Path, Svg} from 'react-native-svg';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
+import apiClient from '../api/apiClient';
 import {BottomNavbar} from '../components/BottomNavbar';
-import {Card} from '../components/Card';
 import LineBreak from '../components/LineBreak';
 import List from '../components/List';
 
@@ -30,13 +28,12 @@ const Home = ({navigation}: any) => {
   const [saldoCash, setSaldoCash] = useState(0);
   const [saldoCashless, setSaldoCashless] = useState(0);
 
-  const urlBase = 'http://192.168.43.129:8000/api/';
   const urlKey = 'catatan/';
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(urlBase + urlKey);
+        const res = await apiClient.get(urlKey);
         if (res.data.success) {
           const dataCatatan = res.data.data;
           // setData(dataCatatan);
@@ -74,9 +71,12 @@ const Home = ({navigation}: any) => {
 
   const fetchData = async () => {
     try {
-      const res = await axios.get(urlBase + urlKey);
+      const res = await apiClient.get(urlKey);
       if (res.data.success) {
         const dataCatatan = res.data.data;
+
+        // console.log(dataCatatan);
+
         let cash = 0;
         let cashless = 0;
 
@@ -113,24 +113,10 @@ const Home = ({navigation}: any) => {
     return unsubscribe;
   }, [navigation]);
 
-  // const [searchInput, setSearchInput] = useState('');
-  // const [searchResults, setSearchResults] = useState([]);
-
-  // const handleSearch = () => {
-  //   if (searchInput && data && Array.isArray(data)) {
-  //     const filteredData = data.filter(
-  //       (item: any) =>
-  //         item.fieldToSearch &&
-  //         item.fieldToSearch.toLowerCase().includes(searchInput.toLowerCase()),
-  //     );
-  //     setSearchResults(filteredData);
-  //   }
-  // };
-
   return (
-    <SafeAreaView style={[backgroundStyle]}>
+    <SafeAreaView style={backgroundStyle}>
       <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+        barStyle={isDarkMode ? 'dark-content' : 'light-content'}
         backgroundColor={
           isDarkMode ? backgroundStyle.backgroundColor : '#0284C7'
         }
@@ -219,69 +205,6 @@ const Home = ({navigation}: any) => {
         </View>
       </View>
       <ScrollView>
-        <View style={{alignItems: 'center'}}>
-          <Card>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                width: 350,
-                borderWidth: 0.5,
-                borderColor: '#d1d1d1',
-                borderRadius: 10,
-              }}>
-              <Svg
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="#d1d1d1"
-                width={20}
-                height={20}
-                style={{
-                  marginLeft: 4,
-                }}>
-                <Path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-                />
-              </Svg>
-              <TextInput
-                placeholder="Cari catatan"
-                style={{
-                  flex: 1,
-                  height: 40,
-                  marginHorizontal: 4,
-                }}
-                // value={searchInput}
-                // onChangeText={text => setSearchInput(text)}
-                // onSubmitEditing={handleSearch}
-              />
-            </View>
-          </Card>
-        </View>
-        {/* {searchResults.length > 0 ? (
-          // Tampilkan hasil pencarian
-          <FlatList
-            data={searchResults}
-            renderItem={(item: any) => (
-              // Tampilkan item hasil pencarian
-              <Text>{item.fieldToDisplay}</Text>
-            )}
-            keyExtractor={(item, index) => index.toString()}
-          />
-        ) : (
-          // Tampilkan data asli jika tidak ada pencarian
-          <FlatList
-            data={data}
-            renderItem={(item: any) => (
-              // Tampilkan item data asli
-              <Text>{item.fieldToDisplay}</Text>
-            )}
-            keyExtractor={(item, index) => index.toString()}
-          />
-        )} */}
-
         <View>
           <List navigation={navigation} />
         </View>
@@ -296,6 +219,7 @@ const Home = ({navigation}: any) => {
             paddingTop: 10,
             paddingHorizontal: 20,
             backgroundColor: '#f2f2f2',
+            height: 300,
           }}>
           <Text style={{textAlign: 'center'}}>
             Kelola uang jadi seru dan mudah dengan{' '}

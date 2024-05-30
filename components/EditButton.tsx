@@ -1,11 +1,17 @@
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity} from 'react-native';
 
-const EditButton = () => {
+const EditButton = ({
+  onPress,
+  textButton,
+}: {
+  onPress: any;
+  textButton: string;
+}) => {
   return (
-    <View style={styles.editButton}>
-      <Text style={styles.buttonText}>Edit</Text>
-    </View>
+    <TouchableOpacity style={styles.editButton} onPress={onPress}>
+      <Text style={styles.buttonText}>{textButton}</Text>
+    </TouchableOpacity>
   );
 };
 

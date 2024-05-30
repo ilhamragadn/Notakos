@@ -1,7 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   Alert,
   SafeAreaView,
@@ -10,22 +9,45 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
   useColorScheme,
 } from 'react-native';
-import {PieChart} from 'react-native-gifted-charts';
 import * as Progress from 'react-native-progress';
+import {Path, Svg} from 'react-native-svg';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {BottomNavbar} from '../components/BottomNavbar';
 import {Card} from '../components/Card';
 import LineBreak from '../components/LineBreak';
 import SubmitButton from '../components/SubmitButton';
 
-// const topLabelComponent = () => (
-//   <Text style={{color: '#0D6EFD', marginBottom: 6, fontSize: 6}}>
-//     Rp 500.000
-//   </Text>
-// );
+interface User {
+  id?: number;
+}
+
+interface Allocation {
+  id?: number;
+  variabel_alokasi: string;
+  persentase_alokasi: number;
+  user_id: number;
+  alokasi_pemasukans: [
+    {
+      pivot: {
+        saldo_teralokasi: number;
+        variabel_teralokasi: string;
+      };
+    },
+  ];
+}
+
+interface resultAllocation {
+  allocationVariable: string;
+  allocationPercentage: number;
+  allocationBalance: number;
+  allocationRemaining: number;
+  allocationFraction: number;
+  totalOutcome: number;
+}
 
 const Alokasi = ({navigation}: any) => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -35,215 +57,532 @@ const Alokasi = ({navigation}: any) => {
     flex: 1,
   };
 
-  const [primaryValue, setPrimaryValue] = useState('0');
-  const [secondaryValue, setSecondaryValue] = useState('0');
-  const [emergencyValue, setEmergencyValue] = useState('0');
-  const [primaryAllocation, setPrimaryAllocation] = useState(0);
-  const [secondaryAllocation, setSecondaryAllocation] = useState(0);
-  const [emergencyAllocation, setEmergencyAllocation] = useState(0);
-  const [totalPercentageError, setTotalPercentageError] = useState(false);
+  const urlBase = 'http://192.168.1.223:8000/api/';
+  const urlKey = 'alokasi/';
 
-  const [saldoTeralokasi, setSaldoTeralokasi] = useState(0);
-  const [saldoTerkini, setSaldoTerkini] = useState(0);
+  const [userID, setUserID] = useState<User>();
+  const fetchUser = useCallback(async () => {
+    try {
+      const res = await axios.get(urlBase + 'profil/');
+      if (res.data) {
+        const dataUser = res.data;
+        setUserID(dataUser.id);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
 
-  const [primaryUsed, setPrimaryUsed] = useState(0);
-  const [secondaryUsed, setSecondaryUsed] = useState(0);
-  const [emergencyUsed, setEmergencyUsed] = useState(0);
-  const [remainingPrimary, setRemainingPrimary] = useState(0);
-  const [remainingSecondary, setRemainingSecondary] = useState(0);
-  const [remainingEmergency, setRemainingEmergency] = useState(0);
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]);
 
-  let parsePrimer = parseInt(primaryValue, 10);
-  let parseSekunder = parseInt(secondaryValue, 10);
-  let parseDarurat = parseInt(emergencyValue, 10);
+  useEffect(() => {
+    if (userID) {
+      setAllocationSections(prevSections =>
+        prevSections.map(section => ({
+          ...section,
+          userIdValue: userID,
+        })),
+      );
+    }
+  }, [userID]);
 
-  const allocationData = [
-    // sekunder
-    {value: parseSekunder || 0, color: '#A802C7'},
-    // darurat
-    {value: parseDarurat || 0, color: '#C74502'},
-    // primer
-    {value: parsePrimer || 0, color: '#0284C7'},
-  ];
+  const [allocationSections, setAllocationSections] = useState([
+    {
+      variableAllocationValue: '',
+      percentageAllocationValue: 0,
+      userIdValue: userID,
+    },
+  ]);
 
-  const handleTotalPercentage = (value: string, setStateFunction: any) => {
-    const parseVal = parseInt(value, 10);
-    if (!isNaN(parseVal) && parseVal >= 0 && parseVal <= 100) {
-      setStateFunction(value);
-    } else {
-      setStateFunction('');
+  const [savedAllocations, setSavedAllocations] = useState<Allocation[]>([]);
+
+  const [disableButton, setDisableButton] = useState(true);
+
+  const addAllocationSection = () => {
+    setAllocationSections([
+      ...allocationSections,
+      {
+        variableAllocationValue: '',
+        percentageAllocationValue: 0,
+        userIdValue: userID,
+      },
+    ]);
+    setDisableButton(false);
+  };
+
+  const removeAllocationSection = (index: number) => {
+    const updatedAllocationSections = [...allocationSections];
+    updatedAllocationSections.splice(index, 1);
+    setAllocationSections(updatedAllocationSections);
+    setDisableButton(false);
+  };
+
+  const handleVariableAllocation = (
+    variableAllocationVal: string,
+    index: number,
+  ) => {
+    const updatedAllocationSections = [...allocationSections];
+    updatedAllocationSections[index].variableAllocationValue =
+      variableAllocationVal;
+    setAllocationSections(updatedAllocationSections);
+    setDisableButton(false);
+  };
+
+  const handlePercentageAllocation = (
+    percentageAllocationVal: string,
+    index: number,
+  ) => {
+    const updatedAllocationSections = [...allocationSections];
+    const parsedValue = parseInt(
+      percentageAllocationVal.replace(/[^\d]/g, ''),
+      10,
+    );
+    updatedAllocationSections[index].percentageAllocationValue = isNaN(
+      parsedValue,
+    )
+      ? 0
+      : parsedValue;
+    setAllocationSections(updatedAllocationSections);
+    setDisableButton(false);
+  };
+
+  const preparePostAllocationData = () => {
+    const postData = allocationSections.map(section => ({
+      variabel_alokasi: section.variableAllocationValue,
+      persentase_alokasi: section.percentageAllocationValue,
+      user_id: section.userIdValue,
+    }));
+    console.log('Prepared post data:', JSON.stringify(postData, null, 2)); // Debugging line
+    return postData;
+  };
+
+  const submitAllocation = async () => {
+    try {
+      const postAllocationData = preparePostAllocationData();
+      console.log(postAllocationData);
+
+      const response = await axios.post(urlBase + urlKey, postAllocationData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      console.log('Success post data: ', response.data);
+      Alert.alert('Berhasil', 'Data Berhasil Disimpan');
+      fetchAllocation();
+    } catch (error) {
+      console.error('Axios error: ', error);
     }
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const urlBase = 'http://192.168.43.129:8000/api/';
-        const urlKey = 'catatan/';
-        const res = await axios.get(urlBase + urlKey);
-        if (res.data.success) {
-          const dataCatatan = res.data.data;
-          // console.log(dataCatatan);
-
-          let saldoTeralokasiVal = 0;
-          let saldoTerkiniVal = 0;
-          let primerTerpakai = 0;
-          let sekunderTerpakai = 0;
-          let daruratTerpakai = 0;
-          let sisaPrimer = 0;
-          let sisaSekunder = 0;
-          let sisaDarurat = 0;
-
-          dataCatatan.forEach((item: any) => {
-            saldoTeralokasiVal += item.total_uang_masuk;
-
-            saldoTerkiniVal += item.total_uang_masuk;
-            saldoTerkiniVal -= item.total_uang_keluar;
-
-            item.catatan_pengeluaran.forEach((pengeluaran: any) => {
-              // console.log(pengeluaran);
-              if (pengeluaran.jenis_kebutuhan === 'Kebutuhan Primer') {
-                primerTerpakai += pengeluaran.nominal_uang_keluar;
-                sisaPrimer = primaryAllocation - primerTerpakai;
-              } else if (pengeluaran.jenis_kebutuhan === 'Kebutuhan Sekunder') {
-                sekunderTerpakai += pengeluaran.nominal_uang_keluar;
-                sisaSekunder = secondaryAllocation - sekunderTerpakai;
-              } else if (pengeluaran.jenis_kebutuhan === 'Kebutuhan Darurat') {
-                daruratTerpakai += pengeluaran.nominal_uang_keluar;
-                sisaDarurat = emergencyAllocation - daruratTerpakai;
+  const postAllocationSection = () => {
+    return allocationSections.map((section, index) => (
+      <View key={index}>
+        <TextInput style={{display: 'none'}} value={userID?.toString()} />
+        <View style={{marginVertical: 6, flexDirection: 'row'}}>
+          <View style={{marginHorizontal: 4, flex: 1}}>
+            <TextInput
+              style={{
+                height: 45,
+                borderWidth: 1.5,
+                borderRadius: 10,
+                paddingHorizontal: 12,
+              }}
+              value={section.variableAllocationValue}
+              onChangeText={text => {
+                handleVariableAllocation(text, index);
+              }}
+              placeholder="Sewa Kos, Kebutuhan Kuliah"
+            />
+          </View>
+          <View style={{flexDirection: 'row', marginHorizontal: 6}}>
+            <TextInput
+              style={{
+                height: 45,
+                width: 50,
+                borderWidth: 1.5,
+                borderTopLeftRadius: 10,
+                borderBottomLeftRadius: 10,
+                paddingHorizontal: 12,
+                textAlign: 'center',
+              }}
+              value={
+                section.percentageAllocationValue !== undefined
+                  ? section.percentageAllocationValue.toString()
+                  : '0'
               }
-            });
+              onChangeText={text => {
+                handlePercentageAllocation(text, index);
+              }}
+              placeholder="50"
+              inputMode="numeric"
+            />
+            <View
+              style={{
+                backgroundColor: '#dddddd',
+                paddingVertical: 4,
+                paddingHorizontal: 6,
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderTopRightRadius: 10,
+                borderBottomRightRadius: 10,
+                borderWidth: 1.5,
+                borderLeftWidth: 0,
+              }}>
+              <Text style={{fontSize: 20, fontWeight: 'bold'}}>%</Text>
+            </View>
+          </View>
+          {/* tombol sampah */}
+          <TouchableOpacity
+            onPress={() => removeAllocationSection(index)}
+            style={{
+              marginHorizontal: 4,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: '#DC2626',
+              paddingHorizontal: 8,
+              borderRadius: 10,
+            }}>
+            <Svg
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="#FFFFFF"
+              width={24}
+              height={24}>
+              <Path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+              />
+            </Svg>
+          </TouchableOpacity>
+        </View>
+      </View>
+    ));
+  };
+
+  // FETCH DATA
+
+  const [saldoKeSemua, setSaldoKeSemua] = useState(0);
+  const [pivotVariabelTeralokasi, setPivotVariabelTeralokasi] = useState('');
+
+  type alokasiSaldo = {[key: string]: number};
+
+  const [saldoPerAlokasi, setSaldoPerAlokasi] = useState<alokasiSaldo>({});
+
+  const fetchAllocation = useCallback(async () => {
+    try {
+      const res = await axios.get(urlBase + urlKey);
+      if (res.data.success) {
+        const dataAlokasi = res.data.data;
+        setSavedAllocations(dataAlokasi);
+
+        let totalSaldoSemua = 0;
+        let variabelTeralokasi = '';
+        let newSaldoTeralokasi: alokasiSaldo = {};
+        let saldoDefault = 0;
+        let saldoTeralokasi = 0;
+
+        dataAlokasi.forEach((item: any) => {
+          item.alokasi_pemasukans.forEach((pemasukan: any) => {
+            variabelTeralokasi = pemasukan.pivot.variabel_teralokasi;
+            saldoDefault = pemasukan.pivot.saldo_teralokasi;
+            saldoTeralokasi = pemasukan.pivot.saldo_teralokasi;
+
+            if (variabelTeralokasi === 'Semua Alokasi') {
+              totalSaldoSemua += saldoDefault;
+            } else {
+              if (!newSaldoTeralokasi[variabelTeralokasi]) {
+                newSaldoTeralokasi[variabelTeralokasi] = 0;
+              }
+              newSaldoTeralokasi[variabelTeralokasi] += saldoTeralokasi;
+            }
           });
 
-          setSaldoTeralokasi(saldoTeralokasiVal);
-          setSaldoTerkini(saldoTerkiniVal);
-
-          setPrimaryUsed(primerTerpakai);
-          setRemainingPrimary(sisaPrimer);
-          setSecondaryUsed(sekunderTerpakai);
-          setRemainingSecondary(sisaSekunder);
-          setEmergencyUsed(daruratTerpakai);
-          setRemainingEmergency(sisaDarurat);
-
-          let inputPrimer = parseInt(primaryValue, 10);
-          let inputSekunder = parseInt(secondaryValue, 10);
-          let inputDarurat = parseInt(emergencyValue, 10);
-
-          let totalPercentageValue = inputPrimer + inputSekunder + inputDarurat;
-
-          if (totalPercentageValue > 100) {
-            setTotalPercentageError(true);
-            setPrimaryAllocation(0);
-            setSecondaryAllocation(0);
-            setEmergencyAllocation(0);
-          } else {
-            setTotalPercentageError(false);
-            let primaryPercentageValue = inputPrimer / totalPercentageValue;
-            let secondaryPercentageValue = inputSekunder / totalPercentageValue;
-            let emergencyPercentageValue = inputDarurat / totalPercentageValue;
-
-            let primaryAllocationValue =
-              primaryPercentageValue * saldoTeralokasiVal;
-            let secondaryAllocationValue =
-              secondaryPercentageValue * saldoTeralokasiVal;
-            let emergencyAllocationValue =
-              emergencyPercentageValue * saldoTeralokasiVal;
-
-            setPrimaryAllocation(primaryAllocationValue);
-            setSecondaryAllocation(secondaryAllocationValue);
-            setEmergencyAllocation(emergencyAllocationValue);
+          if (!newSaldoTeralokasi[item.variabel_alokasi]) {
+            newSaldoTeralokasi[item.variabel_alokasi] = 0;
           }
-        } else {
-          console.error('Failed to fetch data: ', res.data.message);
+        });
+
+        setSaldoKeSemua(totalSaldoSemua);
+        setPivotVariabelTeralokasi(variabelTeralokasi);
+        setSaldoPerAlokasi(newSaldoTeralokasi);
+      }
+    } catch (error) {
+      console.error('Error fetching data: ', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchAllocation();
+  }, [fetchAllocation]);
+
+  const handleUpdateAllocation = async (allocation: Allocation) => {
+    try {
+      const response = await axios.put(urlBase + urlKey + `${allocation.id}`, {
+        variabel_alokasi: allocation.variabel_alokasi,
+        persentase_alokasi: allocation.persentase_alokasi,
+      });
+      Alert.alert('Berhasil', 'Alokasi telah diperbarui!');
+      fetchAllocation();
+      console.log('Success update: ', response.data);
+    } catch (error) {
+      Alert.alert('Gagal', 'Alokasi gagal diperbarui!');
+      console.error(error);
+    }
+  };
+
+  const handleDeleteAllocation = async (id: any) => {
+    try {
+      const response = await axios.delete(urlBase + urlKey + `${id}`);
+      Alert.alert('Berhasil', 'Alokasi telah dihapus!');
+      fetchAllocation();
+      console.log(response.data);
+    } catch (error) {
+      Alert.alert('Gagal', 'Alokasi gagal dihapus!');
+      console.error(error);
+    }
+  };
+
+  const fetchAllocationSection = () => {
+    return savedAllocations.map((allocation, index) => (
+      <View key={index}>
+        {allocation.variabel_alokasi === 'Semua Alokasi' ? (
+          <View />
+        ) : (
+          <View style={{marginVertical: 6, flexDirection: 'row'}}>
+            <View style={{marginHorizontal: 4, flex: 1}}>
+              <TextInput
+                style={{
+                  height: 45,
+                  borderWidth: 1.5,
+                  borderRadius: 10,
+                  paddingHorizontal: 12,
+                }}
+                value={allocation.variabel_alokasi}
+                onChangeText={text => {
+                  const updatedAllocations = [...savedAllocations];
+                  updatedAllocations[index].variabel_alokasi = text;
+                  setSavedAllocations(updatedAllocations);
+                }}
+              />
+            </View>
+            <View style={{flexDirection: 'row', marginHorizontal: 6}}>
+              <TextInput
+                style={{
+                  height: 45,
+                  width: 50,
+                  borderWidth: 1.5,
+                  borderTopLeftRadius: 10,
+                  borderBottomLeftRadius: 10,
+                  paddingHorizontal: 12,
+                  textAlign: 'center',
+                }}
+                value={(allocation.persentase_alokasi !== undefined
+                  ? allocation.persentase_alokasi
+                  : 0
+                ).toString()}
+                onChangeText={text => {
+                  const updatedAllocations = [...savedAllocations];
+                  updatedAllocations[index].persentase_alokasi =
+                    parseInt(text, 10) || 0;
+                  setSavedAllocations(updatedAllocations);
+                }}
+                placeholder="50"
+                inputMode="numeric"
+              />
+              <View
+                style={{
+                  backgroundColor: '#dddddd',
+                  paddingVertical: 4,
+                  paddingHorizontal: 6,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderTopRightRadius: 10,
+                  borderBottomRightRadius: 10,
+                  borderWidth: 1.5,
+                  borderLeftWidth: 0,
+                }}>
+                <Text style={{fontSize: 20, fontWeight: 'bold'}}>%</Text>
+              </View>
+            </View>
+
+            {/* tombol update */}
+            <TouchableOpacity
+              onPress={() => handleUpdateAllocation(allocation)}
+              style={{
+                marginHorizontal: 4,
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: '#16A34A',
+                paddingHorizontal: 8,
+                borderRadius: 10,
+              }}>
+              <Svg
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="#FFFFFF"
+                width={24}
+                height={24}>
+                <Path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
+                />
+              </Svg>
+            </TouchableOpacity>
+
+            {/* tombol sampah */}
+            <TouchableOpacity
+              onPress={() => handleDeleteAllocation(allocation.id)}
+              style={{
+                marginHorizontal: 4,
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: '#DC2626',
+                paddingHorizontal: 8,
+                borderRadius: 10,
+              }}>
+              <Svg
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="#FFFFFF"
+                width={24}
+                height={24}>
+                <Path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                />
+              </Svg>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+    ));
+  };
+
+  const [note, setNote] = useState([]);
+
+  useEffect(() => {
+    const fetchNotes = async () => {
+      try {
+        const urlNote = 'catatan/';
+        const res = await axios.get(urlBase + urlNote);
+        if (res.data.success) {
+          const dataCatatan = res.data.data;
+          setNote(dataCatatan);
+          // console.log(dataCatatan);
         }
       } catch (error) {
         console.error('Error fetching data: ', error);
       }
     };
 
-    fetchData();
-  }, [
-    emergencyAllocation,
-    emergencyValue,
-    primaryAllocation,
-    primaryValue,
-    secondaryAllocation,
-    secondaryValue,
-  ]);
-
-  const storeValue = async () => {
-    try {
-      await AsyncStorage.setItem('primaryValue', primaryValue);
-      await AsyncStorage.setItem('secondaryValue', secondaryValue);
-      await AsyncStorage.setItem('emergencyValue', emergencyValue);
-
-      console.log('Nilai berhasil diterapkan');
-      Alert.alert('Berhasil', 'Pengaturan Alokasi Disimpan');
-    } catch (error) {
-      console.error('Error store data: ', error);
-      Alert.alert('Gagal', 'Pengaturan Alokasi Gagal');
-    }
-  };
-
-  useEffect(() => {
-    const loadValue = async () => {
-      try {
-        const storedPrimaryValue =
-          (await AsyncStorage.getItem('primaryValue')) || '0'; // Default value if not found
-        const storedSecondaryValue =
-          (await AsyncStorage.getItem('secondaryValue')) || '0'; // Default value if not found
-        const storedEmergencyValue =
-          (await AsyncStorage.getItem('emergencyValue')) || '0'; // Default value if not found
-
-        setPrimaryValue(storedPrimaryValue);
-        setSecondaryValue(storedSecondaryValue);
-        setEmergencyValue(storedEmergencyValue);
-      } catch (error) {
-        console.error('Error load value: ', error);
-      }
-    };
-
-    loadValue();
+    fetchNotes();
   }, []);
 
-  let primerTakTerpakai = remainingPrimary / primaryAllocation;
-  let sekunderTakTerpakai = remainingSecondary / secondaryAllocation;
-  let daruratTakTerpakai = remainingEmergency / emergencyAllocation;
+  const [resultAllocation, setResultAllocation] = useState<resultAllocation[]>(
+    [],
+  );
 
-  // if (!isNaN(sekunderTakTerpakai) && sekunderTakTerpakai > 0) {
-  //   console.log('sekunderTakTerpakai');
-  // } else if (isNaN(sekunderTakTerpakai)) {
-  //   console.log(0);
-  // } else {
-  //   console.log(10);
-  // }
+  const calcAllocation = useCallback(() => {
+    let totalPercentage = 0;
 
-  // console.log(sekunderTakTerpakai);
+    if (savedAllocations && savedAllocations.length > 0) {
+      const results = savedAllocations
+        .map(section => {
+          const variabelAlokasi = section.variabel_alokasi;
+          const persentaseAlokasi = section.persentase_alokasi;
+          let saldoTeralokasiAkhir = 0;
 
-  // const data = [
-  //   {value: 20, label: 'Sen'},
-  //   {value: 30, label: 'Sel'},
-  //   {
-  //     value: 50,
-  //     label: 'Rabu',
-  //     topLabelComponent: topLabelComponent,
-  //   },
-  //   {value: 40, label: 'Kam'},
-  //   {value: 30, label: 'Jum'},
-  //   {value: 25, label: 'Sab'},
-  //   {value: 30, label: 'Min'},
-  // ];
+          totalPercentage += persentaseAlokasi;
 
-  // const pieData = [
-  //   {value: 20, color: '#5FAC84'},
-  //   {value: 30, color: '#AC845F'},
-  //   {value: 50, color: '#0284C7'},
-  // ];
+          if (totalPercentage <= 100) {
+            const saldoTeralokasiAwal =
+              (persentaseAlokasi / 100) * saldoKeSemua;
+
+            if (pivotVariabelTeralokasi !== 'Semua Alokasi') {
+              saldoTeralokasiAkhir =
+                saldoTeralokasiAwal + saldoPerAlokasi[variabelAlokasi];
+
+              let outcome = 0;
+
+              note.forEach((item: any) => {
+                item.catatan_pengeluaran.forEach((pengeluaran: any) => {
+                  if (variabelAlokasi === pengeluaran.jenis_kebutuhan) {
+                    outcome += pengeluaran.nominal_uang_keluar;
+                  }
+                });
+              });
+
+              const sisaSaldoTeralokasi = saldoTeralokasiAkhir - outcome;
+              const sisaSaldoAlokasiPerSaldoAlokasi =
+                sisaSaldoTeralokasi / saldoTeralokasiAkhir;
+
+              return {
+                allocationBalance: saldoTeralokasiAkhir,
+                allocationVariable: variabelAlokasi,
+                allocationPercentage: persentaseAlokasi,
+                allocationRemaining: sisaSaldoTeralokasi,
+                allocationFraction: sisaSaldoAlokasiPerSaldoAlokasi,
+                totalOutcome: outcome,
+              };
+            } else {
+              saldoTeralokasiAkhir = saldoTeralokasiAwal;
+
+              let outcome = 0;
+
+              note.forEach((item: any) => {
+                item.catatan_pengeluaran.forEach((pengeluaran: any) => {
+                  if (variabelAlokasi === pengeluaran.jenis_kebutuhan) {
+                    outcome += pengeluaran.nominal_uang_keluar;
+                  }
+                });
+              });
+
+              const sisaSaldoTeralokasi = saldoTeralokasiAkhir - outcome;
+              const sisaSaldoAlokasiPerSaldoAlokasi =
+                sisaSaldoTeralokasi / saldoTeralokasiAkhir;
+
+              return {
+                allocationBalance: saldoTeralokasiAkhir,
+                allocationVariable: variabelAlokasi,
+                allocationPercentage: persentaseAlokasi,
+                allocationRemaining: sisaSaldoTeralokasi,
+                allocationFraction: sisaSaldoAlokasiPerSaldoAlokasi,
+                totalOutcome: outcome,
+              };
+            }
+          } else {
+            return Alert.alert('Gagal', 'Total persentase lebih dari seratus');
+          }
+        })
+        .filter(result => result !== undefined) as resultAllocation[];
+
+      setResultAllocation(results);
+    }
+  }, [
+    note,
+    pivotVariabelTeralokasi,
+    saldoKeSemua,
+    saldoPerAlokasi,
+    savedAllocations,
+  ]);
+
+  useEffect(() => {
+    calcAllocation();
+  }, [calcAllocation, savedAllocations]);
 
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+        barStyle={isDarkMode ? 'dark-content' : 'light-content'}
         backgroundColor={
           isDarkMode ? backgroundStyle.backgroundColor : '#0284C7'
         }
@@ -263,6 +602,203 @@ const Alokasi = ({navigation}: any) => {
         </Text>
       </View>
       <ScrollView>
+        <View style={styles.container}>
+          <Card>
+            <View style={{marginVertical: 8}}>
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: '500',
+                  marginHorizontal: 4,
+                  textAlign: 'center',
+                  marginBottom: 6,
+                }}>
+                Atur Persentase Alokasi
+              </Text>
+              <View
+                style={{
+                  padding: 8,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                {/* <PieChart donut radius={70} data={allocationPieData} /> */}
+              </View>
+              {fetchAllocationSection()}
+              {postAllocationSection()}
+              {/* tombol add */}
+              <TouchableOpacity
+                onPress={addAllocationSection}
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  margin: 6,
+                }}>
+                <View
+                  style={{
+                    borderWidth: 2,
+                    padding: 6,
+                    borderRadius: 5,
+                    borderStyle: 'dashed',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <Svg
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="#000000"
+                    width={24}
+                    height={24}>
+                    <Path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 4.5v15m7.5-7.5h-15"
+                    />
+                  </Svg>
+                </View>
+              </TouchableOpacity>
+              <View>
+                {disableButton ? (
+                  <View />
+                ) : (
+                  <SubmitButton
+                    onPress={submitAllocation}
+                    textButton="Simpan"
+                  />
+                )}
+              </View>
+            </View>
+          </Card>
+
+          <View style={{marginVertical: 8}}>
+            <LineBreak />
+          </View>
+
+          <View>
+            {resultAllocation.map((section, index) => (
+              <View key={index}>
+                {section.allocationVariable === 'Semua Alokasi' ? (
+                  <View />
+                ) : (
+                  <Card>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        margin: 6,
+                        alignItems: 'center',
+                      }}>
+                      <View
+                        style={{
+                          height: 18,
+                          width: 18,
+                          marginRight: 6,
+                          borderRadius: 4,
+                          backgroundColor: '#0284C7',
+                        }}
+                      />
+                      <Text
+                        style={{
+                          color: '#0284C7',
+                          fontWeight: 'bold',
+                          textTransform: 'capitalize',
+                        }}>
+                        {section.allocationVariable}
+                      </Text>
+
+                      <View
+                        style={{
+                          flex: 1,
+                          justifyContent: 'flex-end',
+                          alignItems: 'flex-end',
+                        }}>
+                        <Text style={{fontWeight: 'bold', marginRight: 6}}>
+                          {isNaN(section.allocationBalance)
+                            ? 'Rp 0'
+                            : section.allocationBalance.toLocaleString(
+                                'id-ID',
+                                {
+                                  style: 'currency',
+                                  currency: 'IDR',
+                                  minimumFractionDigits: 0,
+                                  maximumFractionDigits: 0,
+                                },
+                              )}
+                        </Text>
+                      </View>
+                    </View>
+
+                    <View style={{margin: 6}}>
+                      <View
+                        style={{
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          marginVertical: 2,
+                        }}>
+                        <Progress.Bar
+                          progress={
+                            !isNaN(section.allocationFraction) &&
+                            section.allocationFraction > 0
+                              ? section.allocationFraction
+                              : isNaN(section.allocationFraction)
+                              ? 0
+                              : 10
+                          }
+                          width={320}
+                          color="#0284C7"
+                          unfilledColor="#e9ecef"
+                        />
+                      </View>
+
+                      <View style={{flexDirection: 'row', marginVertical: 6}}>
+                        <View
+                          style={{
+                            flex: 1,
+                            justifyContent: 'flex-start',
+                            alignItems: 'flex-start',
+                          }}>
+                          <Text style={{fontWeight: 'bold', marginLeft: 6}}>
+                            Rp 0
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            flex: 1,
+                            justifyContent: 'flex-end',
+                            alignItems: 'flex-end',
+                          }}>
+                          <Text style={{fontWeight: 'bold', marginRight: 6}}>
+                            {isNaN(section.allocationRemaining)
+                              ? 'Rp 0'
+                              : section.totalOutcome === 0
+                              ? section.allocationBalance.toLocaleString(
+                                  'id-ID',
+                                  {
+                                    style: 'currency',
+                                    currency: 'IDR',
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 0,
+                                  },
+                                )
+                              : section.allocationRemaining.toLocaleString(
+                                  'id-ID',
+                                  {
+                                    style: 'currency',
+                                    currency: 'IDR',
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 0,
+                                  },
+                                )}
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+                  </Card>
+                )}
+              </View>
+            ))}
+          </View>
+        </View>
+
         {/* <View style={{marginTop: 4, marginBottom: 6}}>
           <Text
             style={{
@@ -320,586 +856,6 @@ const Alokasi = ({navigation}: any) => {
             </View>
           </View>
         </Card> */}
-
-        <Card>
-          <View
-            style={{
-              marginVertical: 8,
-            }}>
-            <View style={{flexDirection: 'row'}}>
-              <View
-                style={{
-                  flex: 1,
-                  marginLeft: 32,
-                }}>
-                <Text style={{fontSize: 16, fontWeight: 'bold'}}>
-                  Saldo Teralokasi:
-                </Text>
-              </View>
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <Text style={{fontSize: 16, fontWeight: 'bold'}}>
-                  {saldoTeralokasi.toLocaleString('id-ID', {
-                    style: 'currency',
-                    currency: 'IDR',
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 0,
-                  })}
-                </Text>
-              </View>
-            </View>
-          </View>
-          <View
-            style={{
-              marginVertical: 8,
-            }}>
-            <View style={{flexDirection: 'row'}}>
-              <View
-                style={{
-                  flex: 1,
-                  marginLeft: 32,
-                }}>
-                <Text style={{fontSize: 16, fontWeight: 'bold'}}>
-                  Saldo Terkini:
-                </Text>
-              </View>
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <Text style={{fontSize: 16, fontWeight: 'bold'}}>
-                  {saldoTerkini.toLocaleString('id-ID', {
-                    style: 'currency',
-                    currency: 'IDR',
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 0,
-                  })}
-                </Text>
-              </View>
-            </View>
-          </View>
-        </Card>
-
-        <View style={{marginVertical: 8}}>
-          <LineBreak />
-        </View>
-
-        <Card>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-around',
-            }}>
-            <View style={{padding: 8, justifyContent: 'center'}}>
-              <PieChart donut radius={80} data={allocationData} />
-            </View>
-            <View
-              style={{
-                marginTop: 4,
-                marginBottom: 6,
-              }}>
-              <Text
-                style={{
-                  fontWeight: '500',
-                  marginHorizontal: 6,
-                }}>
-                Atur Persentase Alokasi
-              </Text>
-              <View style={{marginTop: 8}}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    margin: 6,
-                    alignItems: 'center',
-                  }}>
-                  <View
-                    style={{
-                      height: 18,
-                      width: 18,
-                      marginRight: 6,
-                      borderRadius: 4,
-                      backgroundColor: '#0284C7',
-                    }}
-                  />
-                  <Text style={{color: '#0284C7', fontWeight: 'bold'}}>
-                    Primer
-                  </Text>
-                  <View
-                    style={{
-                      flex: 1,
-                      alignItems: 'flex-end',
-                    }}>
-                    <TextInput
-                      style={{
-                        height: 40,
-                        width: 40,
-                        borderWidth: 2,
-                        borderRadius: 10,
-                        borderColor: '#0284C7',
-                        textAlign: 'center',
-                      }}
-                      value={primaryValue}
-                      onChangeText={text =>
-                        handleTotalPercentage(text, setPrimaryValue)
-                      }
-                      placeholder="50"
-                      inputMode="numeric"
-                    />
-                  </View>
-                </View>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    margin: 6,
-                    alignItems: 'center',
-                  }}>
-                  <View
-                    style={{
-                      height: 18,
-                      width: 18,
-                      marginRight: 6,
-                      borderRadius: 4,
-                      backgroundColor: '#A802C7',
-                    }}
-                  />
-                  <Text
-                    style={{
-                      color: '#A802C7',
-                      fontWeight: 'bold',
-                    }}>
-                    Sekunder
-                  </Text>
-                  <View
-                    style={{
-                      flex: 1,
-                      alignItems: 'flex-end',
-                    }}>
-                    <TextInput
-                      style={{
-                        height: 40,
-                        width: 40,
-                        borderWidth: 2,
-                        borderRadius: 10,
-                        borderColor: '#A802C7',
-                        textAlign: 'center',
-                      }}
-                      value={secondaryValue}
-                      onChangeText={text =>
-                        handleTotalPercentage(text, setSecondaryValue)
-                      }
-                      placeholder="30"
-                      inputMode="numeric"
-                    />
-                  </View>
-                </View>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    margin: 6,
-                    alignItems: 'center',
-                  }}>
-                  <View
-                    style={{
-                      height: 18,
-                      width: 18,
-                      marginRight: 6,
-                      borderRadius: 4,
-                      backgroundColor: '#C74502',
-                    }}
-                  />
-                  <Text style={{color: '#C74502', fontWeight: 'bold'}}>
-                    Darurat
-                  </Text>
-                  <View
-                    style={{
-                      flex: 1,
-                      alignItems: 'flex-end',
-                    }}>
-                    <TextInput
-                      style={{
-                        height: 40,
-                        width: 40,
-                        borderWidth: 2,
-                        borderRadius: 10,
-                        borderColor: '#C74502',
-                        textAlign: 'center',
-                      }}
-                      value={emergencyValue}
-                      onChangeText={text =>
-                        handleTotalPercentage(text, setEmergencyValue)
-                      }
-                      placeholder="20"
-                      inputMode="numeric"
-                    />
-                  </View>
-                </View>
-              </View>
-            </View>
-          </View>
-          <View>
-            {totalPercentageError ? (
-              totalPercentageError && (
-                <Text
-                  style={{
-                    color: '#DC2626',
-                    textAlign: 'center',
-                    marginBottom: 6,
-                  }}>
-                  Total persentase tidak boleh melebihi 100.
-                </Text>
-              )
-            ) : (
-              <SubmitButton onPress={storeValue} />
-            )}
-          </View>
-        </Card>
-
-        <View style={{marginVertical: 8}}>
-          <LineBreak />
-        </View>
-
-        <Card>
-          <View
-            style={{
-              flexDirection: 'row',
-              margin: 6,
-              alignItems: 'center',
-            }}>
-            <View
-              style={{
-                height: 18,
-                width: 18,
-                marginRight: 6,
-                borderRadius: 4,
-                backgroundColor: '#0284C7',
-              }}
-            />
-            <Text style={{color: '#0284C7', fontWeight: 'bold'}}>Primer</Text>
-          </View>
-          <View style={{margin: 6}}>
-            <View style={{flexDirection: 'row', marginVertical: 6}}>
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: 'flex-start',
-                  alignItems: 'flex-start',
-                }}>
-                <Text style={{fontWeight: 'bold', marginLeft: 6}}>
-                  Alokasi Primer:
-                </Text>
-              </View>
-
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: 'flex-end',
-                  alignItems: 'flex-end',
-                }}>
-                <Text style={{fontWeight: 'bold', marginRight: 6}}>
-                  {isNaN(primaryAllocation)
-                    ? 'Rp 0'
-                    : primaryAllocation.toLocaleString('id-ID', {
-                        style: 'currency',
-                        currency: 'IDR',
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0,
-                      })}
-                </Text>
-              </View>
-            </View>
-
-            <View
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginVertical: 2,
-              }}>
-              <Progress.Bar
-                progress={
-                  !isNaN(primerTakTerpakai) && primerTakTerpakai > 0
-                    ? primerTakTerpakai
-                    : isNaN(primerTakTerpakai)
-                    ? 0
-                    : 10
-                }
-                width={320}
-                color="#0284C7"
-                unfilledColor="#e9ecef"
-              />
-            </View>
-
-            <View style={{flexDirection: 'row', marginVertical: 6}}>
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: 'flex-start',
-                  alignItems: 'flex-start',
-                }}>
-                <Text style={{fontWeight: 'bold', marginLeft: 6}}>Rp 0</Text>
-              </View>
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: 'flex-end',
-                  alignItems: 'flex-end',
-                }}>
-                <Text style={{fontWeight: 'bold', marginRight: 6}}>
-                  {isNaN(remainingPrimary)
-                    ? 'Rp 0'
-                    : primaryUsed === 0
-                    ? primaryAllocation.toLocaleString('id-ID', {
-                        style: 'currency',
-                        currency: 'IDR',
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0,
-                      })
-                    : remainingPrimary.toLocaleString('id-ID', {
-                        style: 'currency',
-                        currency: 'IDR',
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0,
-                      })}
-                </Text>
-              </View>
-            </View>
-          </View>
-        </Card>
-
-        <View style={{marginVertical: 8}}>
-          <LineBreak />
-        </View>
-
-        <Card>
-          <View
-            style={{
-              flexDirection: 'row',
-              margin: 6,
-              alignItems: 'center',
-            }}>
-            <View
-              style={{
-                height: 18,
-                width: 18,
-                marginRight: 6,
-                borderRadius: 4,
-                backgroundColor: '#A802C7',
-              }}
-            />
-            <Text
-              style={{
-                color: '#A802C7',
-                fontWeight: 'bold',
-              }}>
-              Sekunder
-            </Text>
-          </View>
-          <View style={{margin: 6}}>
-            <View style={{flexDirection: 'row', marginVertical: 6}}>
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: 'flex-start',
-                  alignItems: 'flex-start',
-                }}>
-                <Text style={{fontWeight: 'bold', marginLeft: 6}}>
-                  Alokasi Sekunder:
-                </Text>
-              </View>
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: 'flex-end',
-                  alignItems: 'flex-end',
-                }}>
-                <Text style={{fontWeight: 'bold', marginRight: 6}}>
-                  {isNaN(secondaryAllocation)
-                    ? 'Rp 0'
-                    : secondaryAllocation.toLocaleString('id-ID', {
-                        style: 'currency',
-                        currency: 'IDR',
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0,
-                      })}
-                </Text>
-              </View>
-            </View>
-
-            <View
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginVertical: 2,
-              }}>
-              <Progress.Bar
-                progress={
-                  !isNaN(sekunderTakTerpakai) && sekunderTakTerpakai > 0
-                    ? sekunderTakTerpakai
-                    : isNaN(sekunderTakTerpakai)
-                    ? 0
-                    : 10
-                }
-                width={320}
-                color="#A802C7"
-                unfilledColor="#e9ecef"
-              />
-            </View>
-
-            <View style={{flexDirection: 'row', marginVertical: 6}}>
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: 'flex-start',
-                  alignItems: 'flex-start',
-                }}>
-                <Text style={{fontWeight: 'bold', marginLeft: 6}}>Rp 0</Text>
-              </View>
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: 'flex-end',
-                  alignItems: 'flex-end',
-                }}>
-                <Text style={{fontWeight: 'bold', marginRight: 6}}>
-                  {isNaN(remainingSecondary) || remainingSecondary < 0
-                    ? 'Rp 0'
-                    : secondaryUsed === 0
-                    ? secondaryAllocation.toLocaleString('id-ID', {
-                        style: 'currency',
-                        currency: 'IDR',
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0,
-                      })
-                    : remainingSecondary.toLocaleString('id-ID', {
-                        style: 'currency',
-                        currency: 'IDR',
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0,
-                      })}
-                </Text>
-              </View>
-            </View>
-          </View>
-        </Card>
-
-        <View style={{marginVertical: 8}}>
-          <LineBreak />
-        </View>
-
-        <Card>
-          <View
-            style={{
-              flexDirection: 'row',
-              margin: 6,
-              alignItems: 'center',
-            }}>
-            <View
-              style={{
-                height: 18,
-                width: 18,
-                marginRight: 6,
-                borderRadius: 4,
-                backgroundColor: '#C74502',
-              }}
-            />
-            <Text style={{color: '#C74502', fontWeight: 'bold'}}>Darurat</Text>
-          </View>
-          <View style={{margin: 6}}>
-            <View style={{flexDirection: 'row', marginVertical: 6}}>
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: 'flex-start',
-                  alignItems: 'flex-start',
-                }}>
-                <Text style={{fontWeight: 'bold', marginLeft: 6}}>
-                  Alokasi Darurat:
-                </Text>
-              </View>
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: 'flex-end',
-                  alignItems: 'flex-end',
-                }}>
-                <Text style={{fontWeight: 'bold', marginRight: 6}}>
-                  {isNaN(emergencyAllocation)
-                    ? 'Rp 0'
-                    : emergencyAllocation.toLocaleString('id-ID', {
-                        style: 'currency',
-                        currency: 'IDR',
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0,
-                      })}
-                </Text>
-              </View>
-            </View>
-
-            <View
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginVertical: 2,
-              }}>
-              <Progress.Bar
-                progress={
-                  !isNaN(daruratTakTerpakai) && daruratTakTerpakai > 0
-                    ? daruratTakTerpakai
-                    : isNaN(daruratTakTerpakai)
-                    ? 0
-                    : 10
-                }
-                width={320}
-                color="#C74502"
-                unfilledColor="#e9ecef"
-              />
-            </View>
-
-            <View style={{flexDirection: 'row', marginVertical: 6}}>
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: 'flex-start',
-                  alignItems: 'flex-start',
-                }}>
-                <Text style={{fontWeight: 'bold', marginLeft: 6}}>Rp 0</Text>
-              </View>
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: 'flex-end',
-                  alignItems: 'flex-end',
-                }}>
-                <Text style={{fontWeight: 'bold', marginRight: 6}}>
-                  {isNaN(remainingEmergency) || remainingEmergency < 0
-                    ? 'Rp 0'
-                    : emergencyUsed === 0
-                    ? emergencyAllocation.toLocaleString('id-ID', {
-                        style: 'currency',
-                        currency: 'IDR',
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0,
-                      })
-                    : remainingEmergency.toLocaleString('id-ID', {
-                        style: 'currency',
-                        currency: 'IDR',
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0,
-                      })}
-                </Text>
-              </View>
-            </View>
-          </View>
-        </Card>
-
-        <View style={{marginVertical: 8}}>
-          <LineBreak />
-        </View>
 
         {/* <View style={{marginTop: 8}}>
           <LineBreak />
@@ -968,6 +924,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   textPath: {fontSize: 18, fontWeight: 'bold', padding: 30},
+  container: {margin: 5},
 });
 
 export default Alokasi;

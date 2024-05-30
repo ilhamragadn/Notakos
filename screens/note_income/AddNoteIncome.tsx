@@ -8,7 +8,6 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
   useColorScheme,
 } from 'react-native';
@@ -20,14 +19,21 @@ import LineBreak from '../../components/LineBreak';
 import SubmitButton from '../../components/SubmitButton';
 // import CoreSectionIncome from './components/CoreSectionIncome';
 import {CheckBox} from '@rneui/themed';
+import {Alert} from 'react-native';
 
 type PostDataState = {
+  user_id: number | undefined;
   deskripsi: string;
   kategori: string;
   total_uang_masuk: string;
   catatan_pemasukan: Array<{
     nominal_uang_masuk: string;
     kategori_uang_masuk: string;
+  }>;
+  alokasis: Array<{
+    alokasi_id: number;
+    variabel_teralokasi: string;
+    saldo_teralokasi: string;
   }>;
 };
 
@@ -39,34 +45,87 @@ const AddNoteIncome = ({navigation}: any) => {
     flex: 1,
   };
 
+  const urlBase = 'http://192.168.1.223:8000/api/';
+
+  const [userID, setUserID] = useState<number>();
+  const fetchUser = useCallback(async () => {
+    try {
+      const res = await axios.get(urlBase + 'profil/');
+      if (res.data) {
+        const dataUser = res.data;
+        setUserID(dataUser.id);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]);
+
+  console.log(userID);
+
+  useEffect(() => {
+    if (userID !== undefined) {
+      setPostData(data => ({
+        ...data,
+        user_id: userID,
+      }));
+    }
+  }, [userID]);
+
   // SECTION CORE ADD NOTE
 
-  const [sections, setSections] = useState([{nominal: '0', kategori: 'Cash'}]);
+  const [sections, setSections] = useState([
+    {
+      nominal: '0',
+      kategori: 'Cash',
+      kategoriAlokasi: 'Semua Alokasi',
+    },
+  ]);
 
-  const addSection = () => {
-    setSections([...sections, {nominal: '0', kategori: 'Cash'}]);
+  // const addSection = () => {
+  //   setSections([
+  //     ...sections,
+  //     {
+  //       nominal: '0',
+  //       kategori: 'Cash',
+  //       kategoriAlokasi: 'Semua',
+  //     },
+  //   ]);
 
-    setPostData(prevData => ({
-      ...prevData,
-      catatan_pemasukan: [
-        ...prevData.catatan_pemasukan,
-        {nominal_uang_masuk: 'Rp 0', kategori_uang_masuk: 'Cash'},
-      ],
-    }));
-  };
+  //   setPostData(prevData => ({
+  //     ...prevData,
+  //     catatan_pemasukan: [
+  //       ...prevData.catatan_pemasukan,
+  //       {
+  //         nominal_uang_masuk: 'Rp 0',
+  //         kategori_uang_masuk: 'Cash',
+  //         alokasis: [
+  //           {
+  //             alokasi_id: 1,
+  //             variabel_teralokasi: 'Semua',
+  //             saldo_teralokasi: 'Rp 0',
+  //           },
+  //         ],
+  //       },
+  //     ],
+  //   }));
+  // };
 
-  const removeSection = (index: number) => {
-    const updatedSections = [...sections];
-    updatedSections.splice(index, 1);
-    setSections(updatedSections);
+  // const removeSection = (index: number) => {
+  //   const updatedSections = [...sections];
+  //   updatedSections.splice(index, 1);
+  //   setSections(updatedSections);
 
-    setPostData(prevData => ({
-      ...prevData,
-      catatan_pemasukan: prevData.catatan_pemasukan.filter(
-        (_, i) => i !== index,
-      ),
-    }));
-  };
+  //   setPostData(prevData => ({
+  //     ...prevData,
+  //     catatan_pemasukan: prevData.catatan_pemasukan.filter(
+  //       (_, i) => i !== index,
+  //     ),
+  //   }));
+  // };
 
   const handleNominalChange = (index: number, newTotal: string) => {
     const updatedSections = [...sections];
@@ -91,6 +150,23 @@ const AddNoteIncome = ({navigation}: any) => {
           : item,
       ),
     }));
+
+    setPostData(prevData => ({
+      ...prevData,
+      alokasis: prevData.alokasis.map((item, i) =>
+        i === index
+          ? {
+              ...item,
+              saldo_teralokasi: new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+              }).format(nominalValue),
+            }
+          : item,
+      ),
+    }));
   };
 
   const calculateTotal = useCallback(() => {
@@ -100,6 +176,14 @@ const AddNoteIncome = ({navigation}: any) => {
     });
     return total;
   }, [sections]);
+
+  useEffect(() => {
+    const total = calculateTotal();
+    setPostData(prevData => ({
+      ...prevData,
+      total_uang_masuk: formatCurrency(total.toString()),
+    }));
+  }, [calculateTotal]);
 
   const formatCurrency = (value: string): string => {
     const amountValue = value.replace(/[^\d]/g, '');
@@ -114,14 +198,6 @@ const AddNoteIncome = ({navigation}: any) => {
       maximumFractionDigits: 0,
     });
   };
-
-  useEffect(() => {
-    const total = calculateTotal();
-    setPostData(prevData => ({
-      ...prevData,
-      total_uang_masuk: formatCurrency(total.toString()),
-    }));
-  }, [calculateTotal]);
 
   const handleCategoryIncome = (categoryIncome: string, index: number) => {
     const updatedSections = [...sections];
@@ -139,7 +215,7 @@ const AddNoteIncome = ({navigation}: any) => {
   const sectionIncome = () => {
     return sections.map((section, index) => (
       <View key={index}>
-        <View
+        {/* <View
           style={{
             marginRight: 6,
             marginTop: 4,
@@ -167,67 +243,185 @@ const AddNoteIncome = ({navigation}: any) => {
               />
             </Svg>
           </TouchableOpacity>
-        </View>
+        </View> */}
         <View style={{flexDirection: 'row'}}>
-          <Card>
-            <View style={styles.box}>
-              <Text style={styles.label}>Nominal Uang Masuk</Text>
-              <TextInput
-                placeholder="Masukkan Nominal Uang"
-                inputMode="numeric"
-                style={styles.input_nominal}
-                onChangeText={newTotal => handleNominalChange(index, newTotal)}
-                value={formatCurrency(section.nominal)}
-              />
-            </View>
-          </Card>
-          <Card>
-            <View style={styles.box}>
-              <Text style={styles.label}>Kategori Uang Masuk</Text>
-              <View style={styles.input_category}>
-                <CheckBox
-                  title="Cash"
-                  checked={section.kategori === 'Cash'}
-                  onPress={() => handleCategoryIncome('Cash', index)}
-                  checkedIcon={
-                    <Svg viewBox="0 0 512 512" width={20} height={20}>
-                      <Path
-                        fill="#0D6EFD"
-                        d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256-96a96 96 0 1 1 0 192 96 96 0 1 1 0-192z"
-                      />
-                    </Svg>
+          <View style={{flex: 1}}>
+            <Card>
+              <View style={styles.box}>
+                <Text style={styles.label}>Nominal Uang Masuk</Text>
+                <TextInput
+                  placeholder="Masukkan Nominal Uang"
+                  inputMode="numeric"
+                  style={styles.input_nominal}
+                  onChangeText={newTotal =>
+                    handleNominalChange(index, newTotal)
                   }
-                  uncheckedIcon={
-                    <Svg viewBox="0 0 512 512" width={20} height={20}>
-                      <Path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z" />
-                    </Svg>
-                  }
+                  value={formatCurrency(section.nominal)}
                 />
               </View>
-              <View style={styles.input_category}>
-                <CheckBox
-                  title="Cashless"
-                  checked={section.kategori === 'Cashless'}
-                  onPress={() => handleCategoryIncome('Cashless', index)}
-                  checkedIcon={
-                    <Svg viewBox="0 0 512 512" width={20} height={20}>
-                      <Path
-                        fill="#0D6EFD"
-                        d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256-96a96 96 0 1 1 0 192 96 96 0 1 1 0-192z"
-                      />
-                    </Svg>
-                  }
-                  uncheckedIcon={
-                    <Svg viewBox="0 0 512 512" width={20} height={20}>
-                      <Path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z" />
-                    </Svg>
-                  }
-                />
+            </Card>
+          </View>
+          <View style={{flex: 1}}>
+            <Card>
+              <View style={styles.box}>
+                <Text style={styles.label}>Kategori Uang Masuk</Text>
+                <View style={[styles.input_category, {marginTop: 4}]}>
+                  <CheckBox
+                    title="Cash"
+                    checked={section.kategori === 'Cash'}
+                    onPress={() => handleCategoryIncome('Cash', index)}
+                    textStyle={{fontWeight: 'normal'}}
+                    checkedIcon={
+                      <Svg viewBox="0 0 512 512" width={20} height={20}>
+                        <Path
+                          fill="#0D6EFD"
+                          d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256-96a96 96 0 1 1 0 192 96 96 0 1 1 0-192z"
+                        />
+                      </Svg>
+                    }
+                    uncheckedIcon={
+                      <Svg viewBox="0 0 512 512" width={20} height={20}>
+                        <Path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z" />
+                      </Svg>
+                    }
+                  />
+                </View>
+                <View style={{marginBottom: 4}}>
+                  <CheckBox
+                    title="Cashless"
+                    checked={section.kategori === 'Cashless'}
+                    onPress={() => handleCategoryIncome('Cashless', index)}
+                    textStyle={{fontWeight: 'normal'}}
+                    checkedIcon={
+                      <Svg viewBox="0 0 512 512" width={20} height={20}>
+                        <Path
+                          fill="#0D6EFD"
+                          d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256-96a96 96 0 1 1 0 192 96 96 0 1 1 0-192z"
+                        />
+                      </Svg>
+                    }
+                    uncheckedIcon={
+                      <Svg viewBox="0 0 512 512" width={20} height={20}>
+                        <Path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z" />
+                      </Svg>
+                    }
+                  />
+                </View>
               </View>
-            </View>
-          </Card>
+            </Card>
+          </View>
         </View>
+        <Card>
+          <View style={{marginTop: 6, marginBottom: 24, paddingHorizontal: 6}}>
+            <Text style={styles.label}>Alokasi Ke</Text>
+            {fetchAllocationSection(index)}
+          </View>
+        </Card>
         <LineBreak />
+      </View>
+    ));
+  };
+
+  const [savedAllocation, setSavedAllocation] = useState<
+    {id: number; variabel_alokasi: string}[]
+  >([]);
+
+  const fetchAllocation = async () => {
+    try {
+      const urlKey = 'alokasi/';
+      const res = await axios.get(urlBase + urlKey);
+      if (res.data.success) {
+        const dataAlokasi = res.data.data;
+        // console.log(dataAlokasi);
+
+        setSavedAllocation(dataAlokasi);
+      }
+    } catch (error) {}
+  };
+
+  useEffect(() => {
+    fetchAllocation();
+  }, []);
+
+  useEffect(() => {
+    const fetchAllocations = async () => {
+      try {
+        const urlKey = 'alokasi/';
+        const res = await axios.get(urlBase + urlKey);
+        if (res.data.success) {
+          const dataAlokasi = res.data.data;
+          // console.log(dataAlokasi);
+          setSavedAllocation(dataAlokasi);
+        }
+      } catch (error) {}
+    };
+
+    fetchAllocations();
+  }, []);
+
+  const handleCategoryAllocation = (
+    categoryAllocation: string,
+    sectionIndex: number,
+    allocationIndex: number,
+  ) => {
+    const updatedSections = sections.map((section, i) =>
+      i === sectionIndex
+        ? {...section, kategoriAlokasi: categoryAllocation}
+        : section,
+    );
+    setSections(updatedSections);
+
+    setPostData(prevData => {
+      const newPostData = {
+        ...prevData,
+        alokasis: prevData.alokasis.map((item, i) =>
+          i === sectionIndex
+            ? {
+                ...item,
+                variabel_teralokasi: categoryAllocation,
+                alokasi_id: savedAllocation[allocationIndex].id,
+              }
+            : item,
+        ),
+      };
+
+      return newPostData;
+    });
+  };
+
+  const fetchAllocationSection = (sectionIndex: number) => {
+    return savedAllocation.map((allocation, allocationIndex) => (
+      <View key={allocationIndex} style={{height: 32}}>
+        <View>
+          <CheckBox
+            title={allocation.variabel_alokasi}
+            textStyle={{fontWeight: 'normal', textTransform: 'capitalize'}}
+            checked={
+              allocation.variabel_alokasi ===
+              sections[sectionIndex]?.kategoriAlokasi
+            }
+            onPress={() =>
+              handleCategoryAllocation(
+                allocation.variabel_alokasi,
+                sectionIndex,
+                allocationIndex,
+              )
+            }
+            checkedIcon={
+              <Svg viewBox="0 0 512 512" width={20} height={20}>
+                <Path
+                  fill="#0D6EFD"
+                  d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256-96a96 96 0 1 1 0 192 96 96 0 1 1 0-192z"
+                />
+              </Svg>
+            }
+            uncheckedIcon={
+              <Svg viewBox="0 0 512 512" width={20} height={20}>
+                <Path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z" />
+              </Svg>
+            }
+          />
+        </View>
       </View>
     ));
   };
@@ -235,19 +429,31 @@ const AddNoteIncome = ({navigation}: any) => {
   // END SECTION CORE ADD NOTE
 
   const [postData, setPostData] = useState<PostDataState>({
+    user_id: userID,
     deskripsi: '',
     kategori: 'Catatan Pemasukan',
     total_uang_masuk: '',
     catatan_pemasukan: [
-      {nominal_uang_masuk: 'Rp 0', kategori_uang_masuk: 'Cash'},
+      {
+        nominal_uang_masuk: 'Rp 0',
+        kategori_uang_masuk: 'Cash',
+      },
+    ],
+    alokasis: [
+      {
+        alokasi_id: 1,
+        variabel_teralokasi: 'Semua Alokasi',
+        saldo_teralokasi: 'Rp 0',
+      },
     ],
   });
+
   console.log(postData);
 
   const submitNoteIncome = async () => {
     try {
       const response = await axios.post(
-        'http://192.168.43.129:8000/api/catatan/',
+        'http://192.168.1.223:8000/api/catatan/',
         postData,
         {
           headers: {
@@ -256,6 +462,7 @@ const AddNoteIncome = ({navigation}: any) => {
         },
       );
       console.log('Success post data: ', response.data);
+      Alert.alert('Berhasil', 'Data Berhasil Disimpan');
       navigation.navigate('Home');
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -273,7 +480,7 @@ const AddNoteIncome = ({navigation}: any) => {
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+        barStyle={isDarkMode ? 'dark-content' : 'light-content'}
         backgroundColor={
           isDarkMode ? backgroundStyle.backgroundColor : '#0284C7'
         }
@@ -296,6 +503,10 @@ const AddNoteIncome = ({navigation}: any) => {
       </View>
       <ScrollView style={{flex: 1}}>
         <View style={styles.container}>
+          <TextInput
+            style={{display: 'none'}}
+            value={postData.user_id?.toString()}
+          />
           <Card>
             <View style={styles.box}>
               <Text style={styles.label}>Deskripsi Catatan Pemasukan</Text>
@@ -314,7 +525,9 @@ const AddNoteIncome = ({navigation}: any) => {
           <LineBreak />
           <View>
             {sectionIncome()}
-            <View style={{alignItems: 'center', marginBottom: 12}}>
+
+            {/* ADD SECTION BUTTON */}
+            {/* <View style={{alignItems: 'center', marginBottom: 12}}>
               <TouchableOpacity onPress={addSection} style={styles.addButton}>
                 <View
                   style={{
@@ -334,7 +547,7 @@ const AddNoteIncome = ({navigation}: any) => {
                   </Svg>
                 </View>
               </TouchableOpacity>
-            </View>
+            </View> */}
             <Card>
               <View style={[styles.box, {width: 360}]}>
                 <Text style={{fontSize: 16, fontWeight: 'bold'}}>Total</Text>
@@ -353,7 +566,7 @@ const AddNoteIncome = ({navigation}: any) => {
               <BackButton />
             </View>
             <View style={{flex: 1}}>
-              <SubmitButton onPress={submitNoteIncome} />
+              <SubmitButton onPress={submitNoteIncome} textButton="Simpan" />
             </View>
           </View>
         </View>
@@ -406,7 +619,6 @@ const styles = StyleSheet.create({
   },
   input_nominal: {
     height: 80,
-    width: 150,
     margin: 5,
     padding: 10,
     borderWidth: 2,
@@ -415,8 +627,7 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   input_category: {
-    height: 40,
-    width: 160,
+    height: 32,
   },
   input_description: {
     margin: 5,

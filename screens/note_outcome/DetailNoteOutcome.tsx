@@ -25,6 +25,7 @@ import EditButton from '../../components/EditButton';
 import LineBreak from '../../components/LineBreak';
 
 type DataCatatan = {
+  id: number;
   deskripsi: string | null;
   kategori: string;
   total_uang_keluar: number;
@@ -43,6 +44,10 @@ type CatatanPengeluaran = {
   created_at: string;
 };
 
+type DataAlokasi = {
+  variabel_alokasi: string;
+};
+
 const DetailNoteOutcome = ({navigation, route}: any) => {
   const isDarkMode = useColorScheme() === 'dark';
 
@@ -55,9 +60,11 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
 
   const [data, setData] = useState<DataCatatan>();
 
-  const urlBase = 'http://192.168.43.129:8000/api/';
+  const urlBase = 'http://192.168.1.223:8000/api/';
   const urlKey = 'catatan/';
   const {itemId} = route.params;
+
+  const [typeOfNeed, setTypeOfNeed] = useState('');
 
   useEffect(() => {
     axios
@@ -67,6 +74,13 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
           const catatanData = res.data.data;
           setData(catatanData);
           // console.log(catatanData);
+
+          let jenisKebutuhan = '';
+          catatanData.catatan_pengeluaran.forEach((element: any) => {
+            jenisKebutuhan = element.jenis_kebutuhan;
+          });
+
+          setTypeOfNeed(jenisKebutuhan);
         } else {
           console.error('Failed to fetch data: ', res.data.message);
         }
@@ -102,10 +116,60 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
     }
   };
 
+  const [allocationData, setAllocationData] = useState<DataAlokasi[]>([]);
+
+  useEffect(() => {
+    const fetchAllocation = async () => {
+      try {
+        const res = await axios.get(urlBase + 'alokasi/');
+        if (res.data.success) {
+          const dataAlokasi = res.data.data;
+          // console.log(dataAlokasi);
+          setAllocationData(dataAlokasi);
+        }
+      } catch (error) {
+        console.error('Error fetching data: ', error);
+      }
+    };
+
+    fetchAllocation();
+  }, []);
+
+  const allocationSection = () => {
+    return allocationData.map((allocation, allocationIndex) => (
+      <View key={allocationIndex}>
+        {allocation.variabel_alokasi === 'Semua Alokasi' ? (
+          <View />
+        ) : (
+          <View style={[styles.input_category, {marginBottom: 4}]}>
+            <CheckBox
+              title={allocation.variabel_alokasi}
+              textStyle={{fontWeight: 'normal', textTransform: 'capitalize'}}
+              checked={allocation.variabel_alokasi === typeOfNeed}
+              checkedIcon={
+                <Svg viewBox="0 0 512 512" width={20} height={20}>
+                  <Path
+                    fill="#0D6EFD"
+                    d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256-96a96 96 0 1 1 0 192 96 96 0 1 1 0-192z"
+                  />
+                </Svg>
+              }
+              uncheckedIcon={
+                <Svg viewBox="0 0 512 512" width={20} height={20}>
+                  <Path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z" />
+                </Svg>
+              }
+            />
+          </View>
+        )}
+      </View>
+    ));
+  };
+
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+        barStyle={isDarkMode ? 'dark-content' : 'light-content'}
         backgroundColor={
           isDarkMode ? backgroundStyle.backgroundColor : '#0284C7'
         }
@@ -140,7 +204,7 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
                   <View style={styles.box}>
                     <Text style={styles.label}>Nama Barang/Keperluan</Text>
                     <TextInput
-                      defaultValue={item.nama_barang}
+                      value={item.nama_barang}
                       readOnly={true}
                       style={styles.input_primary}
                     />
@@ -152,8 +216,8 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
                       <Text style={styles.label}>Harga</Text>
                       <TextInput
                         style={styles.input_secondary}
-                        readOnly={true}
-                        defaultValue={formatCurrency(item.harga_barang)}
+                        editable={false}
+                        value={formatCurrency(item.harga_barang)}
                       />
                     </View>
                   </Card>
@@ -196,73 +260,7 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
                             </Svg>
                           </TouchableOpacity>
                         </View>
-                        <View style={styles.input_category}>
-                          <CheckBox
-                            title="Primer"
-                            style={{marginVertical: 0}}
-                            checked={
-                              item.jenis_kebutuhan === 'Kebutuhan Primer'
-                            }
-                            checkedIcon={
-                              <Svg viewBox="0 0 512 512" width={20} height={20}>
-                                <Path
-                                  fill="#0D6EFD"
-                                  d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256-96a96 96 0 1 1 0 192 96 96 0 1 1 0-192z"
-                                />
-                              </Svg>
-                            }
-                            uncheckedIcon={
-                              <Svg viewBox="0 0 512 512" width={20} height={20}>
-                                <Path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z" />
-                              </Svg>
-                            }
-                          />
-                        </View>
-                        <View style={styles.input_category}>
-                          <CheckBox
-                            title="Sekunder"
-                            style={{marginVertical: 0}}
-                            checked={
-                              item.jenis_kebutuhan === 'Kebutuhan Sekunder'
-                            }
-                            checkedIcon={
-                              <Svg viewBox="0 0 512 512" width={20} height={20}>
-                                <Path
-                                  fill="#0D6EFD"
-                                  d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256-96a96 96 0 1 1 0 192 96 96 0 1 1 0-192z"
-                                />
-                              </Svg>
-                            }
-                            uncheckedIcon={
-                              <Svg viewBox="0 0 512 512" width={20} height={20}>
-                                <Path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z" />
-                              </Svg>
-                            }
-                          />
-                        </View>
-                        <View
-                          style={[styles.input_category, {marginBottom: 8}]}>
-                          <CheckBox
-                            title="Darurat"
-                            style={{marginVertical: 0}}
-                            checked={
-                              item.jenis_kebutuhan === 'Kebutuhan Darurat'
-                            }
-                            checkedIcon={
-                              <Svg viewBox="0 0 512 512" width={20} height={20}>
-                                <Path
-                                  fill="#0D6EFD"
-                                  d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256-96a96 96 0 1 1 0 192 96 96 0 1 1 0-192z"
-                                />
-                              </Svg>
-                            }
-                            uncheckedIcon={
-                              <Svg viewBox="0 0 512 512" width={20} height={20}>
-                                <Path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z" />
-                              </Svg>
-                            }
-                          />
-                        </View>
+                        {allocationSection()}
                       </View>
                     </Card>
                   </View>
@@ -270,10 +268,11 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
                     <Card>
                       <View style={styles.box}>
                         <Text style={styles.label}>Kategori Uang Keluar</Text>
-                        <View style={{marginTop: 4}}>
+                        <View style={[styles.input_category, {marginTop: 4}]}>
                           <CheckBox
                             title="Cash"
                             checked={item.kategori_uang_keluar === 'Cash'}
+                            textStyle={{fontWeight: 'normal'}}
                             checkedIcon={
                               <Svg viewBox="0 0 512 512" width={20} height={20}>
                                 <Path
@@ -289,10 +288,11 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
                             }
                           />
                         </View>
-                        <View style={{marginBottom: 2}}>
+                        <View style={{marginBottom: 4}}>
                           <CheckBox
                             title="Cashless"
                             checked={item.kategori_uang_keluar === 'Cashless'}
+                            textStyle={{fontWeight: 'normal'}}
                             checkedIcon={
                               <Svg viewBox="0 0 512 512" width={20} height={20}>
                                 <Path
@@ -409,7 +409,12 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
                 />
               </View>
               <View style={{flex: 1}}>
-                <EditButton />
+                <EditButton
+                  onPress={() =>
+                    navigation.navigate('EditNoteOutcome', {itemId: data.id})
+                  }
+                  textButton="Edit"
+                />
               </View>
             </View>
             <View style={{flex: 1}}>

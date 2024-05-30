@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import {CheckBox} from '@rneui/themed';
 import axios from 'axios';
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -23,11 +23,13 @@ import EditButton from '../../components/EditButton';
 import LineBreak from '../../components/LineBreak';
 
 type DataCatatan = {
+  id: number;
   deskripsi: string | null;
   kategori: string;
   total_uang_masuk: number;
   created_at: string;
   catatan_pemasukan: CatatanPemasukan[];
+  alokasis: Alokasis[];
 };
 
 type CatatanPemasukan = {
@@ -35,6 +37,24 @@ type CatatanPemasukan = {
   kategori_uang_masuk: string;
   nominal_uang_masuk: number;
   created_at: string;
+};
+
+type Alokasis = {
+  id: number;
+  variabel_alokasi: string;
+  persentase_alokasi: number;
+  created_at: string;
+  pivot: {
+    catatan_id: number;
+    alokasi_id: number;
+    variabel_teralokasi: string;
+    saldo_teralokasi: number;
+    created_at: string;
+  };
+};
+
+type DataAlokasi = {
+  variabel_alokasi: string;
 };
 
 const DetailNoteIncome = ({navigation, route}: any) => {
@@ -45,32 +65,48 @@ const DetailNoteIncome = ({navigation, route}: any) => {
     flex: 1,
   };
 
-  const [data, setData] = useState<DataCatatan>();
-
-  const urlBase = 'http://192.168.43.129:8000/api/';
+  const urlBase = 'http://192.168.1.223:8000/api/';
   const urlKey = 'catatan/';
   const {itemId} = route.params;
   // console.log(itemId);
+  const [data, setData] = useState<DataCatatan | null>(null);
 
-  useEffect(() => {
-    const fetchDatabyID = async () => {
-      try {
-        const res = await axios.get(urlBase + urlKey + `${itemId}`);
-        if (res.data.success) {
-          const dataCatatan = res.data.data;
-          setData(dataCatatan);
-          // console.log(dataCatatan);
-        } else {
-          console.error('Failed to fetch data: ', res.data.message);
-        }
-      } catch (error) {
-        console.error('Error fetching data: ', error);
+  const [variabelTerpilih, setVariabelTerpilih] = useState('');
+
+  const fetchDatabyID = useCallback(async () => {
+    try {
+      const res = await axios.get(urlBase + urlKey + `${itemId}`);
+      if (res.data.success) {
+        const dataCatatan = res.data.data;
+        setData(dataCatatan);
+        // console.log(dataCatatan);
+
+        let variabelTeralokasi = '';
+        dataCatatan.alokasis.forEach((element: any) => {
+          variabelTeralokasi = element.pivot.variabel_teralokasi;
+        });
+        console.log(variabelTeralokasi);
+
+        setVariabelTerpilih(variabelTeralokasi);
+      } else {
+        console.error('Failed to fetch data: ', res.data.message);
       }
-    };
-    fetchDatabyID();
+    } catch (error) {
+      console.error('Error fetching data: ', error);
+    }
   }, [itemId]);
 
+  useEffect(() => {
+    fetchDatabyID();
+  }, [fetchDatabyID]);
+
+  // console.log(updateData);
+  console.log(data);
+
   const formatCurrency = (amount: number) => {
+    if (isNaN(amount)) {
+      return 'Rp ';
+    }
     return amount.toLocaleString('id-ID', {
       style: 'currency',
       currency: 'IDR',
@@ -96,10 +132,56 @@ const DetailNoteIncome = ({navigation, route}: any) => {
     }
   };
 
+  const [allocationData, setAllocationData] = useState<DataAlokasi[]>([]);
+
+  useEffect(() => {
+    const fetchAllocation = async () => {
+      try {
+        const res = await axios.get(urlBase + 'alokasi/');
+        if (res.data.success) {
+          const dataAlokasi = res.data.data;
+          // console.log(dataAlokasi);
+          setAllocationData(dataAlokasi);
+        }
+      } catch (error) {
+        console.error('Error fetching data: ', error);
+      }
+    };
+
+    fetchAllocation();
+  }, []);
+
+  const allocationSection = () => {
+    return allocationData.map((allocation, allocationIndex) => (
+      <View key={allocationIndex} style={{height: 32, marginBottom: 4}}>
+        <View>
+          <CheckBox
+            title={allocation.variabel_alokasi}
+            textStyle={{fontWeight: 'normal', textTransform: 'capitalize'}}
+            checked={allocation.variabel_alokasi === variabelTerpilih}
+            checkedIcon={
+              <Svg viewBox="0 0 512 512" width={20} height={20}>
+                <Path
+                  fill="#0D6EFD"
+                  d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256-96a96 96 0 1 1 0 192 96 96 0 1 1 0-192z"
+                />
+              </Svg>
+            }
+            uncheckedIcon={
+              <Svg viewBox="0 0 512 512" width={20} height={20}>
+                <Path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z" />
+              </Svg>
+            }
+          />
+        </View>
+      </View>
+    ));
+  };
+
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+        barStyle={isDarkMode ? 'dark-content' : 'light-content'}
         backgroundColor={
           isDarkMode ? backgroundStyle.backgroundColor : '#0284C7'
         }
@@ -135,16 +217,28 @@ const DetailNoteIncome = ({navigation, route}: any) => {
             <Card>
               <View style={styles.box}>
                 <Text style={styles.label}>Deskripsi Catatan Pemasukan</Text>
-                <TextInput
-                  defaultValue={data.deskripsi || 'Tidak ada deskripsi catatan'}
-                  readOnly={true}
-                  style={styles.input_deskripsi}
-                  multiline={true}
-                  numberOfLines={4}
-                />
+                {data.deskripsi !== null ? (
+                  <TextInput
+                    value={data.deskripsi}
+                    editable={false}
+                    style={styles.input_deskripsi}
+                    multiline={true}
+                    numberOfLines={4}
+                  />
+                ) : (
+                  <TextInput
+                    placeholder="Tidak ada deskripsi catatan"
+                    editable={false}
+                    style={styles.input_deskripsi}
+                    multiline={true}
+                    numberOfLines={4}
+                  />
+                )}
               </View>
             </Card>
+
             <LineBreak />
+
             {data.catatan_pemasukan.map(item => (
               <View key={item.id}>
                 <View style={{flexDirection: 'row'}}>
@@ -153,21 +247,23 @@ const DetailNoteIncome = ({navigation, route}: any) => {
                       <View style={styles.box}>
                         <Text style={styles.label}>Nominal Uang Masuk</Text>
                         <TextInput
-                          readOnly={true}
-                          style={styles.input_source}
-                          defaultValue={formatCurrency(item.nominal_uang_masuk)}
+                          editable={false}
+                          style={styles.input_nominal}
+                          value={formatCurrency(item?.nominal_uang_masuk)}
                         />
                       </View>
                     </Card>
                   </View>
+
                   <View style={{flex: 1}}>
                     <Card>
                       <View style={styles.box}>
                         <Text style={styles.label}>Kategori Uang Masuk</Text>
-                        <View style={styles.input_category}>
+                        <View style={[styles.input_category, {marginTop: 4}]}>
                           <CheckBox
                             title="Cash"
                             checked={item.kategori_uang_masuk === 'Cash'}
+                            textStyle={{fontWeight: 'normal'}}
                             checkedIcon={
                               <Svg viewBox="0 0 512 512" width={20} height={20}>
                                 <Path
@@ -183,10 +279,11 @@ const DetailNoteIncome = ({navigation, route}: any) => {
                             }
                           />
                         </View>
-                        <View style={styles.input_category}>
+                        <View style={{marginBottom: 4}}>
                           <CheckBox
                             title="Cashless"
                             checked={item.kategori_uang_masuk === 'Cashless'}
+                            textStyle={{fontWeight: 'normal'}}
                             checkedIcon={
                               <Svg viewBox="0 0 512 512" width={20} height={20}>
                                 <Path
@@ -208,16 +305,26 @@ const DetailNoteIncome = ({navigation, route}: any) => {
                 </View>
               </View>
             ))}
-            <LineBreak />
+
+            <Card>
+              <View style={styles.box}>
+                <Text style={styles.label}>Uang Dialokasikan Ke</Text>
+                {allocationSection()}
+              </View>
+            </Card>
+
+            <View style={{marginVertical: 2}}>
+              <LineBreak />
+            </View>
+
             <Card>
               <View style={[styles.box, {width: 360}]}>
                 <Text style={{fontSize: 16, fontWeight: 'bold'}}>Total</Text>
                 <View style={styles.card}>
                   <TextInput
                     style={styles.input_total}
-                    readOnly={true}
-                    inputMode="numeric"
-                    defaultValue={formatCurrency(data.total_uang_masuk)}
+                    editable={false}
+                    value={formatCurrency(data.total_uang_masuk)}
                   />
                 </View>
               </View>
@@ -231,7 +338,12 @@ const DetailNoteIncome = ({navigation, route}: any) => {
                 />
               </View>
               <View style={{flex: 1}}>
-                <EditButton />
+                <EditButton
+                  textButton="Edit"
+                  onPress={() =>
+                    navigation.navigate('EditNoteIncome', {itemId: data.id})
+                  }
+                />
               </View>
             </View>
             <View style={{flex: 1}}>
@@ -315,8 +427,8 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
     color: '#000000',
   },
-  input_source: {
-    height: 70,
+  input_nominal: {
+    height: 80,
     margin: 5,
     padding: 10,
     borderWidth: 2,
@@ -326,8 +438,7 @@ const styles = StyleSheet.create({
     color: '#000000',
   },
   input_category: {
-    height: 40,
-    width: 160,
+    height: 32,
   },
   input_total: {
     flex: 1,
