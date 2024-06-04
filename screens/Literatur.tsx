@@ -15,8 +15,8 @@ import {
 } from 'react-native';
 import {Path, Svg} from 'react-native-svg';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-import {BottomNavbar} from '../../components/BottomNavbar';
-import LineBreak from '../../components/LineBreak';
+import {BottomNavbar} from '../components/BottomNavbar';
+import LineBreak from '../components/LineBreak';
 
 type LiteraturItem = {
   id: number;
@@ -40,7 +40,7 @@ const Literatur = ({navigation}: any) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const urlBase = 'http://192.168.1.223:8000/api/';
+        const urlBase = 'http://192.168.43.129:8000/api/';
         const urlKey = 'literatur/';
         const res = await axios.get(urlBase + urlKey);
 
@@ -58,7 +58,7 @@ const Literatur = ({navigation}: any) => {
 
   const fetchData = async () => {
     try {
-      const urlBase = 'http://192.168.1.223:8000/api/';
+      const urlBase = 'http://192.168.43.129:8000/api/';
       const urlKey = 'literatur/';
       const res = await axios.get(urlBase + urlKey);
 

@@ -65,7 +65,7 @@ const DetailNoteIncome = ({navigation, route}: any) => {
     flex: 1,
   };
 
-  const urlBase = 'http://192.168.1.223:8000/api/';
+  const urlBase = 'http://192.168.43.129:8000/api/';
   const urlKey = 'catatan/';
   const {itemId} = route.params;
   // console.log(itemId);

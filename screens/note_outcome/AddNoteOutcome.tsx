@@ -62,7 +62,7 @@ const AddNoteOutcome = ({navigation}: any) => {
 
   const fetchAllocation = async () => {
     try {
-      const urlBase = 'http://192.168.1.223:8000/api/';
+      const urlBase = 'http://192.168.43.129:8000/api/';
       const urlKey = 'alokasi/';
       const res = await axios.get(urlBase + urlKey);
       if (res.data.success) {
@@ -80,7 +80,7 @@ const AddNoteOutcome = ({navigation}: any) => {
   useEffect(() => {
     const fetchAllocations = async () => {
       try {
-        const urlBase = 'http://192.168.1.223:8000/api/';
+        const urlBase = 'http://192.168.43.129:8000/api/';
         const urlKey = 'alokasi/';
         const res = await axios.get(urlBase + urlKey);
         if (res.data.success) {
@@ -97,7 +97,7 @@ const AddNoteOutcome = ({navigation}: any) => {
   const [userID, setUserID] = useState<number>();
   const fetchUser = useCallback(async () => {
     try {
-      const urlBase = 'http://192.168.1.223:8000/api/';
+      const urlBase = 'http://192.168.43.129:8000/api/';
       const res = await axios.get(urlBase + 'profil/');
       if (res.data) {
         const dataUser = res.data;
@@ -624,7 +624,33 @@ const AddNoteOutcome = ({navigation}: any) => {
 
   const submitNoteOutcome = async () => {
     try {
-      const urlBase = 'http://192.168.1.223:8000/api/';
+      if (
+        Array.isArray(postData.catatan_pengeluaran) &&
+        postData.catatan_pengeluaran.every(e => e.nama_barang === '')
+      ) {
+        Alert.alert('Error', 'Kolom nama barang harus diisi');
+        return;
+      } else if (
+        Array.isArray(postData.catatan_pengeluaran) &&
+        postData.catatan_pengeluaran.every(e => e.harga_barang === 'Rp 0')
+      ) {
+        Alert.alert('Error', 'Kolom harga barang masih Rp 0');
+        return;
+      } else if (
+        Array.isArray(postData.catatan_pengeluaran) &&
+        postData.catatan_pengeluaran.every(e => e.satuan_barang === '')
+      ) {
+        Alert.alert('Error', 'Kolom satuan barang tidak boleh 0');
+        return;
+      } else if (
+        Array.isArray(postData.catatan_pengeluaran) &&
+        postData.catatan_pengeluaran.every(e => e.jenis_kebutuhan === '')
+      ) {
+        Alert.alert('Error', 'Kolom jenis kebutuhan harus diisi');
+        return;
+      }
+
+      const urlBase = 'http://192.168.43.129:8000/api/';
       const urlKey = 'catatan/';
       const response = await axios.post(urlBase + urlKey, postData);
       console.log('Success post data: ', response.data);

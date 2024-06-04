@@ -1,4 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
+import axios from 'axios';
 import React, {useEffect, useState} from 'react';
 import {
   SafeAreaView,
@@ -11,7 +12,6 @@ import {
 } from 'react-native';
 import {Path, Svg} from 'react-native-svg';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-import apiClient from '../api/apiClient';
 import {BottomNavbar} from '../components/BottomNavbar';
 import LineBreak from '../components/LineBreak';
 import List from '../components/List';
@@ -24,58 +24,18 @@ const Home = ({navigation}: any) => {
     flex: 1,
   };
 
-  // const [, setData] = useState([]);
+  const [datas, setDatas] = useState([]);
   const [saldoCash, setSaldoCash] = useState(0);
   const [saldoCashless, setSaldoCashless] = useState(0);
 
+  const urlBase = 'http://192.168.43.129:8000/api/';
   const urlKey = 'catatan/';
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await apiClient.get(urlKey);
-        if (res.data.success) {
-          const dataCatatan = res.data.data;
-          // setData(dataCatatan);
-
-          let cash = 0;
-          let cashless = 0;
-
-          dataCatatan.forEach((item: any) => {
-            item.catatan_pemasukan.forEach((pemasukan: any) => {
-              if (pemasukan.kategori_uang_masuk === 'Cash') {
-                cash += pemasukan.nominal_uang_masuk;
-              } else {
-                cashless += pemasukan.nominal_uang_masuk;
-              }
-            });
-            item.catatan_pengeluaran.forEach((pengeluaran: any) => {
-              if (pengeluaran.kategori_uang_keluar === 'Cash') {
-                cash -= pengeluaran.nominal_uang_keluar;
-              } else {
-                cashless -= pengeluaran.nominal_uang_keluar;
-              }
-            });
-          });
-          setSaldoCash(cash);
-          setSaldoCashless(cashless);
-        } else {
-          console.error('Failed to fetch data: ', res.data.message);
-        }
-      } catch (error) {
-        console.error('Error fetching data: ', error);
-      }
-    };
-    fetchData();
-  }, []);
 
   const fetchData = async () => {
     try {
-      const res = await apiClient.get(urlKey);
+      const res = await axios.get(urlBase + urlKey);
       if (res.data.success) {
         const dataCatatan = res.data.data;
-
-        // console.log(dataCatatan);
 
         let cash = 0;
         let cashless = 0;
@@ -96,6 +56,7 @@ const Home = ({navigation}: any) => {
             }
           });
         });
+        setDatas(dataCatatan);
         setSaldoCash(cash);
         setSaldoCashless(cashless);
       } else {
@@ -206,7 +167,7 @@ const Home = ({navigation}: any) => {
       </View>
       <ScrollView>
         <View>
-          <List navigation={navigation} />
+          <List navigation={navigation} data={datas} />
         </View>
 
         <View style={{marginVertical: 8}}>

@@ -57,7 +57,7 @@ const Alokasi = ({navigation}: any) => {
     flex: 1,
   };
 
-  const urlBase = 'http://192.168.1.223:8000/api/';
+  const urlBase = 'http://192.168.43.129:8000/api/';
   const urlKey = 'alokasi/';
 
   const [userID, setUserID] = useState<User>();
@@ -154,13 +154,21 @@ const Alokasi = ({navigation}: any) => {
       persentase_alokasi: section.percentageAllocationValue,
       user_id: section.userIdValue,
     }));
+
     console.log('Prepared post data:', JSON.stringify(postData, null, 2)); // Debugging line
+
     return postData;
   };
 
   const submitAllocation = async () => {
     try {
       const postAllocationData = preparePostAllocationData();
+
+      if (postAllocationData.every(e => e.variabel_alokasi === '')) {
+        Alert.alert('Error', 'Kolom tidak boleh kosong');
+        return;
+      }
+
       console.log(postAllocationData);
 
       const response = await axios.post(urlBase + urlKey, postAllocationData, {
@@ -171,7 +179,16 @@ const Alokasi = ({navigation}: any) => {
 
       console.log('Success post data: ', response.data);
       Alert.alert('Berhasil', 'Data Berhasil Disimpan');
+      setDisableButton(true);
       fetchAllocation();
+
+      setAllocationSections([
+        {
+          variableAllocationValue: '',
+          percentageAllocationValue: 0,
+          userIdValue: userID,
+        },
+      ]);
     } catch (error) {
       console.error('Axios error: ', error);
     }
@@ -272,6 +289,7 @@ const Alokasi = ({navigation}: any) => {
   type alokasiSaldo = {[key: string]: number};
 
   const [saldoPerAlokasi, setSaldoPerAlokasi] = useState<alokasiSaldo>({});
+  const [totalPercentage, setTotalPercentage] = useState(0);
 
   const fetchAllocation = useCallback(async () => {
     try {
@@ -285,8 +303,10 @@ const Alokasi = ({navigation}: any) => {
         let newSaldoTeralokasi: alokasiSaldo = {};
         let saldoDefault = 0;
         let saldoTeralokasi = 0;
+        let totalPersentase = 0;
 
         dataAlokasi.forEach((item: any) => {
+          totalPersentase += item.persentase_alokasi;
           item.alokasi_pemasukans.forEach((pemasukan: any) => {
             variabelTeralokasi = pemasukan.pivot.variabel_teralokasi;
             saldoDefault = pemasukan.pivot.saldo_teralokasi;
@@ -307,6 +327,7 @@ const Alokasi = ({navigation}: any) => {
           }
         });
 
+        setTotalPercentage(totalPersentase);
         setSaldoKeSemua(totalSaldoSemua);
         setPivotVariabelTeralokasi(variabelTeralokasi);
         setSaldoPerAlokasi(newSaldoTeralokasi);
@@ -492,7 +513,7 @@ const Alokasi = ({navigation}: any) => {
   );
 
   const calcAllocation = useCallback(() => {
-    let totalPercentage = 0;
+    let resultTotalPercentage = 0;
 
     if (savedAllocations && savedAllocations.length > 0) {
       const results = savedAllocations
@@ -501,9 +522,9 @@ const Alokasi = ({navigation}: any) => {
           const persentaseAlokasi = section.persentase_alokasi;
           let saldoTeralokasiAkhir = 0;
 
-          totalPercentage += persentaseAlokasi;
+          resultTotalPercentage += persentaseAlokasi;
 
-          if (totalPercentage <= 100) {
+          if (resultTotalPercentage <= 100) {
             const saldoTeralokasiAwal =
               (persentaseAlokasi / 100) * saldoKeSemua;
 
@@ -623,50 +644,59 @@ const Alokasi = ({navigation}: any) => {
                 }}>
                 {/* <PieChart donut radius={70} data={allocationPieData} /> */}
               </View>
+
               {fetchAllocationSection()}
-              {postAllocationSection()}
-              {/* tombol add */}
-              <TouchableOpacity
-                onPress={addAllocationSection}
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  margin: 6,
-                }}>
-                <View
-                  style={{
-                    borderWidth: 2,
-                    padding: 6,
-                    borderRadius: 5,
-                    borderStyle: 'dashed',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}>
-                  <Svg
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2}
-                    stroke="#000000"
-                    width={24}
-                    height={24}>
-                    <Path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M12 4.5v15m7.5-7.5h-15"
-                    />
-                  </Svg>
-                </View>
-              </TouchableOpacity>
-              <View>
-                {disableButton ? (
-                  <View />
-                ) : (
-                  <SubmitButton
-                    onPress={submitAllocation}
-                    textButton="Simpan"
-                  />
-                )}
-              </View>
+
+              {totalPercentage >= 100 ? (
+                <View />
+              ) : (
+                <>
+                  {postAllocationSection()}
+
+                  {/* tombol add */}
+                  <TouchableOpacity
+                    onPress={addAllocationSection}
+                    style={{
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      margin: 6,
+                    }}>
+                    <View
+                      style={{
+                        borderWidth: 2,
+                        padding: 6,
+                        borderRadius: 5,
+                        borderStyle: 'dashed',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}>
+                      <Svg
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2}
+                        stroke="#000000"
+                        width={24}
+                        height={24}>
+                        <Path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M12 4.5v15m7.5-7.5h-15"
+                        />
+                      </Svg>
+                    </View>
+                  </TouchableOpacity>
+                  <View>
+                    {disableButton ? (
+                      <View />
+                    ) : (
+                      <SubmitButton
+                        onPress={submitAllocation}
+                        textButton="Simpan"
+                      />
+                    )}
+                  </View>
+                </>
+              )}
             </View>
           </Card>
 

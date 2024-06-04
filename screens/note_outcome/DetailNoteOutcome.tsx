@@ -60,7 +60,7 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
 
   const [data, setData] = useState<DataCatatan>();
 
-  const urlBase = 'http://192.168.1.223:8000/api/';
+  const urlBase = 'http://192.168.43.129:8000/api/';
   const urlKey = 'catatan/';
   const {itemId} = route.params;
 
@@ -342,15 +342,9 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
                           </View>
                           <View style={{width: 300, marginHorizontal: 4}}>
                             <Text style={styles.text}>
-                              Berikut ini adalah jenis kebutuhan Anda. Kebutuhan
-                              primer meliputi: biaya sewa kost, makan,
-                              tranportasi, dan keperluan lainnya yang terkait
-                              perkuliahan. Kebutuhan sekunder meliputi:
-                              kebutuhan di luar terkait perkuliahan atau
-                              keinginan pribadi. Terakhir, merupakan untuk
-                              darurat bisa meliputi: pengeluaran tidak terduga
-                              atau pengeluaran kritis yang menggunakan dana
-                              tabungan, investasi.
+                              Berikut ini adalah jenis kebutuhan Anda
+                              berdasarkan dari alokasi yang sudah Anda buat
+                              sebelumnya.
                             </Text>
                           </View>
                         </View>

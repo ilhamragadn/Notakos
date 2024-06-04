@@ -1,14 +1,14 @@
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import React from 'react';
+import React, {useEffect} from 'react';
+import NotifService from './NotifService';
 import {AuthProvider, useAuth} from './context/AuthContext';
 import Alokasi from './screens/Alokasi';
 import Home from './screens/Home';
+import Literatur from './screens/Literatur';
 import Login from './screens/Login';
 import Profil from './screens/Profil';
 import Register from './screens/Register';
-import DetailAlokasi from './screens/alocation/DetailAlokasi';
-import Literatur from './screens/literature/Literatur';
 import AddNoteIncome from './screens/note_income/AddNoteIncome';
 import DetailNoteIncome from './screens/note_income/DetailNoteIncome';
 import EditNoteIncome from './screens/note_income/EditNoteIncome';
@@ -19,15 +19,32 @@ import EditNoteOutcome from './screens/note_outcome/EditNoteOutcome';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  const notifService = new NotifService(
+    token => {
+      console.log('Device registered for notifications:', token);
+    },
+    notification => {
+      console.log('Received notification:', notification);
+    },
+  );
+
   return (
     <AuthProvider>
-      <Layout />
+      <Layout notifService={notifService} />
     </AuthProvider>
   );
 }
 
-export const Layout = () => {
+export const Layout = ({notifService}: any) => {
   const {authState} = useAuth();
+
+  useEffect(() => {
+    console.log('Checking authentication state');
+    if (authState?.authenticated) {
+      console.log('User authenticated, scheduling notification');
+      notifService.scheduleNotif('./assets/notif_sample.mp3');
+    }
+  }, [authState, notifService]);
 
   return (
     <NavigationContainer>
@@ -39,7 +56,6 @@ export const Layout = () => {
           <Stack.Group>
             <Stack.Screen name="Home" component={Home} />
             <Stack.Screen name="Alokasi" component={Alokasi} />
-            <Stack.Screen name="DetailAlokasi" component={DetailAlokasi} />
             <Stack.Screen name="AddNoteIncome" component={AddNoteIncome} />
             <Stack.Screen
               name="DetailNoteIncome"

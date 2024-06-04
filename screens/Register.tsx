@@ -170,7 +170,6 @@ const Register = ({navigation}: any) => {
                       marginHorizontal: 2,
                       borderRadius: 8,
                     }}
-                    inputMode="email"
                     value={postFormRegis.email}
                     onChangeText={text =>
                       setPostFormRegis({...postFormRegis, email: text})

@@ -12,6 +12,12 @@ import Svg, {Path} from 'react-native-svg';
 
 const ModalChoose = ({navigation}: any) => {
   const [modalVisible, setModalVisible] = useState(false);
+
+  const navigateAndDisableModal = (link: string) => {
+    navigation.navigate(link);
+    setModalVisible(false);
+  };
+
   return (
     <View>
       <View style={styles.centeredView}>
@@ -24,7 +30,7 @@ const ModalChoose = ({navigation}: any) => {
                   right: 10,
                   top: 10,
                 }}
-                onPress={() => setModalVisible(!modalVisible)}>
+                onPress={() => setModalVisible(false)}>
                 <Svg
                   width={25}
                   height={25}
@@ -44,14 +50,14 @@ const ModalChoose = ({navigation}: any) => {
                 </Text>
                 <View style={styles.fixToText}>
                   <TouchableHighlight
-                    onPress={() => navigation.navigate('AddNoteIncome')}
+                    onPress={() => navigateAndDisableModal('AddNoteIncome')}
                     style={styles.button}>
                     <Text style={{color: '#ffffff', fontWeight: 'bold'}}>
                       Catat Pemasukan
                     </Text>
                   </TouchableHighlight>
                   <TouchableHighlight
-                    onPress={() => navigation.navigate('AddNoteOutcome')}
+                    onPress={() => navigateAndDisableModal('AddNoteOutcome')}
                     style={styles.button}>
                     <Text style={{color: '#ffffff', fontWeight: 'bold'}}>
                       Catat Pengeluaran
@@ -80,6 +86,7 @@ const ModalChoose = ({navigation}: any) => {
             borderRadius: 30,
             backgroundColor: '#0284C7',
             shadowColor: '#0284C7',
+            zIndex: 100,
             shadowOffset: {
               width: 0,
               height: 10,
@@ -120,7 +127,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   modalView: {
-    // margin: 20,
     backgroundColor: 'white',
     borderRadius: 20,
     padding: 20,

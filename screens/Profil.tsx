@@ -38,23 +38,53 @@ const Profil = ({navigation}: any) => {
     flex: 1,
   };
 
+  const urlBase = 'http://192.168.43.129:8000/api/';
+  const urlKey = 'catatan/';
+
   const [totalPemasukan, setTotalPemasukan] = useState(0);
   const [totalPengeluaran, setTotalPengeluaran] = useState(0);
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+  const [cardMonth, setCardMonth] = useState(false);
+  const toggleCardMonth = () => {
+    setCardMonth(!cardMonth);
+  };
+  const monthNames = [
+    'Januari',
+    'Februari',
+    'Maret',
+    'April',
+    'Mei',
+    'Juni',
+    'Juli',
+    'Agustus',
+    'September',
+    'Oktober',
+    'November',
+    'Desember',
+  ];
 
-  const urlBase = 'http://192.168.1.223:8000/api/';
-  const urlKey = 'catatan/';
+  const handleMonthSelect = (month: any) => {
+    setSelectedMonth(month);
+    setCardMonth(false);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       const res = await axios.get(urlBase + urlKey);
       if (res.data.success) {
         const dataCatatan = res.data.data;
+        console.log(dataCatatan);
+
         let totalPemasukanVal = 0;
         let totalPengeluaranVal = 0;
 
         dataCatatan.forEach((item: any) => {
-          totalPemasukanVal += item.total_uang_masuk;
-          totalPengeluaranVal += item.total_uang_keluar;
+          const itemDate = new Date(item.created_at);
+          const itemMonth = itemDate.getMonth();
+          if (itemMonth === selectedMonth) {
+            totalPemasukanVal += item.total_uang_masuk || 0;
+            totalPengeluaranVal += item.total_uang_keluar || 0;
+          }
         });
 
         setTotalPemasukan(totalPemasukanVal);
@@ -65,7 +95,7 @@ const Profil = ({navigation}: any) => {
     };
 
     fetchData();
-  }, []);
+  }, [selectedMonth]);
 
   const [visibleProfile, setVisibleProfile] = useState(false);
   const toggleVisibilityProfile = () => {
@@ -206,11 +236,10 @@ const Profil = ({navigation}: any) => {
               },
             ]}>
             <Text
-              style={{
-                marginHorizontal: 8,
-                fontWeight: 'bold',
-                color: '#DC2626',
-              }}>
+              style={[
+                isDarkMode ? {color: '#FFFFFF'} : {color: '#DC2626'},
+                {marginHorizontal: 8, fontWeight: 'bold'},
+              ]}>
               Keluar
             </Text>
           </View>
@@ -394,6 +423,91 @@ const Profil = ({navigation}: any) => {
               </View>
             </Card>
           </View>
+
+          <View
+            style={{
+              marginBottom: 8,
+              marginHorizontal: 4,
+            }}>
+            <TouchableOpacity
+              onPress={toggleCardMonth}
+              style={{
+                paddingVertical: 4,
+                paddingHorizontal: 8,
+                borderWidth: 1.5,
+                borderRadius: 8,
+                borderColor: '#0284C7',
+                backgroundColor: '#F0F9FF',
+                shadowColor: '#0284C7',
+                shadowOpacity: 0.25,
+                shadowRadius: 3.5,
+                shadowOffset: {width: 0, height: 10},
+                elevation: 3,
+              }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <Text
+                  style={{
+                    fontWeight: 'bold',
+                    color: '#0284C7',
+                    marginHorizontal: 4,
+                  }}>
+                  {monthNames[selectedMonth]}
+                </Text>
+                <View
+                  style={{
+                    justifyContent: 'center',
+                  }}>
+                  <Svg
+                    viewBox="0 0 320 512"
+                    width={16}
+                    height={16}
+                    fill="#0284C7">
+                    <Path d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z" />
+                  </Svg>
+                </View>
+              </View>
+            </TouchableOpacity>
+          </View>
+
+          {cardMonth && (
+            <View
+              style={{
+                position: 'absolute',
+                top: 275,
+                marginHorizontal: 1.5,
+                zIndex: 1,
+              }}>
+              <View style={{width: 380}}>
+                <Card>
+                  <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+                    {monthNames.map((month, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        onPress={() => handleMonthSelect(index)}
+                        style={{
+                          width: '33%',
+                          paddingVertical: 4,
+                        }}>
+                        <Text
+                          style={{
+                            marginVertical: 2,
+                            paddingVertical: 2,
+                            textAlign: 'center',
+                          }}>
+                          {month}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </Card>
+              </View>
+            </View>
+          )}
 
           <Card>
             <View style={[styles.box, {flexDirection: 'row'}]}>

@@ -55,7 +55,7 @@ const EditNoteOutcome = ({navigation, route}: any) => {
     flex: 1,
   };
 
-  const urlBase = 'http://192.168.1.223:8000/api/';
+  const urlBase = 'http://192.168.43.129:8000/api/';
   const urlKey = 'catatan/';
   const {itemId} = route.params;
 
@@ -552,6 +552,7 @@ const EditNoteOutcome = ({navigation, route}: any) => {
   };
 
   console.log(data);
+  console.log(itemId);
 
   const handleUpdateNotes = async () => {
     try {

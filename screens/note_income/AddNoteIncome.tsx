@@ -45,7 +45,7 @@ const AddNoteIncome = ({navigation}: any) => {
     flex: 1,
   };
 
-  const urlBase = 'http://192.168.1.223:8000/api/';
+  const urlBase = 'http://192.168.43.129:8000/api/';
 
   const [userID, setUserID] = useState<number>();
   const fetchUser = useCallback(async () => {
@@ -452,8 +452,17 @@ const AddNoteIncome = ({navigation}: any) => {
 
   const submitNoteIncome = async () => {
     try {
+      if (
+        Array.isArray(postData.catatan_pemasukan) &&
+        postData.catatan_pemasukan.every(
+          (e: any) => e.nominal_uang_masuk === 'Rp 0',
+        )
+      ) {
+        Alert.alert('Error', 'Kolom nominal uang masuk masih Rp 0');
+        return;
+      }
       const response = await axios.post(
-        'http://192.168.1.223:8000/api/catatan/',
+        'http://192.168.43.129:8000/api/catatan/',
         postData,
         {
           headers: {

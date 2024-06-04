@@ -22,6 +22,7 @@ import LineBreak from '../../components/LineBreak';
 import SubmitButton from '../../components/SubmitButton';
 
 type DataCatatan = {
+  id: number;
   deskripsi: string | null;
   kategori: string;
   total_uang_masuk: number;
@@ -64,7 +65,7 @@ const EditNoteIncome = ({navigation, route}: any) => {
     flex: 1,
   };
 
-  const urlBase = 'http://192.168.1.223:8000/api/';
+  const urlBase = 'http://192.168.43.129:8000/api/';
   const urlKey = 'catatan/';
   const {itemId} = route.params;
 
@@ -118,7 +119,7 @@ const EditNoteIncome = ({navigation, route}: any) => {
     const amountValue = value.replace(/[^\d]/g, '');
     const amount = parseInt(amountValue, 10);
     if (isNaN(amount)) {
-      return 'Rp ';
+      return 'Rp 0';
     }
     return amount.toLocaleString('id-ID', {
       style: 'currency',
@@ -428,6 +429,7 @@ const EditNoteIncome = ({navigation, route}: any) => {
   };
 
   console.log(data);
+  // console.log(itemId);
 
   const handleUpdateNotes = async () => {
     try {

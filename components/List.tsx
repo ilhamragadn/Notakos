@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 // import axios from 'axios';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -10,60 +10,9 @@ import {
   View,
 } from 'react-native';
 import {Path, Svg} from 'react-native-svg';
-import apiClient from '../api/apiClient';
 import {Card} from './Card';
 
-export type ListItems = {
-  kategori: string;
-  deskripsi: string;
-};
-
-const List = ({navigation}: any) => {
-  const [data, setData] = useState<ListItems>();
-
-  // const urlBase = 'http://192.168.1.223:8000/api/';
-  const urlKey = 'catatan/';
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await apiClient.get(urlKey);
-        if (res.data.success) {
-          const dataCatatan = res.data.data;
-          setData(dataCatatan);
-          // console.log(dataCatatan);
-        } else {
-          console.error('Failed to fetch data: ', res.data.message);
-        }
-      } catch (error) {
-        console.error('Error fetching data: ', error);
-      }
-    };
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    try {
-      const res = await apiClient.get(urlKey);
-      if (res.data.success) {
-        const dataCatatan = res.data.data;
-        setData(dataCatatan);
-        // console.log(dataCatatan);
-      } else {
-        console.error('Failed to fetch data: ', res.data.message);
-      }
-    } catch (error) {
-      console.error('Error fetching data: ', error);
-    }
-  };
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      fetchData();
-    });
-    return unsubscribe;
-  }, [navigation]);
-
+const List = ({navigation, data}: any) => {
   const formatDateTime = (dateTimeString: string) => {
     const dateObject = new Date(dateTimeString);
     const dayIndex = dateObject.getDay();
@@ -118,8 +67,6 @@ const List = ({navigation}: any) => {
     });
   };
 
-  console.log(data);
-
   const filteredData = data ? filterByMonth(data, selectedMonth) : [];
 
   const monthNames = [
@@ -145,7 +92,7 @@ const List = ({navigation}: any) => {
 
   return (
     <View>
-      <View style={{marginVertical: 6, alignItems: 'flex-start'}}>
+      <View style={{marginVertical: 6, alignItems: 'flex-end'}}>
         <TouchableOpacity
           onPress={toggleCardMonth}
           style={{
@@ -191,7 +138,7 @@ const List = ({navigation}: any) => {
       </View>
 
       {cardMonth && (
-        <View style={{position: 'absolute', left: 22, top: 52, zIndex: 1}}>
+        <View style={{position: 'absolute', right: 22, top: 52, zIndex: 1}}>
           <View style={{width: 105}}>
             <Card>
               <View>
