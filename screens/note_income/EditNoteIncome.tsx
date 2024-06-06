@@ -20,6 +20,7 @@ import {BackButton} from '../../components/BackButton';
 import {Card} from '../../components/Card';
 import LineBreak from '../../components/LineBreak';
 import SubmitButton from '../../components/SubmitButton';
+import {API_URL} from '../../context/AuthContext';
 
 type DataCatatan = {
   id: number;
@@ -65,8 +66,6 @@ const EditNoteIncome = ({navigation, route}: any) => {
     flex: 1,
   };
 
-  const urlBase = 'http://192.168.43.129:8000/api/';
-  const urlKey = 'catatan/';
   const {itemId} = route.params;
 
   const [data, setData] = useState<DataCatatan | null>(null);
@@ -80,7 +79,7 @@ const EditNoteIncome = ({navigation, route}: any) => {
 
   const fetchDatabyID = useCallback(async () => {
     try {
-      const res = await axios.get(urlBase + urlKey + `${itemId}`);
+      const res = await axios.get(`${API_URL}/catatan/${itemId}`);
       if (res.data.success) {
         const dataCatatan = res.data.data;
         setData(dataCatatan);
@@ -134,7 +133,7 @@ const EditNoteIncome = ({navigation, route}: any) => {
   useEffect(() => {
     const fetchAllocation = async () => {
       try {
-        const res = await axios.get(urlBase + 'alokasi/');
+        const res = await axios.get(`${API_URL}/alokasi`);
         if (res.data.success) {
           const dataAlokasi = res.data.data;
           // console.log(dataAlokasi);
@@ -431,13 +430,19 @@ const EditNoteIncome = ({navigation, route}: any) => {
   console.log(data);
   // console.log(itemId);
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleUpdateNotes = async () => {
     try {
-      const res = await axios.put(urlBase + urlKey + `${itemId}`, data);
+      setIsLoading(true);
+      const res = await axios.put(`${API_URL}/catatan/${itemId}`, data);
+
+      setIsLoading(false);
       console.log('Success update: ', res.data);
       Alert.alert('Berhasil', 'Data Berhasil Diperbarui');
       navigation.navigate('Home');
     } catch (error) {
+      setIsLoading(false);
       Alert.alert('Gagal', 'Data Gagal Diperbarui');
       console.error(error);
     }
@@ -527,6 +532,7 @@ const EditNoteIncome = ({navigation, route}: any) => {
                 <SubmitButton
                   textButton="Perbarui"
                   onPress={handleUpdateNotes}
+                  disabled={isLoading}
                 />
               </View>
             </View>

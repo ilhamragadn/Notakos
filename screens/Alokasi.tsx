@@ -20,6 +20,7 @@ import {BottomNavbar} from '../components/BottomNavbar';
 import {Card} from '../components/Card';
 import LineBreak from '../components/LineBreak';
 import SubmitButton from '../components/SubmitButton';
+import {API_URL} from '../context/AuthContext';
 
 interface User {
   id?: number;
@@ -57,13 +58,10 @@ const Alokasi = ({navigation}: any) => {
     flex: 1,
   };
 
-  const urlBase = 'http://192.168.43.129:8000/api/';
-  const urlKey = 'alokasi/';
-
   const [userID, setUserID] = useState<User>();
   const fetchUser = useCallback(async () => {
     try {
-      const res = await axios.get(urlBase + 'profil/');
+      const res = await axios.get(`${API_URL}/profil`);
       if (res.data) {
         const dataUser = res.data;
         setUserID(dataUser.id);
@@ -171,11 +169,15 @@ const Alokasi = ({navigation}: any) => {
 
       console.log(postAllocationData);
 
-      const response = await axios.post(urlBase + urlKey, postAllocationData, {
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await axios.post(
+        `${API_URL}/alokasi`,
+        postAllocationData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
         },
-      });
+      );
 
       console.log('Success post data: ', response.data);
       Alert.alert('Berhasil', 'Data Berhasil Disimpan');
@@ -293,7 +295,7 @@ const Alokasi = ({navigation}: any) => {
 
   const fetchAllocation = useCallback(async () => {
     try {
-      const res = await axios.get(urlBase + urlKey);
+      const res = await axios.get(`${API_URL}/alokasi`);
       if (res.data.success) {
         const dataAlokasi = res.data.data;
         setSavedAllocations(dataAlokasi);
@@ -343,7 +345,7 @@ const Alokasi = ({navigation}: any) => {
 
   const handleUpdateAllocation = async (allocation: Allocation) => {
     try {
-      const response = await axios.put(urlBase + urlKey + `${allocation.id}`, {
+      const response = await axios.put(`${API_URL}/alokasi/${allocation.id}`, {
         variabel_alokasi: allocation.variabel_alokasi,
         persentase_alokasi: allocation.persentase_alokasi,
       });
@@ -358,7 +360,7 @@ const Alokasi = ({navigation}: any) => {
 
   const handleDeleteAllocation = async (id: any) => {
     try {
-      const response = await axios.delete(urlBase + urlKey + `${id}`);
+      const response = await axios.delete(`${API_URL}/alokasi/${id}`);
       Alert.alert('Berhasil', 'Alokasi telah dihapus!');
       fetchAllocation();
       console.log(response.data);
@@ -493,8 +495,7 @@ const Alokasi = ({navigation}: any) => {
   useEffect(() => {
     const fetchNotes = async () => {
       try {
-        const urlNote = 'catatan/';
-        const res = await axios.get(urlBase + urlNote);
+        const res = await axios.get(`${API_URL}/catatan`);
         if (res.data.success) {
           const dataCatatan = res.data.data;
           setNote(dataCatatan);

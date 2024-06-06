@@ -45,14 +45,19 @@ const Login = ({navigation}: any) => {
 
   const {onLogin} = useAuth();
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const submitFormLogin = async () => {
     if (postFormLogin.email === '' || postFormLogin.password === '') {
       Alert.alert('Error', 'Kolom tidak boleh kosong');
       return;
     }
 
+    setIsLoading(true);
     const res = await onLogin!(postFormLogin.email, postFormLogin.password);
+    setIsLoading(false);
     if (res && res.error) {
+      setIsLoading(false);
       Alert.alert(res.message);
     }
   };
@@ -171,7 +176,8 @@ const Login = ({navigation}: any) => {
 
                 <TouchableOpacity
                   style={{marginVertical: 6}}
-                  onPress={submitFormLogin}>
+                  onPress={submitFormLogin}
+                  disabled={isLoading}>
                   <View
                     style={{
                       alignItems: 'center',

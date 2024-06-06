@@ -17,6 +17,7 @@ import {Path, Svg} from 'react-native-svg';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {BottomNavbar} from '../components/BottomNavbar';
 import LineBreak from '../components/LineBreak';
+import {API_URL} from '../context/AuthContext';
 
 type LiteraturItem = {
   id: number;
@@ -37,30 +38,9 @@ const Literatur = ({navigation}: any) => {
 
   const [data, setData] = useState<LiteraturItem[]>([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const urlBase = 'http://192.168.43.129:8000/api/';
-        const urlKey = 'literatur/';
-        const res = await axios.get(urlBase + urlKey);
-
-        if (res.data.success) {
-          setData(res.data.data);
-        } else {
-          console.error('Failed to fetch data: ', res.data.message);
-        }
-      } catch (error) {
-        console.error('Error fetching data: ', error);
-      }
-    };
-    fetchData();
-  }, []);
-
   const fetchData = async () => {
     try {
-      const urlBase = 'http://192.168.43.129:8000/api/';
-      const urlKey = 'literatur/';
-      const res = await axios.get(urlBase + urlKey);
+      const res = await axios.get(`${API_URL}/literatur`);
 
       if (res.data.success) {
         setData(res.data.data);
@@ -79,12 +59,9 @@ const Literatur = ({navigation}: any) => {
     return unsubscribe;
   }, [navigation]);
 
-  // console.log(data.link);
-
   const handleLink = (datas: LiteraturItem) => {
     if (datas.link) {
-      // Memeriksa apakah link ada di item
-      Linking.openURL(datas.link); // Menggunakan item.link untuk membuka URL
+      Linking.openURL(datas.link);
     } else {
       console.error('Link tidak tersedia.');
     }

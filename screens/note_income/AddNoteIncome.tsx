@@ -1,7 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
+import {CheckBox} from '@rneui/themed';
 import axios, {AxiosError} from 'axios';
 import React, {useCallback, useEffect, useState} from 'react';
 import {
+  Alert,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -17,9 +19,7 @@ import {BackButton} from '../../components/BackButton';
 import {Card} from '../../components/Card';
 import LineBreak from '../../components/LineBreak';
 import SubmitButton from '../../components/SubmitButton';
-// import CoreSectionIncome from './components/CoreSectionIncome';
-import {CheckBox} from '@rneui/themed';
-import {Alert} from 'react-native';
+import {API_URL} from '../../context/AuthContext';
 
 type PostDataState = {
   user_id: number | undefined;
@@ -45,12 +45,10 @@ const AddNoteIncome = ({navigation}: any) => {
     flex: 1,
   };
 
-  const urlBase = 'http://192.168.43.129:8000/api/';
-
   const [userID, setUserID] = useState<number>();
   const fetchUser = useCallback(async () => {
     try {
-      const res = await axios.get(urlBase + 'profil/');
+      const res = await axios.get(`${API_URL}/profil`);
       if (res.data) {
         const dataUser = res.data;
         setUserID(dataUser.id);
@@ -328,8 +326,8 @@ const AddNoteIncome = ({navigation}: any) => {
 
   const fetchAllocation = async () => {
     try {
-      const urlKey = 'alokasi/';
-      const res = await axios.get(urlBase + urlKey);
+      // const urlKey = 'alokasi/';
+      const res = await axios.get(`${API_URL}/alokasi`);
       if (res.data.success) {
         const dataAlokasi = res.data.data;
         // console.log(dataAlokasi);
@@ -346,8 +344,7 @@ const AddNoteIncome = ({navigation}: any) => {
   useEffect(() => {
     const fetchAllocations = async () => {
       try {
-        const urlKey = 'alokasi/';
-        const res = await axios.get(urlBase + urlKey);
+        const res = await axios.get(`${API_URL}/alokasi`);
         if (res.data.success) {
           const dataAlokasi = res.data.data;
           // console.log(dataAlokasi);
@@ -450,6 +447,8 @@ const AddNoteIncome = ({navigation}: any) => {
 
   console.log(postData);
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const submitNoteIncome = async () => {
     try {
       if (
@@ -461,19 +460,21 @@ const AddNoteIncome = ({navigation}: any) => {
         Alert.alert('Error', 'Kolom nominal uang masuk masih Rp 0');
         return;
       }
-      const response = await axios.post(
-        'http://192.168.43.129:8000/api/catatan/',
-        postData,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
+
+      setIsLoading(true);
+
+      const response = await axios.post(`${API_URL}/catatan`, postData, {
+        headers: {
+          'Content-Type': 'application/json',
         },
-      );
+      });
+
+      setIsLoading(false);
       console.log('Success post data: ', response.data);
       Alert.alert('Berhasil', 'Data Berhasil Disimpan');
       navigation.navigate('Home');
     } catch (error) {
+      setIsLoading(false);
       if (axios.isAxiosError(error)) {
         const axiosError = error as AxiosError;
         console.error(
@@ -575,7 +576,11 @@ const AddNoteIncome = ({navigation}: any) => {
               <BackButton />
             </View>
             <View style={{flex: 1}}>
-              <SubmitButton onPress={submitNoteIncome} textButton="Simpan" />
+              <SubmitButton
+                onPress={submitNoteIncome}
+                textButton="Simpan"
+                disabled={isLoading}
+              />
             </View>
           </View>
         </View>

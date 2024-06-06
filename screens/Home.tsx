@@ -15,6 +15,7 @@ import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {BottomNavbar} from '../components/BottomNavbar';
 import LineBreak from '../components/LineBreak';
 import List from '../components/List';
+import {API_URL} from '../context/AuthContext';
 
 const Home = ({navigation}: any) => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -28,12 +29,9 @@ const Home = ({navigation}: any) => {
   const [saldoCash, setSaldoCash] = useState(0);
   const [saldoCashless, setSaldoCashless] = useState(0);
 
-  const urlBase = 'http://192.168.43.129:8000/api/';
-  const urlKey = 'catatan/';
-
   const fetchData = async () => {
     try {
-      const res = await axios.get(urlBase + urlKey);
+      const res = await axios.get(`${API_URL}/catatan`);
       if (res.data.success) {
         const dataCatatan = res.data.data;
 

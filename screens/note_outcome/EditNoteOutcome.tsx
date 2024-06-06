@@ -22,6 +22,7 @@ import {BackButton} from '../../components/BackButton';
 import {Card} from '../../components/Card';
 import LineBreak from '../../components/LineBreak';
 import SubmitButton from '../../components/SubmitButton';
+import {API_URL} from '../../context/AuthContext';
 
 type DataCatatan = {
   id: number;
@@ -55,8 +56,6 @@ const EditNoteOutcome = ({navigation, route}: any) => {
     flex: 1,
   };
 
-  const urlBase = 'http://192.168.43.129:8000/api/';
-  const urlKey = 'catatan/';
   const {itemId} = route.params;
 
   const [data, setData] = useState<DataCatatan | null>(null);
@@ -74,7 +73,7 @@ const EditNoteOutcome = ({navigation, route}: any) => {
 
   const fetchDatabyID = useCallback(async () => {
     try {
-      const res = await axios.get(urlBase + urlKey + `${itemId}`);
+      const res = await axios.get(`${API_URL}/catatan/${itemId}`);
       if (res.data.success) {
         const dataCatatan = res.data.data;
         setData(dataCatatan);
@@ -111,7 +110,7 @@ const EditNoteOutcome = ({navigation, route}: any) => {
   useEffect(() => {
     const fetchAllocation = async () => {
       try {
-        const res = await axios.get(urlBase + 'alokasi/');
+        const res = await axios.get(`${API_URL}/alokasi`);
         if (res.data.success) {
           const dataAlokasi = res.data.data;
           // console.log(dataAlokasi);
@@ -556,7 +555,7 @@ const EditNoteOutcome = ({navigation, route}: any) => {
 
   const handleUpdateNotes = async () => {
     try {
-      const res = await axios.put(urlBase + urlKey + `${itemId}`, data);
+      const res = await axios.put(`${API_URL}/catatan/${itemId}`, data);
       console.log('Success update: ', res.data);
       Alert.alert('Berhasil', 'Data Berhasil Diperbarui');
       navigation.navigate('Home');

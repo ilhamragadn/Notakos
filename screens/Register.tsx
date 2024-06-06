@@ -65,6 +65,8 @@ const Register = ({navigation}: any) => {
     }
   };
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const submitFormRegister = async () => {
     if (postFormRegis.password !== postFormRegis.password_confirmation) {
       Alert.alert('Error', 'Password dan Konfirmasi Password tidak sama');
@@ -79,6 +81,8 @@ const Register = ({navigation}: any) => {
       return;
     }
 
+    setIsLoading(true);
+
     const res = await onRegister!(
       postFormRegis.name,
       postFormRegis.email,
@@ -87,7 +91,10 @@ const Register = ({navigation}: any) => {
       postFormRegis.role,
     );
 
+    setIsLoading(false);
+
     if (res && res.error) {
+      setIsLoading(false);
       Alert.alert(res.message);
     } else {
       login();
@@ -292,7 +299,8 @@ const Register = ({navigation}: any) => {
 
                 <TouchableOpacity
                   style={{marginVertical: 6}}
-                  onPress={submitFormRegister}>
+                  onPress={submitFormRegister}
+                  disabled={isLoading}>
                   <View
                     style={{
                       alignItems: 'center',

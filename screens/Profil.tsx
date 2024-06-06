@@ -20,7 +20,7 @@ import {BottomNavbar} from '../components/BottomNavbar';
 import {Card} from '../components/Card';
 import LineBreak from '../components/LineBreak';
 import SubmitButton from '../components/SubmitButton';
-import {useAuth} from '../context/AuthContext';
+import {API_URL, useAuth} from '../context/AuthContext';
 
 type Profil = {
   name: string;
@@ -37,9 +37,6 @@ const Profil = ({navigation}: any) => {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
     flex: 1,
   };
-
-  const urlBase = 'http://192.168.43.129:8000/api/';
-  const urlKey = 'catatan/';
 
   const [totalPemasukan, setTotalPemasukan] = useState(0);
   const [totalPengeluaran, setTotalPengeluaran] = useState(0);
@@ -70,7 +67,7 @@ const Profil = ({navigation}: any) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await axios.get(urlBase + urlKey);
+      const res = await axios.get(`${API_URL}/catatan`);
       if (res.data.success) {
         const dataCatatan = res.data.data;
         console.log(dataCatatan);
@@ -155,7 +152,7 @@ const Profil = ({navigation}: any) => {
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
-        const res = await axios.get(urlBase + 'profil/');
+        const res = await axios.get(`${API_URL}/profil`);
 
         if (res.data) {
           const dataProfil = res.data;
@@ -172,7 +169,7 @@ const Profil = ({navigation}: any) => {
 
   const handleUpdateProfile = async (profil: Profil) => {
     try {
-      const res = await axios.put(urlBase + 'profil/', {
+      const res = await axios.put(`${API_URL}/profil`, {
         name: profil.name,
         email: profil.email,
         parent_email: profil.parent_email,
@@ -186,7 +183,7 @@ const Profil = ({navigation}: any) => {
 
   const handleUpdatePassword = async (profil: Profil) => {
     try {
-      const res = await axios.put(urlBase + 'profil/password/', {
+      const res = await axios.put(`${API_URL}/profil/password`, {
         password: profil.password,
         password_confirmation: profil.password_confirmation,
       });

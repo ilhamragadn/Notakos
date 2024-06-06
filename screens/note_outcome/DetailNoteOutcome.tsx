@@ -23,6 +23,7 @@ import {Card} from '../../components/Card';
 import DeleteButton from '../../components/DeleteButton';
 import EditButton from '../../components/EditButton';
 import LineBreak from '../../components/LineBreak';
+import {API_URL} from '../../context/AuthContext';
 
 type DataCatatan = {
   id: number;
@@ -60,15 +61,13 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
 
   const [data, setData] = useState<DataCatatan>();
 
-  const urlBase = 'http://192.168.43.129:8000/api/';
-  const urlKey = 'catatan/';
   const {itemId} = route.params;
 
   const [typeOfNeed, setTypeOfNeed] = useState('');
 
   useEffect(() => {
     axios
-      .get(urlBase + urlKey + `${itemId}`)
+      .get(`${API_URL}/catatan/${itemId}`)
       .then(res => {
         if (res.data.success) {
           const catatanData = res.data.data;
@@ -104,7 +103,7 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
   const handleDeleteData = async (id: any) => {
     try {
       setIsLoading(true);
-      const response = await axios.delete(urlBase + urlKey + `${id}`);
+      const response = await axios.delete(`${API_URL}/catatan/${id}`);
       setIsLoading(false);
       Alert.alert('Berhasil', 'Catatan telah dihapus!');
       navigation.navigate('Home');
@@ -121,7 +120,7 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
   useEffect(() => {
     const fetchAllocation = async () => {
       try {
-        const res = await axios.get(urlBase + 'alokasi/');
+        const res = await axios.get(`${API_URL}/alokasi`);
         if (res.data.success) {
           const dataAlokasi = res.data.data;
           // console.log(dataAlokasi);

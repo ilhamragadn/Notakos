@@ -21,6 +21,7 @@ import {Card} from '../../components/Card';
 import DeleteButton from '../../components/DeleteButton';
 import EditButton from '../../components/EditButton';
 import LineBreak from '../../components/LineBreak';
+import {API_URL} from '../../context/AuthContext';
 
 type DataCatatan = {
   id: number;
@@ -65,17 +66,15 @@ const DetailNoteIncome = ({navigation, route}: any) => {
     flex: 1,
   };
 
-  const urlBase = 'http://192.168.43.129:8000/api/';
-  const urlKey = 'catatan/';
   const {itemId} = route.params;
-  // console.log(itemId);
+
   const [data, setData] = useState<DataCatatan | null>(null);
 
   const [variabelTerpilih, setVariabelTerpilih] = useState('');
 
   const fetchDatabyID = useCallback(async () => {
     try {
-      const res = await axios.get(urlBase + urlKey + `${itemId}`);
+      const res = await axios.get(`${API_URL}/catatan/${itemId}`);
       if (res.data.success) {
         const dataCatatan = res.data.data;
         setData(dataCatatan);
@@ -100,7 +99,6 @@ const DetailNoteIncome = ({navigation, route}: any) => {
     fetchDatabyID();
   }, [fetchDatabyID]);
 
-  // console.log(updateData);
   console.log(data);
 
   const formatCurrency = (amount: number) => {
@@ -120,7 +118,7 @@ const DetailNoteIncome = ({navigation, route}: any) => {
   const handleDeleteData = async (id: any) => {
     try {
       setIsLoading(true);
-      const response = await axios.delete(urlBase + urlKey + `${id}`);
+      const response = await axios.delete(`${API_URL}/catatan/${id}`);
       setIsLoading(false);
       Alert.alert('Berhasil', 'Catatan telah dihapus!');
       navigation.navigate('Home');
@@ -137,7 +135,7 @@ const DetailNoteIncome = ({navigation, route}: any) => {
   useEffect(() => {
     const fetchAllocation = async () => {
       try {
-        const res = await axios.get(urlBase + 'alokasi/');
+        const res = await axios.get(`${API_URL}/alokasi`);
         if (res.data.success) {
           const dataAlokasi = res.data.data;
           // console.log(dataAlokasi);

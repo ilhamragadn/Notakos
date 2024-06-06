@@ -16,7 +16,7 @@ interface AuthProps {
   onLogout?: () => Promise<any>;
 }
 
-export const API_URL = 'http://192.168.43.129:8000/api';
+export const API_URL = 'https://notakos-test.my.id/api';
 export const TOKEN_KEY = 'my-token';
 const AuthContext = createContext<AuthProps>({});
 

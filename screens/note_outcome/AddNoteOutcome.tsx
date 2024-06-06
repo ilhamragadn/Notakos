@@ -21,6 +21,7 @@ import {BackButton} from '../../components/BackButton';
 import {Card} from '../../components/Card';
 import LineBreak from '../../components/LineBreak';
 import SubmitButton from '../../components/SubmitButton';
+import {API_URL} from '../../context/AuthContext';
 
 type PostDataState = {
   user_id: number | undefined;
@@ -62,9 +63,7 @@ const AddNoteOutcome = ({navigation}: any) => {
 
   const fetchAllocation = async () => {
     try {
-      const urlBase = 'http://192.168.43.129:8000/api/';
-      const urlKey = 'alokasi/';
-      const res = await axios.get(urlBase + urlKey);
+      const res = await axios.get(`${API_URL}/alokasi`);
       if (res.data.success) {
         const dataAlokasi = res.data.data;
         console.log(dataAlokasi);
@@ -77,28 +76,10 @@ const AddNoteOutcome = ({navigation}: any) => {
     fetchAllocation();
   }, []);
 
-  useEffect(() => {
-    const fetchAllocations = async () => {
-      try {
-        const urlBase = 'http://192.168.43.129:8000/api/';
-        const urlKey = 'alokasi/';
-        const res = await axios.get(urlBase + urlKey);
-        if (res.data.success) {
-          const dataAlokasi = res.data.data;
-          // console.log(dataAlokasi);
-          setSavedAllocation(dataAlokasi);
-        }
-      } catch (error) {}
-    };
-
-    fetchAllocations();
-  }, []);
-
   const [userID, setUserID] = useState<number>();
   const fetchUser = useCallback(async () => {
     try {
-      const urlBase = 'http://192.168.43.129:8000/api/';
-      const res = await axios.get(urlBase + 'profil/');
+      const res = await axios.get(`${API_URL}/profil`);
       if (res.data) {
         const dataUser = res.data;
         setUserID(dataUser.id);
@@ -622,6 +603,8 @@ const AddNoteOutcome = ({navigation}: any) => {
 
   console.log(postData);
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const submitNoteOutcome = async () => {
     try {
       if (
@@ -650,13 +633,15 @@ const AddNoteOutcome = ({navigation}: any) => {
         return;
       }
 
-      const urlBase = 'http://192.168.43.129:8000/api/';
-      const urlKey = 'catatan/';
-      const response = await axios.post(urlBase + urlKey, postData);
+      setIsLoading(true);
+      const response = await axios.post(`${API_URL}/catatan`, postData);
+
+      setIsLoading(false);
       console.log('Success post data: ', response.data);
       Alert.alert('Berhasil', 'Data Berhasil Disimpan');
       navigation.navigate('Home');
     } catch (error) {
+      setIsLoading(false);
       if (axios.isAxiosError(error)) {
         const axiosError = error as AxiosError;
         console.error(
@@ -759,7 +744,11 @@ const AddNoteOutcome = ({navigation}: any) => {
               <BackButton />
             </View>
             <View style={{flex: 1}}>
-              <SubmitButton onPress={submitNoteOutcome} textButton="Simpan" />
+              <SubmitButton
+                onPress={submitNoteOutcome}
+                textButton="Simpan"
+                disabled={isLoading}
+              />
             </View>
           </View>
         </View>
