@@ -158,6 +158,8 @@ const Alokasi = ({navigation}: any) => {
     return postData;
   };
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const submitAllocation = async () => {
     try {
       const postAllocationData = preparePostAllocationData();
@@ -169,6 +171,8 @@ const Alokasi = ({navigation}: any) => {
 
       console.log(postAllocationData);
 
+      setIsLoading(true);
+
       const response = await axios.post(
         `${API_URL}/alokasi`,
         postAllocationData,
@@ -178,6 +182,8 @@ const Alokasi = ({navigation}: any) => {
           },
         },
       );
+
+      setIsLoading(false);
 
       console.log('Success post data: ', response.data);
       Alert.alert('Berhasil', 'Data Berhasil Disimpan');
@@ -192,6 +198,7 @@ const Alokasi = ({navigation}: any) => {
         },
       ]);
     } catch (error) {
+      setIsLoading(false);
       console.error('Axios error: ', error);
     }
   };
@@ -693,6 +700,7 @@ const Alokasi = ({navigation}: any) => {
                       <SubmitButton
                         onPress={submitAllocation}
                         textButton="Simpan"
+                        disabled={isLoading}
                       />
                     )}
                   </View>

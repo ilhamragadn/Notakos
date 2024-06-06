@@ -551,15 +551,21 @@ const EditNoteOutcome = ({navigation, route}: any) => {
   };
 
   console.log(data);
-  console.log(itemId);
+  // console.log(itemId);
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleUpdateNotes = async () => {
     try {
+      setIsLoading(true);
       const res = await axios.put(`${API_URL}/catatan/${itemId}`, data);
+
+      setIsLoading(false);
       console.log('Success update: ', res.data);
       Alert.alert('Berhasil', 'Data Berhasil Diperbarui');
       navigation.navigate('Home');
     } catch (error) {
+      setIsLoading(false);
       Alert.alert('Gagal', 'Data Gagal Diperbarui');
       console.error(error);
     }
@@ -639,6 +645,7 @@ const EditNoteOutcome = ({navigation, route}: any) => {
                 <SubmitButton
                   textButton="Perbarui"
                   onPress={handleUpdateNotes}
+                  disabled={isLoading}
                 />
               </View>
             </View>

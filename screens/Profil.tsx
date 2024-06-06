@@ -167,29 +167,41 @@ const Profil = ({navigation}: any) => {
     fetchProfileData();
   }, []);
 
+  const [isLoadingUpdateProfile, setIsLoadingUpdateProfile] = useState(false);
+
   const handleUpdateProfile = async (profil: Profil) => {
     try {
+      setIsLoadingUpdateProfile(true);
       const res = await axios.put(`${API_URL}/profil`, {
         name: profil.name,
         email: profil.email,
         parent_email: profil.parent_email,
       });
+
+      setIsLoadingUpdateProfile(false);
       Alert.alert('Berhasil', 'Profil telah diperbarui!');
       console.log('Success update: ', res.data);
     } catch (error) {
+      setIsLoadingUpdateProfile(false);
       console.error(error);
     }
   };
 
+  const [isLoadingUpdatePassword, setIsLoadingUpdatePassword] = useState(false);
+
   const handleUpdatePassword = async (profil: Profil) => {
     try {
+      setIsLoadingUpdatePassword(true);
       const res = await axios.put(`${API_URL}/profil/password`, {
         password: profil.password,
         password_confirmation: profil.password_confirmation,
       });
+
+      setIsLoadingUpdatePassword(false);
       Alert.alert('Berhasil', 'Password telah diperbarui!');
       console.log('Success update password: ', res.data);
     } catch (error) {
+      setIsLoadingUpdatePassword(false);
       console.error(error);
     }
   };
@@ -824,6 +836,7 @@ const Profil = ({navigation}: any) => {
                 <SubmitButton
                   textButton="Perbarui"
                   onPress={() => handleUpdateProfile(profileData)}
+                  disabled={isLoadingUpdateProfile}
                 />
               )}
             </Card>
@@ -1134,6 +1147,7 @@ const Profil = ({navigation}: any) => {
                 <SubmitButton
                   textButton="Simpan"
                   onPress={() => handleUpdatePassword(profileData)}
+                  disabled={isLoadingUpdatePassword}
                 />
               )}
             </Card>
