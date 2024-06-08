@@ -141,7 +141,7 @@ const Register = ({navigation}: any) => {
                   marginVertical: 20,
                 }}>
                 <Image
-                  source={require('../assets/logo_notakos.webp')}
+                  source={require('../assets/logo_notakos.png')}
                   style={styles.image}
                 />
               </View>
