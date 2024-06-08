@@ -1,6 +1,7 @@
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React, {useEffect} from 'react';
+import SplashScreen from 'react-native-splash-screen';
 import NotifService from './NotifService';
 import {AuthProvider, useAuth} from './context/AuthContext';
 import Alokasi from './screens/Alokasi';
@@ -19,6 +20,10 @@ import EditNoteOutcome from './screens/note_outcome/EditNoteOutcome';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  useEffect(() => {
+    SplashScreen.hide();
+  }, []);
+
   const notifService = new NotifService(
     token => {
       console.log('Device registered for notifications:', token);

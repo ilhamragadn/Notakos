@@ -1,9 +1,12 @@
 package com.notakosapp
 
+import android.os.Bundle; // here
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
 import com.facebook.react.defaults.DefaultReactActivityDelegate
+// react-native-splash-screen >= 0.3.1
+import org.devio.rn.splashscreen.SplashScreen; // here
 
 class MainActivity : ReactActivity() {
 
@@ -19,4 +22,9 @@ class MainActivity : ReactActivity() {
    */
   override fun createReactActivityDelegate(): ReactActivityDelegate =
       DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled)
+
+      override fun onCreate(savedInstanceState: Bundle?) {
+        SplashScreen.show(this)  // add this
+        super.onCreate(savedInstanceState)
+    }
 }
