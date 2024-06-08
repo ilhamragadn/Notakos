@@ -12,7 +12,7 @@ import {
 import {Path, Svg} from 'react-native-svg';
 import {Card} from './Card';
 
-const List = ({navigation, data}: any) => {
+const List = ({navigation, data, loading}: any) => {
   const formatDateTime = (dateTimeString: string) => {
     const dateObject = new Date(dateTimeString);
     const dayIndex = dateObject.getDay();
@@ -52,6 +52,7 @@ const List = ({navigation, data}: any) => {
   };
 
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
+
   const [cardMonth, setCardMonth] = useState(false);
   const toggleCardMonth = () => {
     setCardMonth(!cardMonth);
@@ -89,6 +90,19 @@ const List = ({navigation, data}: any) => {
     setSelectedMonth(month);
     setCardMonth(false);
   };
+
+  if (loading) {
+    return (
+      <View
+        style={{
+          marginTop: 35,
+          marginBottom: 25,
+          justifyContent: 'center',
+        }}>
+        <ActivityIndicator size="large" color="#0284C7" />
+      </View>
+    );
+  }
 
   return (
     <View>
@@ -221,10 +235,17 @@ const List = ({navigation, data}: any) => {
       ) : (
         <View
           style={{
-            marginVertical: 10,
-            justifyContent: 'center',
+            marginTop: 25,
+            marginBottom: 15,
           }}>
-          <ActivityIndicator size="large" color="#0284C7" />
+          <Text
+            style={{
+              textAlign: 'center',
+              fontWeight: '500',
+              fontStyle: 'italic',
+            }}>
+            Catatanmu kosong nih.
+          </Text>
         </View>
       )}
     </View>

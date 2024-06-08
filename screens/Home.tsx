@@ -28,9 +28,11 @@ const Home = ({navigation}: any) => {
   const [datas, setDatas] = useState([]);
   const [saldoCash, setSaldoCash] = useState(0);
   const [saldoCashless, setSaldoCashless] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchData = async () => {
     try {
+      setIsLoading(true);
       const res = await axios.get(`${API_URL}/catatan`);
       if (res.data.success) {
         const dataCatatan = res.data.data;
@@ -57,6 +59,7 @@ const Home = ({navigation}: any) => {
         setDatas(dataCatatan);
         setSaldoCash(cash);
         setSaldoCashless(cashless);
+        setIsLoading(false);
       } else {
         console.error('Failed to fetch data: ', res.data.message);
       }
@@ -165,7 +168,7 @@ const Home = ({navigation}: any) => {
       </View>
       <ScrollView>
         <View>
-          <List navigation={navigation} data={datas} />
+          <List navigation={navigation} data={datas} loading={isLoading} />
         </View>
 
         <View style={{marginVertical: 8}}>

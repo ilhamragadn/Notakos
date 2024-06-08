@@ -37,13 +37,16 @@ const Literatur = ({navigation}: any) => {
   };
 
   const [data, setData] = useState<LiteraturItem[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchData = async () => {
     try {
+      setIsLoading(true);
       const res = await axios.get(`${API_URL}/literatur`);
 
       if (res.data.success) {
         setData(res.data.data);
+        setIsLoading(false);
       } else {
         console.error('Failed to fetch data: ', res.data.message);
       }
@@ -90,18 +93,16 @@ const Literatur = ({navigation}: any) => {
         </Text>
       </View>
       <ScrollView>
-        {/* <View style={{marginBottom: 12}}>
-          <Text
+        {isLoading ? (
+          <View
             style={{
-              fontSize: 18,
-              fontWeight: '500',
-              marginVertical: 8,
-              marginLeft: 20,
+              marginTop: 35,
+              marginBottom: 25,
+              justifyContent: 'center',
             }}>
-            Literatur
-          </Text>
-        </View> */}
-        {Array.isArray(data) && data.length > 0 ? (
+            <ActivityIndicator size="large" color="#0284C7" />
+          </View>
+        ) : Array.isArray(data) && data.length > 0 ? (
           data.map(item => (
             <Pressable
               key={item.id}
@@ -139,10 +140,17 @@ const Literatur = ({navigation}: any) => {
         ) : (
           <View
             style={{
-              marginTop: 10,
-              justifyContent: 'center',
+              marginTop: 25,
+              marginBottom: 15,
             }}>
-            <ActivityIndicator size="large" color="#0284C7" />
+            <Text
+              style={{
+                textAlign: 'center',
+                fontWeight: '500',
+                fontStyle: 'italic',
+              }}>
+              Mohon maaf, literatur masih belum tersedia.
+            </Text>
           </View>
         )}
 

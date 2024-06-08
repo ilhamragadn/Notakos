@@ -61,13 +61,15 @@ const AddNoteOutcome = ({navigation}: any) => {
     {variabel_alokasi: '', persentase_alokasi: 0},
   ]);
 
+  const [dataFetched, setDataFetched] = useState(false);
   const fetchAllocation = async () => {
     try {
       const res = await axios.get(`${API_URL}/alokasi`);
       if (res.data.success) {
         const dataAlokasi = res.data.data;
-        console.log(dataAlokasi);
+        // console.log(dataAlokasi);
         setSavedAllocation(dataAlokasi);
+        setDataFetched(true);
       }
     } catch (error) {}
   };
@@ -75,6 +77,25 @@ const AddNoteOutcome = ({navigation}: any) => {
   useEffect(() => {
     fetchAllocation();
   }, []);
+
+  useEffect(() => {
+    if (dataFetched) {
+      // console.log('Saved Allocation Length:', savedAllocation.length);
+      if (savedAllocation.length === 1) {
+        Alert.alert(
+          'Perhatian',
+          'Harap membuat alokasi terlebih dahulu',
+          [
+            {
+              text: 'OK',
+              onPress: () => navigation.navigate('Alokasi'),
+            },
+          ],
+          {cancelable: false},
+        );
+      }
+    }
+  }, [savedAllocation, dataFetched, navigation]);
 
   const [userID, setUserID] = useState<number>();
   const fetchUser = useCallback(async () => {
@@ -101,45 +122,6 @@ const AddNoteOutcome = ({navigation}: any) => {
       }));
     }
   }, [userID]);
-
-  // const alertToAllocation = useCallback(() => {
-  //   if (
-  //     savedAllocation.length <= 2 &&
-  //     savedAllocation.map(e => e.variabel_alokasi !== 'Semua Alokasi')
-  //   ) {
-  //     Alert.alert(
-  //       'Perhatian',
-  //       'Harap membuat alokasi terlebih dahulu',
-  //       [
-  //         {
-  //           text: 'OK',
-  //           onPress: navigation.navigate('Alokasi'),
-  //         },
-  //       ],
-  //       {cancelable: false},
-  //     );
-  //   }
-  // }, [navigation, savedAllocation]);
-
-  // useEffect(() => {
-  //   alertToAllocation();
-  // }, [alertToAllocation]);
-
-  // useEffect(() => {
-  //   if (savedAllocation.length === 0) {
-  //     Alert.alert(
-  //       'Perhatian',
-  //       'Harap membuat alokasi terlebih dahulu',
-  //       [
-  //         {
-  //           text: 'OK',
-  //           onPress: navigation.navigate('Alokasi'),
-  //         },
-  //       ],
-  //       {cancelable: false},
-  //     );
-  //   }
-  // }, [savedAllocation, navigation]);
 
   const addSection = () => {
     setSections([

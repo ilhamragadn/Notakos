@@ -2,6 +2,7 @@
 import axios from 'axios';
 import React, {useCallback, useEffect, useState} from 'react';
 import {
+  ActivityIndicator,
   Alert,
   SafeAreaView,
   ScrollView,
@@ -153,7 +154,7 @@ const Alokasi = ({navigation}: any) => {
       user_id: section.userIdValue,
     }));
 
-    console.log('Prepared post data:', JSON.stringify(postData, null, 2)); // Debugging line
+    console.log('Prepared post data:', JSON.stringify(postData, null, 2));
 
     return postData;
   };
@@ -165,7 +166,10 @@ const Alokasi = ({navigation}: any) => {
       const postAllocationData = preparePostAllocationData();
 
       if (postAllocationData.every(e => e.variabel_alokasi === '')) {
-        Alert.alert('Error', 'Kolom tidak boleh kosong');
+        Alert.alert('Error', 'Kolom alokasi tidak boleh kosong');
+        return;
+      } else if (postAllocationData.every(e => e.persentase_alokasi === 0)) {
+        Alert.alert('Error', 'Kolom persentase tidak boleh 0');
         return;
       }
 
@@ -302,6 +306,7 @@ const Alokasi = ({navigation}: any) => {
 
   const fetchAllocation = useCallback(async () => {
     try {
+      setIsLoading(true);
       const res = await axios.get(`${API_URL}/alokasi`);
       if (res.data.success) {
         const dataAlokasi = res.data.data;
@@ -340,6 +345,8 @@ const Alokasi = ({navigation}: any) => {
         setSaldoKeSemua(totalSaldoSemua);
         setPivotVariabelTeralokasi(variabelTeralokasi);
         setSaldoPerAlokasi(newSaldoTeralokasi);
+
+        setIsLoading(false);
       }
     } catch (error) {
       console.error('Error fetching data: ', error);
@@ -352,10 +359,22 @@ const Alokasi = ({navigation}: any) => {
 
   const handleUpdateAllocation = async (allocation: Allocation) => {
     try {
+      if (allocation.variabel_alokasi === '') {
+        Alert.alert('Error', 'Kolom alokasi tidak boleh kosong');
+        return;
+      } else if (allocation.persentase_alokasi === 0) {
+        Alert.alert('Error', 'Kolom persentase tidak boleh 0');
+        return;
+      }
+
+      setIsLoading(true);
+
       const response = await axios.put(`${API_URL}/alokasi/${allocation.id}`, {
         variabel_alokasi: allocation.variabel_alokasi,
         persentase_alokasi: allocation.persentase_alokasi,
       });
+
+      setIsLoading(false);
       Alert.alert('Berhasil', 'Alokasi telah diperbarui!');
       fetchAllocation();
       console.log('Success update: ', response.data);
@@ -367,7 +386,11 @@ const Alokasi = ({navigation}: any) => {
 
   const handleDeleteAllocation = async (id: any) => {
     try {
+      setIsLoading(true);
+
       const response = await axios.delete(`${API_URL}/alokasi/${id}`);
+
+      setIsLoading(false);
       Alert.alert('Berhasil', 'Alokasi telah dihapus!');
       fetchAllocation();
       console.log(response.data);
@@ -502,12 +525,14 @@ const Alokasi = ({navigation}: any) => {
   useEffect(() => {
     const fetchNotes = async () => {
       try {
+        setIsLoading(true);
         const res = await axios.get(`${API_URL}/catatan`);
         if (res.data.success) {
           const dataCatatan = res.data.data;
           setNote(dataCatatan);
-          // console.log(dataCatatan);
         }
+
+        setIsLoading(false);
       } catch (error) {
         console.error('Error fetching data: ', error);
       }
@@ -631,174 +656,121 @@ const Alokasi = ({navigation}: any) => {
         </Text>
       </View>
       <ScrollView>
-        <View style={styles.container}>
-          <Card>
-            <View style={{marginVertical: 8}}>
-              <Text
-                style={{
-                  fontSize: 16,
-                  fontWeight: '500',
-                  marginHorizontal: 4,
-                  textAlign: 'center',
-                  marginBottom: 6,
-                }}>
-                Atur Persentase Alokasi
-              </Text>
-              <View
-                style={{
-                  padding: 8,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                {/* <PieChart donut radius={70} data={allocationPieData} /> */}
-              </View>
-
-              {fetchAllocationSection()}
-
-              {totalPercentage >= 100 ? (
-                <View />
-              ) : (
-                <>
-                  {postAllocationSection()}
-
-                  {/* tombol add */}
-                  <TouchableOpacity
-                    onPress={addAllocationSection}
-                    style={{
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      margin: 6,
-                    }}>
-                    <View
-                      style={{
-                        borderWidth: 2,
-                        padding: 6,
-                        borderRadius: 5,
-                        borderStyle: 'dashed',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}>
-                      <Svg
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={2}
-                        stroke="#000000"
-                        width={24}
-                        height={24}>
-                        <Path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M12 4.5v15m7.5-7.5h-15"
-                        />
-                      </Svg>
-                    </View>
-                  </TouchableOpacity>
-                  <View>
-                    {disableButton ? (
-                      <View />
-                    ) : (
-                      <SubmitButton
-                        onPress={submitAllocation}
-                        textButton="Simpan"
-                        disabled={isLoading}
-                      />
-                    )}
-                  </View>
-                </>
-              )}
-            </View>
-          </Card>
-
-          <View style={{marginVertical: 8}}>
-            <LineBreak />
+        {isLoading ? (
+          <View
+            style={{
+              marginTop: 35,
+              marginBottom: 25,
+              justifyContent: 'center',
+            }}>
+            <ActivityIndicator size="large" color="#0284C7" />
           </View>
+        ) : (
+          <View style={styles.container}>
+            <Card>
+              <View style={{marginVertical: 8}}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: '500',
+                    marginHorizontal: 4,
+                    textAlign: 'center',
+                    marginBottom: 6,
+                  }}>
+                  Atur Persentase Alokasi
+                </Text>
 
-          <View>
-            {resultAllocation.map((section, index) => (
-              <View key={index}>
-                {section.allocationVariable === 'Semua Alokasi' ? (
+                {fetchAllocationSection()}
+
+                {totalPercentage >= 100 ? (
                   <View />
                 ) : (
-                  <Card>
-                    <View
+                  <>
+                    {postAllocationSection()}
+
+                    {/* tombol add */}
+                    <TouchableOpacity
+                      onPress={addAllocationSection}
                       style={{
-                        flexDirection: 'row',
-                        margin: 6,
+                        justifyContent: 'center',
                         alignItems: 'center',
+                        margin: 6,
                       }}>
                       <View
                         style={{
-                          height: 18,
-                          width: 18,
-                          marginRight: 6,
-                          borderRadius: 4,
-                          backgroundColor: '#0284C7',
-                        }}
-                      />
-                      <Text
-                        style={{
-                          color: '#0284C7',
-                          fontWeight: 'bold',
-                          textTransform: 'capitalize',
-                        }}>
-                        {section.allocationVariable}
-                      </Text>
-
-                      <View
-                        style={{
-                          flex: 1,
-                          justifyContent: 'flex-end',
-                          alignItems: 'flex-end',
-                        }}>
-                        <Text style={{fontWeight: 'bold', marginRight: 6}}>
-                          {isNaN(section.allocationBalance)
-                            ? 'Rp 0'
-                            : section.allocationBalance.toLocaleString(
-                                'id-ID',
-                                {
-                                  style: 'currency',
-                                  currency: 'IDR',
-                                  minimumFractionDigits: 0,
-                                  maximumFractionDigits: 0,
-                                },
-                              )}
-                        </Text>
-                      </View>
-                    </View>
-
-                    <View style={{margin: 6}}>
-                      <View
-                        style={{
+                          borderWidth: 2,
+                          padding: 6,
+                          borderRadius: 5,
+                          borderStyle: 'dashed',
                           justifyContent: 'center',
                           alignItems: 'center',
-                          marginVertical: 2,
                         }}>
-                        <Progress.Bar
-                          progress={
-                            !isNaN(section.allocationFraction) &&
-                            section.allocationFraction > 0
-                              ? section.allocationFraction
-                              : isNaN(section.allocationFraction)
-                              ? 0
-                              : 10
-                          }
-                          width={320}
-                          color="#0284C7"
-                          unfilledColor="#e9ecef"
-                        />
+                        <Svg
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={2}
+                          stroke="#000000"
+                          width={24}
+                          height={24}>
+                          <Path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M12 4.5v15m7.5-7.5h-15"
+                          />
+                        </Svg>
                       </View>
+                    </TouchableOpacity>
+                    <View>
+                      {disableButton ? (
+                        <View />
+                      ) : (
+                        <SubmitButton
+                          onPress={submitAllocation}
+                          textButton="Simpan"
+                          disabled={isLoading}
+                        />
+                      )}
+                    </View>
+                  </>
+                )}
+              </View>
+            </Card>
 
-                      <View style={{flexDirection: 'row', marginVertical: 6}}>
+            <View style={{marginVertical: 8}}>
+              <LineBreak />
+            </View>
+
+            <View>
+              {resultAllocation.map((section, index) => (
+                <View key={index}>
+                  {section.allocationVariable === 'Semua Alokasi' ? (
+                    <View />
+                  ) : (
+                    <Card>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          margin: 6,
+                          alignItems: 'center',
+                        }}>
                         <View
                           style={{
-                            flex: 1,
-                            justifyContent: 'flex-start',
-                            alignItems: 'flex-start',
+                            height: 18,
+                            width: 18,
+                            marginRight: 6,
+                            borderRadius: 4,
+                            backgroundColor: '#0284C7',
+                          }}
+                        />
+                        <Text
+                          style={{
+                            color: '#0284C7',
+                            fontWeight: 'bold',
+                            textTransform: 'capitalize',
                           }}>
-                          <Text style={{fontWeight: 'bold', marginLeft: 6}}>
-                            Rp 0
-                          </Text>
-                        </View>
+                          {section.allocationVariable}
+                        </Text>
+
                         <View
                           style={{
                             flex: 1,
@@ -806,19 +778,9 @@ const Alokasi = ({navigation}: any) => {
                             alignItems: 'flex-end',
                           }}>
                           <Text style={{fontWeight: 'bold', marginRight: 6}}>
-                            {isNaN(section.allocationRemaining)
+                            {isNaN(section.allocationBalance)
                               ? 'Rp 0'
-                              : section.totalOutcome === 0
-                              ? section.allocationBalance.toLocaleString(
-                                  'id-ID',
-                                  {
-                                    style: 'currency',
-                                    currency: 'IDR',
-                                    minimumFractionDigits: 0,
-                                    maximumFractionDigits: 0,
-                                  },
-                                )
-                              : section.allocationRemaining.toLocaleString(
+                              : section.allocationBalance.toLocaleString(
                                   'id-ID',
                                   {
                                     style: 'currency',
@@ -830,102 +792,84 @@ const Alokasi = ({navigation}: any) => {
                           </Text>
                         </View>
                       </View>
-                    </View>
-                  </Card>
-                )}
-              </View>
-            ))}
-          </View>
-        </View>
 
-        {/* <View style={{marginTop: 4, marginBottom: 6}}>
-          <Text
-            style={{
-              fontSize: 18,
-              fontWeight: '500',
-              marginVertical: 8,
-              marginLeft: 20,
-            }}>
-            Alokasi
-          </Text>
-        </View> */}
-        {/* <Card>
-          <View style={{flexDirection: 'row'}}>
-            <View style={{margin: 10, justifyContent: 'center'}}>
-              <PieChart donut radius={32} data={pieData} />
-            </View>
-            <View style={{justifyContent: 'center', flex: 1, margin: 10}}>
-              <TouchableOpacity
-                onPress={() => navigation.navigate('DetailAlokasi')}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    backgroundColor: '#0284C7',
-                    marginVertical: 2,
-                    marginHorizontal: 6,
-                    paddingVertical: 6,
-                    borderRadius: 18,
-                  }}>
-                  <Text
-                    style={{
-                      fontWeight: '500',
-                      textAlign: 'center',
-                      color: '#ffffff',
-                    }}>
-                    Detail dan Atur Alokasi Uang
-                  </Text>
-                  <View style={{marginLeft: 8}}>
-                    <Svg
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      width={22}
-                      height={22}
-                      stroke="#ffffff"
-                      strokeWidth={1.5}>
-                      <Path
-                        d="m8.25 4.5 7.5 7.5-7.5 7.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </Svg>
-                  </View>
+                      <View style={{margin: 6}}>
+                        <View
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            marginVertical: 2,
+                          }}>
+                          <Progress.Bar
+                            progress={
+                              !isNaN(section.allocationFraction) &&
+                              section.allocationFraction > 0
+                                ? section.allocationFraction
+                                : isNaN(section.allocationFraction)
+                                ? 0
+                                : 10
+                            }
+                            width={320}
+                            color="#0284C7"
+                            unfilledColor="#e9ecef"
+                          />
+                        </View>
+
+                        <View style={{flexDirection: 'row', marginVertical: 6}}>
+                          <View
+                            style={{
+                              flex: 1,
+                              justifyContent: 'flex-start',
+                              alignItems: 'flex-start',
+                            }}>
+                            <Text style={{fontWeight: 'bold', marginLeft: 6}}>
+                              Rp 0
+                            </Text>
+                          </View>
+                          <View
+                            style={{
+                              flex: 1,
+                              justifyContent: 'flex-end',
+                              alignItems: 'flex-end',
+                            }}>
+                            <Text style={{fontWeight: 'bold', marginRight: 6}}>
+                              {isNaN(section.allocationRemaining)
+                                ? 'Rp 0'
+                                : section.totalOutcome === 0
+                                ? section.allocationBalance.toLocaleString(
+                                    'id-ID',
+                                    {
+                                      style: 'currency',
+                                      currency: 'IDR',
+                                      minimumFractionDigits: 0,
+                                      maximumFractionDigits: 0,
+                                    },
+                                  )
+                                : section.allocationRemaining.toLocaleString(
+                                    'id-ID',
+                                    {
+                                      style: 'currency',
+                                      currency: 'IDR',
+                                      minimumFractionDigits: 0,
+                                      maximumFractionDigits: 0,
+                                    },
+                                  )}
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                    </Card>
+                  )}
                 </View>
-              </TouchableOpacity>
+              ))}
             </View>
           </View>
-        </Card> */}
+        )}
 
-        {/* <View style={{marginTop: 8}}>
+        <View style={{marginTop: 8}}>
           <LineBreak />
         </View>
 
-        <View style={{marginTop: 4, marginBottom: 6}}>
-          <Text
-            style={{
-              fontSize: 18,
-              fontWeight: '500',
-              marginVertical: 8,
-              marginLeft: 20,
-            }}>
-            Analisis Keuangan
-          </Text>
-        </View>
-
-        <Card>
-          <BarChart
-            width={300}
-            data={data}
-            barWidth={22}
-            noOfSections={3}
-            barBorderRadius={4}
-            frontColor="#0D6EFD"
-            yAxisThickness={0}
-            xAxisThickness={0}
-          />
-        </Card> */}
-
-        {/* <LineBreak /> */}
         <View
           style={{
             alignItems: 'center',
