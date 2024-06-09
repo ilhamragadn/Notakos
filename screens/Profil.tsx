@@ -207,6 +207,7 @@ const Profil = ({navigation}: any) => {
       });
 
       setIsLoadingUpdatePassword(false);
+      setDisableSaveButtonPassword(true);
       Alert.alert('Berhasil', 'Password telah diperbarui!');
       console.log('Success update password: ', res.data);
     } catch (error) {
@@ -612,257 +613,272 @@ const Profil = ({navigation}: any) => {
               </View>
             </Card>
 
-            {visibleProfile && (
+            {isLoadingUpdateProfile ? (
               <Card>
-                <View style={[styles.box, {flexDirection: 'row'}]}>
-                  <View
-                    style={{
-                      flex: 1,
-                      justifyContent: 'center',
-                      alignItems: 'flex-start',
-                      marginHorizontal: 6,
-                      paddingHorizontal: 6,
-                    }}>
-                    <View>
-                      <Text
-                        style={{
-                          fontSize: 12,
-                          fontWeight: 'bold',
-                          marginBottom: 6,
-                        }}>
-                        Nama
-                      </Text>
-                      <TextInput
-                        style={{
-                          width: 300,
-                          backgroundColor: '#f2f2f2',
-                          paddingHorizontal: 18,
-                          marginHorizontal: 2,
-                          borderRadius: 8,
-                        }}
-                        value={profileData?.name}
-                        editable={editableName}
-                        onChangeText={text => {
-                          setProfileData(prevState => ({
-                            ...prevState,
-                            name: text,
-                          }));
-                          setDisableSaveButtonProfile(false);
-                        }}
-                      />
-                    </View>
-                  </View>
-                  <TouchableOpacity
-                    onPress={toggleEditableName}
-                    style={{
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      marginTop: 30,
-                      marginRight: 4,
-                    }}>
-                    <Svg
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={2}
-                      stroke="#0284C7"
-                      width={20}
-                      height={20}>
-                      <Path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
-                      />
-                    </Svg>
-                  </TouchableOpacity>
+                <View
+                  style={{
+                    flex: 1,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: '#FFFFFF',
+                    marginVertical: 8,
+                  }}>
+                  <ActivityIndicator size="large" color="#0284C7" />
                 </View>
-
-                <View style={{marginBottom: 4}}>
-                  <LineBreak />
-                </View>
-
-                <View style={[styles.box, {flexDirection: 'row'}]}>
-                  <View
-                    style={{
-                      flex: 1,
-                      justifyContent: 'center',
-                      alignItems: 'flex-start',
-                      marginHorizontal: 6,
-                      paddingHorizontal: 6,
-                    }}>
-                    <View>
-                      <Text
-                        style={{
-                          fontSize: 12,
-                          fontWeight: 'bold',
-                          marginBottom: 6,
-                        }}>
-                        Email
-                      </Text>
-                      <TextInput
-                        style={{
-                          width: 300,
-                          backgroundColor: '#f2f2f2',
-                          paddingHorizontal: 18,
-                          marginHorizontal: 2,
-                          borderRadius: 8,
-                        }}
-                        value={profileData?.email}
-                        editable={editableEmail}
-                        onChangeText={text => {
-                          setProfileData(prevState => ({
-                            ...prevState,
-                            email: text,
-                          }));
-                          setDisableSaveButtonProfile(false);
-                        }}
-                      />
-                    </View>
-                  </View>
-                  <TouchableOpacity
-                    onPress={toggleEditableEmail}
-                    style={{
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      marginTop: 30,
-                      marginRight: 4,
-                    }}>
-                    <Svg
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={2}
-                      stroke="#0284C7"
-                      width={20}
-                      height={20}>
-                      <Path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
-                      />
-                    </Svg>
-                  </TouchableOpacity>
-                </View>
-
-                <View style={{marginBottom: 4}}>
-                  <LineBreak />
-                </View>
-
-                <View style={[styles.box, {flexDirection: 'row'}]}>
-                  <View
-                    style={{
-                      flex: 1,
-                      justifyContent: 'center',
-                      alignItems: 'flex-start',
-                      marginHorizontal: 6,
-                      paddingHorizontal: 6,
-                    }}>
-                    <View>
-                      <View style={{flexDirection: 'row'}}>
+              </Card>
+            ) : (
+              visibleProfile && (
+                <Card>
+                  <View style={[styles.box, {flexDirection: 'row'}]}>
+                    <View
+                      style={{
+                        flex: 1,
+                        justifyContent: 'center',
+                        alignItems: 'flex-start',
+                        marginHorizontal: 6,
+                        paddingHorizontal: 6,
+                      }}>
+                      <View>
                         <Text
                           style={{
-                            flex: 1,
                             fontSize: 12,
                             fontWeight: 'bold',
                             marginBottom: 6,
                           }}>
-                          Email Orang Tua
+                          Nama
                         </Text>
-                        <TouchableOpacity
-                          onPress={() => setInfoParentEmail(!infoParentEmail)}
-                          style={{marginHorizontal: 6}}>
-                          <Svg
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={1.8}
-                            stroke="#0D6EFD"
-                            width={16}
-                            height={16}>
-                            <Path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
-                            />
-                          </Svg>
-                        </TouchableOpacity>
+                        <TextInput
+                          style={{
+                            width: 300,
+                            backgroundColor: '#f2f2f2',
+                            paddingHorizontal: 18,
+                            marginHorizontal: 2,
+                            borderRadius: 8,
+                          }}
+                          value={profileData?.name}
+                          editable={editableName}
+                          onChangeText={text => {
+                            setProfileData(prevState => ({
+                              ...prevState,
+                              name: text,
+                            }));
+                            setDisableSaveButtonProfile(false);
+                          }}
+                        />
                       </View>
-                      {profileData.parent_email !== null ? (
-                        <TextInput
-                          style={{
-                            width: 300,
-                            backgroundColor: '#f2f2f2',
-                            paddingHorizontal: 18,
-                            marginHorizontal: 2,
-                            borderRadius: 8,
-                          }}
-                          value={profileData?.parent_email}
-                          editable={editableParentEmail}
-                          onChangeText={text => {
-                            setProfileData(prevState => ({
-                              ...prevState,
-                              parent_email: text,
-                            }));
-                            setDisableSaveButtonProfile(false);
-                          }}
-                        />
-                      ) : (
-                        <TextInput
-                          style={{
-                            width: 300,
-                            backgroundColor: '#f2f2f2',
-                            paddingHorizontal: 18,
-                            marginHorizontal: 2,
-                            borderRadius: 8,
-                          }}
-                          placeholder="Masukkan Email Orang Tua"
-                          editable={editableParentEmail}
-                          onChangeText={text => {
-                            setProfileData(prevState => ({
-                              ...prevState,
-                              parent_email: text,
-                            }));
-                            setDisableSaveButtonProfile(false);
-                          }}
-                        />
-                      )}
                     </View>
+                    <TouchableOpacity
+                      onPress={toggleEditableName}
+                      style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        marginTop: 30,
+                        marginRight: 4,
+                      }}>
+                      <Svg
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2}
+                        stroke="#0284C7"
+                        width={20}
+                        height={20}>
+                        <Path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
+                        />
+                      </Svg>
+                    </TouchableOpacity>
                   </View>
-                  <TouchableOpacity
-                    onPress={toggleEditableParentEmail}
-                    style={{
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      marginTop: 30,
-                      marginRight: 4,
-                    }}>
-                    <Svg
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={2}
-                      stroke="#0284C7"
-                      width={20}
-                      height={20}>
-                      <Path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
-                      />
-                    </Svg>
-                  </TouchableOpacity>
-                </View>
 
-                <View style={{marginBottom: 4}}>
-                  <LineBreak />
-                </View>
+                  <View style={{marginBottom: 4}}>
+                    <LineBreak />
+                  </View>
 
-                {disableSaveButtonProfile ? (
-                  <View />
-                ) : (
-                  <SubmitButton
-                    textButton="Perbarui"
-                    onPress={() => handleUpdateProfile(profileData)}
-                    disabled={isLoadingUpdateProfile}
-                  />
-                )}
-              </Card>
+                  <View style={[styles.box, {flexDirection: 'row'}]}>
+                    <View
+                      style={{
+                        flex: 1,
+                        justifyContent: 'center',
+                        alignItems: 'flex-start',
+                        marginHorizontal: 6,
+                        paddingHorizontal: 6,
+                      }}>
+                      <View>
+                        <Text
+                          style={{
+                            fontSize: 12,
+                            fontWeight: 'bold',
+                            marginBottom: 6,
+                          }}>
+                          Email
+                        </Text>
+                        <TextInput
+                          style={{
+                            width: 300,
+                            backgroundColor: '#f2f2f2',
+                            paddingHorizontal: 18,
+                            marginHorizontal: 2,
+                            borderRadius: 8,
+                          }}
+                          value={profileData?.email}
+                          editable={editableEmail}
+                          onChangeText={text => {
+                            setProfileData(prevState => ({
+                              ...prevState,
+                              email: text,
+                            }));
+                            setDisableSaveButtonProfile(false);
+                          }}
+                        />
+                      </View>
+                    </View>
+                    <TouchableOpacity
+                      onPress={toggleEditableEmail}
+                      style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        marginTop: 30,
+                        marginRight: 4,
+                      }}>
+                      <Svg
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2}
+                        stroke="#0284C7"
+                        width={20}
+                        height={20}>
+                        <Path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
+                        />
+                      </Svg>
+                    </TouchableOpacity>
+                  </View>
+
+                  <View style={{marginBottom: 4}}>
+                    <LineBreak />
+                  </View>
+
+                  <View style={[styles.box, {flexDirection: 'row'}]}>
+                    <View
+                      style={{
+                        flex: 1,
+                        justifyContent: 'center',
+                        alignItems: 'flex-start',
+                        marginHorizontal: 6,
+                        paddingHorizontal: 6,
+                      }}>
+                      <View>
+                        <View style={{flexDirection: 'row'}}>
+                          <Text
+                            style={{
+                              flex: 1,
+                              fontSize: 12,
+                              fontWeight: 'bold',
+                              marginBottom: 6,
+                            }}>
+                            Email Orang Tua
+                          </Text>
+                          <TouchableOpacity
+                            onPress={() => setInfoParentEmail(!infoParentEmail)}
+                            style={{marginHorizontal: 6}}>
+                            <Svg
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth={1.8}
+                              stroke="#0D6EFD"
+                              width={16}
+                              height={16}>
+                              <Path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+                              />
+                            </Svg>
+                          </TouchableOpacity>
+                        </View>
+                        {profileData.parent_email !== null ? (
+                          <TextInput
+                            style={{
+                              width: 300,
+                              backgroundColor: '#f2f2f2',
+                              paddingHorizontal: 18,
+                              marginHorizontal: 2,
+                              borderRadius: 8,
+                            }}
+                            value={profileData?.parent_email}
+                            editable={editableParentEmail}
+                            onChangeText={text => {
+                              setProfileData(prevState => ({
+                                ...prevState,
+                                parent_email: text,
+                              }));
+                              setDisableSaveButtonProfile(false);
+                            }}
+                          />
+                        ) : (
+                          <TextInput
+                            style={{
+                              width: 300,
+                              backgroundColor: '#f2f2f2',
+                              paddingHorizontal: 18,
+                              marginHorizontal: 2,
+                              borderRadius: 8,
+                            }}
+                            placeholder="Masukkan Email Orang Tua"
+                            editable={editableParentEmail}
+                            onChangeText={text => {
+                              setProfileData(prevState => ({
+                                ...prevState,
+                                parent_email: text,
+                              }));
+                              setDisableSaveButtonProfile(false);
+                            }}
+                          />
+                        )}
+                      </View>
+                    </View>
+                    <TouchableOpacity
+                      onPress={toggleEditableParentEmail}
+                      style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        marginTop: 30,
+                        marginRight: 4,
+                      }}>
+                      <Svg
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2}
+                        stroke="#0284C7"
+                        width={20}
+                        height={20}>
+                        <Path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
+                        />
+                      </Svg>
+                    </TouchableOpacity>
+                  </View>
+
+                  <View style={{marginBottom: 4}}>
+                    <LineBreak />
+                  </View>
+
+                  {disableSaveButtonProfile ? (
+                    <View />
+                  ) : (
+                    <SubmitButton
+                      textButton="Perbarui"
+                      onPress={() => handleUpdateProfile(profileData)}
+                      disabled={isLoadingUpdateProfile}
+                    />
+                  )}
+                </Card>
+              )
             )}
 
             <Modal
@@ -1008,172 +1024,187 @@ const Profil = ({navigation}: any) => {
               </View>
             </Card>
 
-            {visibleNewPassword && (
+            {isLoadingUpdatePassword ? (
               <Card>
-                <View style={[styles.box, {flexDirection: 'row'}]}>
-                  <View
-                    style={{
-                      flex: 1,
-                      justifyContent: 'center',
-                      alignItems: 'flex-start',
-                      marginHorizontal: 6,
-                      paddingHorizontal: 6,
-                    }}>
-                    <View>
-                      <Text
-                        style={{
-                          fontSize: 12,
-                          fontWeight: 'bold',
-                          marginBottom: 6,
-                        }}>
-                        Password Baru
-                      </Text>
-                      <TextInput
-                        style={{
-                          width: 300,
-                          backgroundColor: '#f2f2f2',
-                          paddingHorizontal: 18,
-                          marginHorizontal: 2,
-                          borderRadius: 8,
-                        }}
-                        placeholder="Masukkan Password Baru"
-                        secureTextEntry={secureNewPassword}
-                        onChangeText={text => {
-                          setProfileData(prevState => ({
-                            ...prevState,
-                            password: text,
-                          }));
-                          setDisableSaveButtonPassword(false);
-                        }}
-                      />
-                    </View>
-                  </View>
-                  <TouchableOpacity
-                    onPress={toggleSecureNewPassword}
-                    style={{
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      marginTop: 30,
-                      marginRight: 4,
-                    }}>
-                    {secureNewPassword === true ? (
-                      <Svg
-                        viewBox="0 0 24 24"
-                        fill="#0284C7"
-                        width={22}
-                        height={22}>
-                        <Path d="M3.53 2.47a.75.75 0 0 0-1.06 1.06l18 18a.75.75 0 1 0 1.06-1.06l-18-18ZM22.676 12.553a11.249 11.249 0 0 1-2.631 4.31l-3.099-3.099a5.25 5.25 0 0 0-6.71-6.71L7.759 4.577a11.217 11.217 0 0 1 4.242-.827c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113Z" />
-                        <Path d="M15.75 12c0 .18-.013.357-.037.53l-4.244-4.243A3.75 3.75 0 0 1 15.75 12ZM12.53 15.713l-4.243-4.244a3.75 3.75 0 0 0 4.244 4.243Z" />
-                        <Path d="M6.75 12c0-.619.107-1.213.304-1.764l-3.1-3.1a11.25 11.25 0 0 0-2.63 4.31c-.12.362-.12.752 0 1.114 1.489 4.467 5.704 7.69 10.675 7.69 1.5 0 2.933-.294 4.242-.827l-2.477-2.477A5.25 5.25 0 0 1 6.75 12Z" />
-                      </Svg>
-                    ) : (
-                      <Svg
-                        viewBox="0 0 24 24"
-                        fill="#0284C7"
-                        width={22}
-                        height={22}>
-                        <Path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
-                        <Path
-                          fillRule="evenodd"
-                          d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 0 1 0-1.113ZM17.25 12a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0Z"
-                          clipRule="evenodd"
-                        />
-                      </Svg>
-                    )}
-                  </TouchableOpacity>
+                <View
+                  style={{
+                    flex: 1,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: '#FFFFFF',
+                    marginVertical: 8,
+                  }}>
+                  <ActivityIndicator size="large" color="#0284C7" />
                 </View>
-
-                <View style={{marginBottom: 4}}>
-                  <LineBreak />
-                </View>
-
-                <View style={[styles.box, {flexDirection: 'row'}]}>
-                  <View
-                    style={{
-                      flex: 1,
-                      justifyContent: 'center',
-                      alignItems: 'flex-start',
-                      marginHorizontal: 6,
-                      paddingHorizontal: 6,
-                    }}>
-                    <View>
-                      <Text
-                        style={{
-                          fontSize: 12,
-                          fontWeight: 'bold',
-                          marginBottom: 6,
-                        }}>
-                        Konfirmasi Password Baru
-                      </Text>
-                      <TextInput
-                        style={{
-                          width: 300,
-                          backgroundColor: '#f2f2f2',
-                          paddingHorizontal: 18,
-                          marginHorizontal: 2,
-                          borderRadius: 8,
-                        }}
-                        placeholder="Konfirmasikan Password Baru"
-                        secureTextEntry={secureNewPasswordConfirmation}
-                        onChangeText={text => {
-                          setProfileData(prevState => ({
-                            ...prevState,
-                            password_confirmation: text,
-                          }));
-                          setDisableSaveButtonPassword(false);
-                        }}
-                      />
-                    </View>
-                  </View>
-                  <TouchableOpacity
-                    onPress={toggleSecureNewPasswordConfirmation}
-                    style={{
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      marginTop: 30,
-                      marginRight: 4,
-                    }}>
-                    {secureNewPasswordConfirmation === true ? (
-                      <Svg
-                        viewBox="0 0 24 24"
-                        fill="#0284C7"
-                        width={22}
-                        height={22}>
-                        <Path d="M3.53 2.47a.75.75 0 0 0-1.06 1.06l18 18a.75.75 0 1 0 1.06-1.06l-18-18ZM22.676 12.553a11.249 11.249 0 0 1-2.631 4.31l-3.099-3.099a5.25 5.25 0 0 0-6.71-6.71L7.759 4.577a11.217 11.217 0 0 1 4.242-.827c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113Z" />
-                        <Path d="M15.75 12c0 .18-.013.357-.037.53l-4.244-4.243A3.75 3.75 0 0 1 15.75 12ZM12.53 15.713l-4.243-4.244a3.75 3.75 0 0 0 4.244 4.243Z" />
-                        <Path d="M6.75 12c0-.619.107-1.213.304-1.764l-3.1-3.1a11.25 11.25 0 0 0-2.63 4.31c-.12.362-.12.752 0 1.114 1.489 4.467 5.704 7.69 10.675 7.69 1.5 0 2.933-.294 4.242-.827l-2.477-2.477A5.25 5.25 0 0 1 6.75 12Z" />
-                      </Svg>
-                    ) : (
-                      <Svg
-                        viewBox="0 0 24 24"
-                        fill="#0284C7"
-                        width={22}
-                        height={22}>
-                        <Path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
-                        <Path
-                          fillRule="evenodd"
-                          d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 0 1 0-1.113ZM17.25 12a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0Z"
-                          clipRule="evenodd"
-                        />
-                      </Svg>
-                    )}
-                  </TouchableOpacity>
-                </View>
-
-                <View style={{marginBottom: 4}}>
-                  <LineBreak />
-                </View>
-
-                {disableSaveButtonPassword ? (
-                  <View />
-                ) : (
-                  <SubmitButton
-                    textButton="Simpan"
-                    onPress={() => handleUpdatePassword(profileData)}
-                    disabled={isLoadingUpdatePassword}
-                  />
-                )}
               </Card>
+            ) : (
+              visibleNewPassword && (
+                <Card>
+                  <View style={[styles.box, {flexDirection: 'row'}]}>
+                    <View
+                      style={{
+                        flex: 1,
+                        justifyContent: 'center',
+                        alignItems: 'flex-start',
+                        marginHorizontal: 6,
+                        paddingHorizontal: 6,
+                      }}>
+                      <View>
+                        <Text
+                          style={{
+                            fontSize: 12,
+                            fontWeight: 'bold',
+                            marginBottom: 6,
+                          }}>
+                          Password Baru
+                        </Text>
+                        <TextInput
+                          style={{
+                            width: 300,
+                            backgroundColor: '#f2f2f2',
+                            paddingHorizontal: 18,
+                            marginHorizontal: 2,
+                            borderRadius: 8,
+                          }}
+                          placeholder="Masukkan Password Baru"
+                          secureTextEntry={secureNewPassword}
+                          onChangeText={text => {
+                            setProfileData(prevState => ({
+                              ...prevState,
+                              password: text,
+                            }));
+                            setDisableSaveButtonPassword(false);
+                          }}
+                        />
+                      </View>
+                    </View>
+                    <TouchableOpacity
+                      onPress={toggleSecureNewPassword}
+                      style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        marginTop: 30,
+                        marginRight: 4,
+                      }}>
+                      {secureNewPassword === true ? (
+                        <Svg
+                          viewBox="0 0 24 24"
+                          fill="#0284C7"
+                          width={22}
+                          height={22}>
+                          <Path d="M3.53 2.47a.75.75 0 0 0-1.06 1.06l18 18a.75.75 0 1 0 1.06-1.06l-18-18ZM22.676 12.553a11.249 11.249 0 0 1-2.631 4.31l-3.099-3.099a5.25 5.25 0 0 0-6.71-6.71L7.759 4.577a11.217 11.217 0 0 1 4.242-.827c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113Z" />
+                          <Path d="M15.75 12c0 .18-.013.357-.037.53l-4.244-4.243A3.75 3.75 0 0 1 15.75 12ZM12.53 15.713l-4.243-4.244a3.75 3.75 0 0 0 4.244 4.243Z" />
+                          <Path d="M6.75 12c0-.619.107-1.213.304-1.764l-3.1-3.1a11.25 11.25 0 0 0-2.63 4.31c-.12.362-.12.752 0 1.114 1.489 4.467 5.704 7.69 10.675 7.69 1.5 0 2.933-.294 4.242-.827l-2.477-2.477A5.25 5.25 0 0 1 6.75 12Z" />
+                        </Svg>
+                      ) : (
+                        <Svg
+                          viewBox="0 0 24 24"
+                          fill="#0284C7"
+                          width={22}
+                          height={22}>
+                          <Path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+                          <Path
+                            fillRule="evenodd"
+                            d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 0 1 0-1.113ZM17.25 12a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0Z"
+                            clipRule="evenodd"
+                          />
+                        </Svg>
+                      )}
+                    </TouchableOpacity>
+                  </View>
+
+                  <View style={{marginBottom: 4}}>
+                    <LineBreak />
+                  </View>
+
+                  <View style={[styles.box, {flexDirection: 'row'}]}>
+                    <View
+                      style={{
+                        flex: 1,
+                        justifyContent: 'center',
+                        alignItems: 'flex-start',
+                        marginHorizontal: 6,
+                        paddingHorizontal: 6,
+                      }}>
+                      <View>
+                        <Text
+                          style={{
+                            fontSize: 12,
+                            fontWeight: 'bold',
+                            marginBottom: 6,
+                          }}>
+                          Konfirmasi Password Baru
+                        </Text>
+                        <TextInput
+                          style={{
+                            width: 300,
+                            backgroundColor: '#f2f2f2',
+                            paddingHorizontal: 18,
+                            marginHorizontal: 2,
+                            borderRadius: 8,
+                          }}
+                          placeholder="Konfirmasikan Password Baru"
+                          secureTextEntry={secureNewPasswordConfirmation}
+                          onChangeText={text => {
+                            setProfileData(prevState => ({
+                              ...prevState,
+                              password_confirmation: text,
+                            }));
+                            setDisableSaveButtonPassword(false);
+                          }}
+                        />
+                      </View>
+                    </View>
+                    <TouchableOpacity
+                      onPress={toggleSecureNewPasswordConfirmation}
+                      style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        marginTop: 30,
+                        marginRight: 4,
+                      }}>
+                      {secureNewPasswordConfirmation === true ? (
+                        <Svg
+                          viewBox="0 0 24 24"
+                          fill="#0284C7"
+                          width={22}
+                          height={22}>
+                          <Path d="M3.53 2.47a.75.75 0 0 0-1.06 1.06l18 18a.75.75 0 1 0 1.06-1.06l-18-18ZM22.676 12.553a11.249 11.249 0 0 1-2.631 4.31l-3.099-3.099a5.25 5.25 0 0 0-6.71-6.71L7.759 4.577a11.217 11.217 0 0 1 4.242-.827c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113Z" />
+                          <Path d="M15.75 12c0 .18-.013.357-.037.53l-4.244-4.243A3.75 3.75 0 0 1 15.75 12ZM12.53 15.713l-4.243-4.244a3.75 3.75 0 0 0 4.244 4.243Z" />
+                          <Path d="M6.75 12c0-.619.107-1.213.304-1.764l-3.1-3.1a11.25 11.25 0 0 0-2.63 4.31c-.12.362-.12.752 0 1.114 1.489 4.467 5.704 7.69 10.675 7.69 1.5 0 2.933-.294 4.242-.827l-2.477-2.477A5.25 5.25 0 0 1 6.75 12Z" />
+                        </Svg>
+                      ) : (
+                        <Svg
+                          viewBox="0 0 24 24"
+                          fill="#0284C7"
+                          width={22}
+                          height={22}>
+                          <Path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+                          <Path
+                            fillRule="evenodd"
+                            d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 0 1 0-1.113ZM17.25 12a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0Z"
+                            clipRule="evenodd"
+                          />
+                        </Svg>
+                      )}
+                    </TouchableOpacity>
+                  </View>
+
+                  <View style={{marginBottom: 4}}>
+                    <LineBreak />
+                  </View>
+
+                  {disableSaveButtonPassword ? (
+                    <View />
+                  ) : (
+                    <SubmitButton
+                      textButton="Simpan"
+                      onPress={() => handleUpdatePassword(profileData)}
+                      disabled={isLoadingUpdatePassword}
+                    />
+                  )}
+                </Card>
+              )
             )}
 
             {/* FAQ */}

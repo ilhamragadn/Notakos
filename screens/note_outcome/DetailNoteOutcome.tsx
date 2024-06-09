@@ -181,249 +181,281 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
         ]}>
         <Text style={styles.textPath}>Detail Catatan Pengeluaran</Text>
       </View>
-      <ScrollView style={{flex: 1}}>
-        {data ? (
-          <View style={styles.container}>
-            <Card>
-              <View style={styles.box}>
-                <Text style={styles.label}>Deskripsi Catatan Pengeluaran</Text>
-                <TextInput
-                  defaultValue={data.deskripsi || 'Tidak ada deskripsi'}
-                  readOnly={true}
-                  style={styles.input_deskripsi}
-                  multiline={true}
-                  numberOfLines={4}
-                />
-              </View>
-            </Card>
-            <LineBreak />
-            {data.catatan_pengeluaran.map(item => (
-              <View key={item.id}>
-                <Card>
-                  <View style={styles.box}>
-                    <Text style={styles.label}>Nama Barang/Keperluan</Text>
-                    <TextInput
-                      value={item.nama_barang}
-                      readOnly={true}
-                      style={styles.input_primary}
-                    />
-                  </View>
-                </Card>
-                <View style={{flexDirection: 'row'}}>
-                  <Card>
-                    <View style={styles.box}>
-                      <Text style={styles.label}>Harga</Text>
-                      <TextInput
-                        style={styles.input_secondary}
-                        editable={false}
-                        value={formatCurrency(item.harga_barang)}
-                      />
-                    </View>
-                  </Card>
-                  <Card>
-                    <View style={styles.box}>
-                      <Text style={styles.label}>Satuan</Text>
-                      <TextInput
-                        style={[styles.input_secondary, {textAlign: 'center'}]}
-                        readOnly={true}
-                        defaultValue={item.satuan_barang.toLocaleString(
-                          'id-ID',
-                          {minimumFractionDigits: 0, maximumFractionDigits: 0},
-                        )}
-                      />
-                    </View>
-                  </Card>
-                </View>
-                <View style={{flexDirection: 'row'}}>
-                  <View style={{flex: 1}}>
-                    <Card>
-                      <View style={styles.box}>
-                        <View style={{flexDirection: 'row'}}>
-                          <Text style={[styles.label, {flex: 1}]}>
-                            Jenis Kebutuhan
-                          </Text>
-                          <TouchableOpacity
-                            onPress={() => setIsInfoType(!isInfoType)}>
-                            <Svg
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              strokeWidth={2}
-                              stroke="#0D6EFD"
-                              width={20}
-                              height={20}>
-                              <Path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
-                              />
-                            </Svg>
-                          </TouchableOpacity>
-                        </View>
-                        {allocationSection()}
-                      </View>
-                    </Card>
-                  </View>
-                  <View style={{flex: 1}}>
-                    <Card>
-                      <View style={styles.box}>
-                        <Text style={styles.label}>Kategori Uang Keluar</Text>
-                        <View style={[styles.input_category, {marginTop: 4}]}>
-                          <CheckBox
-                            title="Cash"
-                            checked={item.kategori_uang_keluar === 'Cash'}
-                            textStyle={{fontWeight: 'normal'}}
-                            checkedIcon={
-                              <Svg viewBox="0 0 512 512" width={20} height={20}>
-                                <Path
-                                  fill="#0D6EFD"
-                                  d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256-96a96 96 0 1 1 0 192 96 96 0 1 1 0-192z"
-                                />
-                              </Svg>
-                            }
-                            uncheckedIcon={
-                              <Svg viewBox="0 0 512 512" width={20} height={20}>
-                                <Path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z" />
-                              </Svg>
-                            }
-                          />
-                        </View>
-                        <View style={{marginBottom: 4}}>
-                          <CheckBox
-                            title="Cashless"
-                            checked={item.kategori_uang_keluar === 'Cashless'}
-                            textStyle={{fontWeight: 'normal'}}
-                            checkedIcon={
-                              <Svg viewBox="0 0 512 512" width={20} height={20}>
-                                <Path
-                                  fill="#0D6EFD"
-                                  d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256-96a96 96 0 1 1 0 192 96 96 0 1 1 0-192z"
-                                />
-                              </Svg>
-                            }
-                            uncheckedIcon={
-                              <Svg viewBox="0 0 512 512" width={20} height={20}>
-                                <Path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z" />
-                              </Svg>
-                            }
-                          />
-                        </View>
-                      </View>
-                    </Card>
-                  </View>
-                </View>
-                <Modal
-                  transparent={true}
-                  animationType="fade"
-                  visible={isInfoType}>
-                  <View
-                    style={{
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      flex: 1,
-                    }}>
-                    <Card>
-                      <View style={styles.box}>
-                        <View style={styles.cardInfo}>
-                          <View>
-                            <Svg
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              strokeWidth={2}
-                              stroke="#0D6EFD"
-                              width={20}
-                              height={20}>
-                              <Path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
-                              />
-                            </Svg>
-                          </View>
-                          <View style={{width: 300, marginHorizontal: 4}}>
-                            <Text style={styles.text}>
-                              Berikut ini adalah jenis kebutuhan Anda
-                              berdasarkan dari alokasi yang sudah Anda buat
-                              sebelumnya.
-                            </Text>
-                          </View>
-                        </View>
-                      </View>
-                      <TouchableOpacity
-                        style={{alignItems: 'center', marginVertical: 4}}
-                        onPress={() => setIsInfoType(!isInfoType)}>
-                        <Svg
-                          width={25}
-                          height={25}
-                          viewBox="0 0 24 24"
-                          strokeWidth={2}
-                          stroke="#000000">
-                          <Path
-                            d="M6 18 18 6M6 6l12 12"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </Svg>
-                      </TouchableOpacity>
-                    </Card>
-                  </View>
-                </Modal>
-                <Card>
-                  <View style={styles.box}>
-                    <Text style={styles.label}>Jumlah Harga</Text>
-                    <TextInput
-                      placeholder="Jumlah Harga"
-                      style={[styles.input_primary, {textAlign: 'center'}]}
-                      readOnly={true}
-                      defaultValue={formatCurrency(item.nominal_uang_keluar)}
-                    />
-                  </View>
-                </Card>
-              </View>
-            ))}
-            <LineBreak />
-            <Card>
-              <View style={styles.box}>
-                <Text style={{fontSize: 16, fontWeight: 'bold'}}>Total</Text>
-                <View style={styles.card}>
+      {isLoading ? (
+        <View
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#FFFFFF',
+          }}>
+          <ActivityIndicator size="large" color="#0284C7" />
+        </View>
+      ) : (
+        <ScrollView>
+          {data ? (
+            <View style={styles.container}>
+              <Card>
+                <View style={styles.box}>
+                  <Text style={styles.label}>
+                    Deskripsi Catatan Pengeluaran
+                  </Text>
                   <TextInput
-                    style={styles.input_total}
+                    defaultValue={data.deskripsi || 'Tidak ada deskripsi'}
                     readOnly={true}
-                    defaultValue={formatCurrency(data.total_uang_keluar)}
+                    style={styles.input_deskripsi}
+                    multiline={true}
+                    numberOfLines={4}
+                  />
+                </View>
+              </Card>
+              <LineBreak />
+              {data.catatan_pengeluaran.map(item => (
+                <View key={item.id}>
+                  <Card>
+                    <View style={styles.box}>
+                      <Text style={styles.label}>Nama Barang/Keperluan</Text>
+                      <TextInput
+                        value={item.nama_barang}
+                        readOnly={true}
+                        style={styles.input_primary}
+                      />
+                    </View>
+                  </Card>
+                  <View style={{flexDirection: 'row'}}>
+                    <Card>
+                      <View style={styles.box}>
+                        <Text style={styles.label}>Harga</Text>
+                        <TextInput
+                          style={styles.input_secondary}
+                          editable={false}
+                          value={formatCurrency(item.harga_barang)}
+                        />
+                      </View>
+                    </Card>
+                    <Card>
+                      <View style={styles.box}>
+                        <Text style={styles.label}>Satuan</Text>
+                        <TextInput
+                          style={[
+                            styles.input_secondary,
+                            {textAlign: 'center'},
+                          ]}
+                          readOnly={true}
+                          defaultValue={item.satuan_barang.toLocaleString(
+                            'id-ID',
+                            {
+                              minimumFractionDigits: 0,
+                              maximumFractionDigits: 0,
+                            },
+                          )}
+                        />
+                      </View>
+                    </Card>
+                  </View>
+                  <View style={{flexDirection: 'row'}}>
+                    <View style={{flex: 1}}>
+                      <Card>
+                        <View style={styles.box}>
+                          <View style={{flexDirection: 'row'}}>
+                            <Text style={[styles.label, {flex: 1}]}>
+                              Jenis Kebutuhan
+                            </Text>
+                            <TouchableOpacity
+                              onPress={() => setIsInfoType(!isInfoType)}>
+                              <Svg
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={2}
+                                stroke="#0D6EFD"
+                                width={20}
+                                height={20}>
+                                <Path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+                                />
+                              </Svg>
+                            </TouchableOpacity>
+                          </View>
+                          {allocationSection()}
+                        </View>
+                      </Card>
+                    </View>
+                    <View style={{flex: 1}}>
+                      <Card>
+                        <View style={styles.box}>
+                          <Text style={styles.label}>Kategori Uang Keluar</Text>
+                          <View style={[styles.input_category, {marginTop: 4}]}>
+                            <CheckBox
+                              title="Cash"
+                              checked={item.kategori_uang_keluar === 'Cash'}
+                              textStyle={{fontWeight: 'normal'}}
+                              checkedIcon={
+                                <Svg
+                                  viewBox="0 0 512 512"
+                                  width={20}
+                                  height={20}>
+                                  <Path
+                                    fill="#0D6EFD"
+                                    d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256-96a96 96 0 1 1 0 192 96 96 0 1 1 0-192z"
+                                  />
+                                </Svg>
+                              }
+                              uncheckedIcon={
+                                <Svg
+                                  viewBox="0 0 512 512"
+                                  width={20}
+                                  height={20}>
+                                  <Path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z" />
+                                </Svg>
+                              }
+                            />
+                          </View>
+                          <View style={{marginBottom: 4}}>
+                            <CheckBox
+                              title="Cashless"
+                              checked={item.kategori_uang_keluar === 'Cashless'}
+                              textStyle={{fontWeight: 'normal'}}
+                              checkedIcon={
+                                <Svg
+                                  viewBox="0 0 512 512"
+                                  width={20}
+                                  height={20}>
+                                  <Path
+                                    fill="#0D6EFD"
+                                    d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256-96a96 96 0 1 1 0 192 96 96 0 1 1 0-192z"
+                                  />
+                                </Svg>
+                              }
+                              uncheckedIcon={
+                                <Svg
+                                  viewBox="0 0 512 512"
+                                  width={20}
+                                  height={20}>
+                                  <Path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z" />
+                                </Svg>
+                              }
+                            />
+                          </View>
+                        </View>
+                      </Card>
+                    </View>
+                  </View>
+                  <Modal
+                    transparent={true}
+                    animationType="fade"
+                    visible={isInfoType}>
+                    <View
+                      style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        flex: 1,
+                      }}>
+                      <Card>
+                        <View style={styles.box}>
+                          <View style={styles.cardInfo}>
+                            <View>
+                              <Svg
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={2}
+                                stroke="#0D6EFD"
+                                width={20}
+                                height={20}>
+                                <Path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+                                />
+                              </Svg>
+                            </View>
+                            <View style={{width: 300, marginHorizontal: 4}}>
+                              <Text style={styles.text}>
+                                Berikut ini adalah jenis kebutuhan Anda
+                                berdasarkan dari alokasi yang sudah Anda buat
+                                sebelumnya.
+                              </Text>
+                            </View>
+                          </View>
+                        </View>
+                        <TouchableOpacity
+                          style={{alignItems: 'center', marginVertical: 4}}
+                          onPress={() => setIsInfoType(!isInfoType)}>
+                          <Svg
+                            width={25}
+                            height={25}
+                            viewBox="0 0 24 24"
+                            strokeWidth={2}
+                            stroke="#000000">
+                            <Path
+                              d="M6 18 18 6M6 6l12 12"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </Svg>
+                        </TouchableOpacity>
+                      </Card>
+                    </View>
+                  </Modal>
+                  <Card>
+                    <View style={styles.box}>
+                      <Text style={styles.label}>Jumlah Harga</Text>
+                      <TextInput
+                        placeholder="Jumlah Harga"
+                        style={[styles.input_primary, {textAlign: 'center'}]}
+                        readOnly={true}
+                        defaultValue={formatCurrency(item.nominal_uang_keluar)}
+                      />
+                    </View>
+                  </Card>
+                </View>
+              ))}
+              <LineBreak />
+              <Card>
+                <View style={styles.box}>
+                  <Text style={{fontSize: 16, fontWeight: 'bold'}}>Total</Text>
+                  <View style={styles.card}>
+                    <TextInput
+                      style={styles.input_total}
+                      readOnly={true}
+                      defaultValue={formatCurrency(data.total_uang_keluar)}
+                    />
+                  </View>
+                </View>
+              </Card>
+
+              <View style={{flexDirection: 'row', marginTop: 8}}>
+                <View style={{flex: 1}}>
+                  <DeleteButton
+                    onPress={() => handleDeleteData(itemId)}
+                    disabled={isLoading}
+                  />
+                </View>
+                <View style={{flex: 1}}>
+                  <EditButton
+                    onPress={() =>
+                      navigation.navigate('EditNoteOutcome', {itemId: data.id})
+                    }
+                    textButton="Edit"
                   />
                 </View>
               </View>
-            </Card>
-
-            <View style={{flexDirection: 'row', marginTop: 8}}>
               <View style={{flex: 1}}>
-                <DeleteButton
-                  onPress={() => handleDeleteData(itemId)}
-                  disabled={isLoading}
-                />
-              </View>
-              <View style={{flex: 1}}>
-                <EditButton
-                  onPress={() =>
-                    navigation.navigate('EditNoteOutcome', {itemId: data.id})
-                  }
-                  textButton="Edit"
-                />
+                <BackButton />
               </View>
             </View>
-            <View style={{flex: 1}}>
-              <BackButton />
+          ) : (
+            <View
+              style={{
+                marginTop: 10,
+                justifyContent: 'center',
+              }}>
+              <ActivityIndicator size="large" color="#0284C7" />
             </View>
-          </View>
-        ) : (
-          <View
-            style={{
-              marginTop: 10,
-              justifyContent: 'center',
-            }}>
-            <ActivityIndicator size="large" color="#0284C7" />
-          </View>
-        )}
-      </ScrollView>
+          )}
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 };

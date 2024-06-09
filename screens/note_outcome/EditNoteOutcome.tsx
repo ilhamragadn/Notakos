@@ -595,71 +595,85 @@ const EditNoteOutcome = ({navigation, route}: any) => {
           </View>
         </View>
       </View>
-      <ScrollView style={{flex: 1}}>
-        {data ? (
-          <View style={styles.container}>
-            <Card>
-              <View style={styles.box}>
-                <Text style={styles.label}>Deskripsi Catatan Pengeluaran</Text>
-                {data.deskripsi !== null ? (
-                  <TextInput
-                    style={styles.input_deskripsi}
-                    multiline={true}
-                    numberOfLines={4}
-                    value={data.deskripsi}
-                    onChangeText={text => setData({...data, deskripsi: text})}
-                  />
-                ) : (
-                  <TextInput
-                    placeholder="Tidak ada deskripsi catatan"
-                    style={styles.input_deskripsi}
-                    multiline={true}
-                    numberOfLines={4}
-                    onChangeText={text => setData({...data, deskripsi: text})}
-                  />
-                )}
-              </View>
-            </Card>
+      {isLoading ? (
+        <View
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#FFFFFF',
+          }}>
+          <ActivityIndicator size="large" color="#0284C7" />
+        </View>
+      ) : (
+        <ScrollView>
+          {data ? (
+            <View style={styles.container}>
+              <Card>
+                <View style={styles.box}>
+                  <Text style={styles.label}>
+                    Deskripsi Catatan Pengeluaran
+                  </Text>
+                  {data.deskripsi !== null ? (
+                    <TextInput
+                      style={styles.input_deskripsi}
+                      multiline={true}
+                      numberOfLines={4}
+                      value={data.deskripsi}
+                      onChangeText={text => setData({...data, deskripsi: text})}
+                    />
+                  ) : (
+                    <TextInput
+                      placeholder="Tidak ada deskripsi catatan"
+                      style={styles.input_deskripsi}
+                      multiline={true}
+                      numberOfLines={4}
+                      onChangeText={text => setData({...data, deskripsi: text})}
+                    />
+                  )}
+                </View>
+              </Card>
 
-            {sectionOutcome()}
+              {sectionOutcome()}
 
-            <LineBreak />
+              <LineBreak />
 
-            <Card>
-              <View style={styles.box}>
-                <Text style={{fontSize: 16, fontWeight: 'bold'}}>Total</Text>
-                <View style={styles.card}>
-                  <TextInput
-                    style={styles.input_total}
-                    editable={false}
-                    value={data.total_uang_keluar.toString()}
+              <Card>
+                <View style={styles.box}>
+                  <Text style={{fontSize: 16, fontWeight: 'bold'}}>Total</Text>
+                  <View style={styles.card}>
+                    <TextInput
+                      style={styles.input_total}
+                      editable={false}
+                      value={data.total_uang_keluar.toString()}
+                    />
+                  </View>
+                </View>
+              </Card>
+              <View style={{flexDirection: 'row', marginTop: 8}}>
+                <View style={{flex: 1}}>
+                  <BackButton />
+                </View>
+                <View style={{flex: 1}}>
+                  <SubmitButton
+                    textButton="Perbarui"
+                    onPress={handleUpdateNotes}
+                    disabled={isLoading}
                   />
                 </View>
               </View>
-            </Card>
-            <View style={{flexDirection: 'row', marginTop: 8}}>
-              <View style={{flex: 1}}>
-                <BackButton />
-              </View>
-              <View style={{flex: 1}}>
-                <SubmitButton
-                  textButton="Perbarui"
-                  onPress={handleUpdateNotes}
-                  disabled={isLoading}
-                />
-              </View>
             </View>
-          </View>
-        ) : (
-          <View
-            style={{
-              marginTop: 10,
-              justifyContent: 'center',
-            }}>
-            <ActivityIndicator size="large" color="#0284C7" />
-          </View>
-        )}
-      </ScrollView>
+          ) : (
+            <View
+              style={{
+                marginTop: 10,
+                justifyContent: 'center',
+              }}>
+              <ActivityIndicator size="large" color="#0284C7" />
+            </View>
+          )}
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 };

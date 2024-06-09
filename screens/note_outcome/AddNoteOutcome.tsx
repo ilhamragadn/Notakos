@@ -3,6 +3,7 @@ import {CheckBox} from '@rneui/themed';
 import axios, {AxiosError} from 'axios';
 import React, {useCallback, useEffect, useState} from 'react';
 import {
+  ActivityIndicator,
   Alert,
   Modal,
   SafeAreaView,
@@ -660,81 +661,94 @@ const AddNoteOutcome = ({navigation}: any) => {
           </View>
         </View>
       </View>
-      <ScrollView style={{flex: 1}}>
-        <View style={styles.container}>
-          <TextInput
-            style={{display: 'none'}}
-            value={postData.user_id?.toString()}
-          />
-          <Card>
-            <View style={styles.box}>
-              <Text style={styles.label}>Deskripsi Catatan Pengeluaran</Text>
-              <TextInput
-                placeholder="Masukkan deskripsi (opsional)"
-                style={styles.input_deskripsi}
-                multiline={true}
-                numberOfLines={4}
-                value={postData.deskripsi || ''}
-                onChangeText={text =>
-                  setPostData({...postData, deskripsi: text})
-                }
-              />
-            </View>
-          </Card>
-
-          <LineBreak />
-
-          <View>
-            {sectionOutcome()}
-            <View style={{alignItems: 'center', marginBottom: 12}}>
-              <TouchableOpacity onPress={addSection} style={styles.addButton}>
-                <View
-                  style={{
-                    alignItems: 'center',
-                  }}>
-                  <Svg
-                    width={20}
-                    height={20}
-                    viewBox="0 0 24 24"
-                    strokeWidth={3}
-                    stroke="#ffffff">
-                    <Path
-                      d="M12 4.5v15m7.5-7.5h-15"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </Svg>
-                </View>
-              </TouchableOpacity>
-            </View>
-          </View>
-          <Card>
-            <View style={styles.box}>
-              <Text style={{fontSize: 16, fontWeight: 'bold'}}>Total</Text>
-              <View style={styles.card}>
+      {isLoading ? (
+        <View
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#FFFFFF',
+          }}>
+          <ActivityIndicator size="large" color="#0284C7" />
+        </View>
+      ) : (
+        <ScrollView>
+          <View style={styles.container}>
+            <TextInput
+              style={{display: 'none'}}
+              value={postData.user_id?.toString()}
+            />
+            <Card>
+              <View style={styles.box}>
+                <Text style={styles.label}>Deskripsi Catatan Pengeluaran</Text>
                 <TextInput
-                  style={styles.input_total}
-                  readOnly={true}
-                  inputMode="numeric"
-                  value={postData.total_uang_keluar}
+                  placeholder="Masukkan deskripsi (opsional)"
+                  style={styles.input_deskripsi}
+                  multiline={true}
+                  numberOfLines={4}
+                  value={postData.deskripsi || ''}
+                  onChangeText={text =>
+                    setPostData({...postData, deskripsi: text})
+                  }
+                />
+              </View>
+            </Card>
+
+            <LineBreak />
+
+            <View>
+              {sectionOutcome()}
+              <View style={{alignItems: 'center', marginBottom: 12}}>
+                <TouchableOpacity onPress={addSection} style={styles.addButton}>
+                  <View
+                    style={{
+                      alignItems: 'center',
+                    }}>
+                    <Svg
+                      width={20}
+                      height={20}
+                      viewBox="0 0 24 24"
+                      strokeWidth={3}
+                      stroke="#ffffff">
+                      <Path
+                        d="M12 4.5v15m7.5-7.5h-15"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </Svg>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            </View>
+            <Card>
+              <View style={styles.box}>
+                <Text style={{fontSize: 16, fontWeight: 'bold'}}>Total</Text>
+                <View style={styles.card}>
+                  <TextInput
+                    style={styles.input_total}
+                    readOnly={true}
+                    inputMode="numeric"
+                    value={postData.total_uang_keluar}
+                  />
+                </View>
+              </View>
+            </Card>
+            <View
+              style={{flexDirection: 'row', marginTop: 8, marginBottom: 12}}>
+              <View style={{flex: 1}}>
+                <BackButton />
+              </View>
+              <View style={{flex: 1}}>
+                <SubmitButton
+                  onPress={submitNoteOutcome}
+                  textButton="Simpan"
+                  disabled={isLoading}
                 />
               </View>
             </View>
-          </Card>
-          <View style={{flexDirection: 'row', marginTop: 8, marginBottom: 12}}>
-            <View style={{flex: 1}}>
-              <BackButton />
-            </View>
-            <View style={{flex: 1}}>
-              <SubmitButton
-                onPress={submitNoteOutcome}
-                textButton="Simpan"
-                disabled={isLoading}
-              />
-            </View>
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 };

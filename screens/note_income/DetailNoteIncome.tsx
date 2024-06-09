@@ -209,155 +209,179 @@ const DetailNoteIncome = ({navigation, route}: any) => {
           </View>
         </View>
       </View>
-      <ScrollView style={{flex: 1}}>
-        {data ? (
-          <View style={styles.container}>
-            <Card>
-              <View style={styles.box}>
-                <Text style={styles.label}>Deskripsi Catatan Pemasukan</Text>
-                {data.deskripsi !== null ? (
-                  <TextInput
-                    value={data.deskripsi}
-                    editable={false}
-                    style={styles.input_deskripsi}
-                    multiline={true}
-                    numberOfLines={4}
-                  />
-                ) : (
-                  <TextInput
-                    placeholder="Tidak ada deskripsi catatan"
-                    editable={false}
-                    style={styles.input_deskripsi}
-                    multiline={true}
-                    numberOfLines={4}
-                  />
-                )}
-              </View>
-            </Card>
-
-            <LineBreak />
-
-            {data.catatan_pemasukan.map(item => (
-              <View key={item.id}>
-                <View style={{flexDirection: 'row'}}>
-                  <View style={{flex: 1}}>
-                    <Card>
-                      <View style={styles.box}>
-                        <Text style={styles.label}>Nominal Uang Masuk</Text>
-                        <TextInput
-                          editable={false}
-                          style={styles.input_nominal}
-                          value={formatCurrency(item?.nominal_uang_masuk)}
-                        />
-                      </View>
-                    </Card>
-                  </View>
-
-                  <View style={{flex: 1}}>
-                    <Card>
-                      <View style={styles.box}>
-                        <Text style={styles.label}>Kategori Uang Masuk</Text>
-                        <View style={[styles.input_category, {marginTop: 4}]}>
-                          <CheckBox
-                            title="Cash"
-                            checked={item.kategori_uang_masuk === 'Cash'}
-                            textStyle={{fontWeight: 'normal'}}
-                            checkedIcon={
-                              <Svg viewBox="0 0 512 512" width={20} height={20}>
-                                <Path
-                                  fill="#0D6EFD"
-                                  d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256-96a96 96 0 1 1 0 192 96 96 0 1 1 0-192z"
-                                />
-                              </Svg>
-                            }
-                            uncheckedIcon={
-                              <Svg viewBox="0 0 512 512" width={20} height={20}>
-                                <Path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z" />
-                              </Svg>
-                            }
-                          />
-                        </View>
-                        <View style={{marginBottom: 4}}>
-                          <CheckBox
-                            title="Cashless"
-                            checked={item.kategori_uang_masuk === 'Cashless'}
-                            textStyle={{fontWeight: 'normal'}}
-                            checkedIcon={
-                              <Svg viewBox="0 0 512 512" width={20} height={20}>
-                                <Path
-                                  fill="#0D6EFD"
-                                  d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256-96a96 96 0 1 1 0 192 96 96 0 1 1 0-192z"
-                                />
-                              </Svg>
-                            }
-                            uncheckedIcon={
-                              <Svg viewBox="0 0 512 512" width={20} height={20}>
-                                <Path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z" />
-                              </Svg>
-                            }
-                          />
-                        </View>
-                      </View>
-                    </Card>
-                  </View>
+      {isLoading ? (
+        <View
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#FFFFFF',
+          }}>
+          <ActivityIndicator size="large" color="#0284C7" />
+        </View>
+      ) : (
+        <ScrollView>
+          {data ? (
+            <View style={styles.container}>
+              <Card>
+                <View style={styles.box}>
+                  <Text style={styles.label}>Deskripsi Catatan Pemasukan</Text>
+                  {data.deskripsi !== null ? (
+                    <TextInput
+                      value={data.deskripsi}
+                      editable={false}
+                      style={styles.input_deskripsi}
+                      multiline={true}
+                      numberOfLines={4}
+                    />
+                  ) : (
+                    <TextInput
+                      placeholder="Tidak ada deskripsi catatan"
+                      editable={false}
+                      style={styles.input_deskripsi}
+                      multiline={true}
+                      numberOfLines={4}
+                    />
+                  )}
                 </View>
-              </View>
-            ))}
+              </Card>
 
-            <Card>
-              <View style={styles.box}>
-                <Text style={styles.label}>Uang Dialokasikan Ke</Text>
-                {allocationSection()}
-              </View>
-            </Card>
-
-            <View style={{marginVertical: 2}}>
               <LineBreak />
-            </View>
 
-            <Card>
-              <View style={[styles.box, {width: 360}]}>
-                <Text style={{fontSize: 16, fontWeight: 'bold'}}>Total</Text>
-                <View style={styles.card}>
-                  <TextInput
-                    style={styles.input_total}
-                    editable={false}
-                    value={formatCurrency(data.total_uang_masuk)}
+              {data.catatan_pemasukan.map(item => (
+                <View key={item.id}>
+                  <View style={{flexDirection: 'row'}}>
+                    <View style={{flex: 1}}>
+                      <Card>
+                        <View style={styles.box}>
+                          <Text style={styles.label}>Nominal Uang Masuk</Text>
+                          <TextInput
+                            editable={false}
+                            style={styles.input_nominal}
+                            value={formatCurrency(item?.nominal_uang_masuk)}
+                          />
+                        </View>
+                      </Card>
+                    </View>
+
+                    <View style={{flex: 1}}>
+                      <Card>
+                        <View style={styles.box}>
+                          <Text style={styles.label}>Kategori Uang Masuk</Text>
+                          <View style={[styles.input_category, {marginTop: 4}]}>
+                            <CheckBox
+                              title="Cash"
+                              checked={item.kategori_uang_masuk === 'Cash'}
+                              textStyle={{fontWeight: 'normal'}}
+                              checkedIcon={
+                                <Svg
+                                  viewBox="0 0 512 512"
+                                  width={20}
+                                  height={20}>
+                                  <Path
+                                    fill="#0D6EFD"
+                                    d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256-96a96 96 0 1 1 0 192 96 96 0 1 1 0-192z"
+                                  />
+                                </Svg>
+                              }
+                              uncheckedIcon={
+                                <Svg
+                                  viewBox="0 0 512 512"
+                                  width={20}
+                                  height={20}>
+                                  <Path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z" />
+                                </Svg>
+                              }
+                            />
+                          </View>
+                          <View style={{marginBottom: 4}}>
+                            <CheckBox
+                              title="Cashless"
+                              checked={item.kategori_uang_masuk === 'Cashless'}
+                              textStyle={{fontWeight: 'normal'}}
+                              checkedIcon={
+                                <Svg
+                                  viewBox="0 0 512 512"
+                                  width={20}
+                                  height={20}>
+                                  <Path
+                                    fill="#0D6EFD"
+                                    d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm256-96a96 96 0 1 1 0 192 96 96 0 1 1 0-192z"
+                                  />
+                                </Svg>
+                              }
+                              uncheckedIcon={
+                                <Svg
+                                  viewBox="0 0 512 512"
+                                  width={20}
+                                  height={20}>
+                                  <Path d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z" />
+                                </Svg>
+                              }
+                            />
+                          </View>
+                        </View>
+                      </Card>
+                    </View>
+                  </View>
+                </View>
+              ))}
+
+              <Card>
+                <View style={styles.box}>
+                  <Text style={styles.label}>Uang Dialokasikan Ke</Text>
+                  {allocationSection()}
+                </View>
+              </Card>
+
+              <View style={{marginVertical: 2}}>
+                <LineBreak />
+              </View>
+
+              <Card>
+                <View style={[styles.box, {width: 360}]}>
+                  <Text style={{fontSize: 16, fontWeight: 'bold'}}>Total</Text>
+                  <View style={styles.card}>
+                    <TextInput
+                      style={styles.input_total}
+                      editable={false}
+                      value={formatCurrency(data.total_uang_masuk)}
+                    />
+                  </View>
+                </View>
+              </Card>
+
+              <View style={{flexDirection: 'row', marginTop: 8}}>
+                <View style={{flex: 1}}>
+                  <DeleteButton
+                    onPress={() => handleDeleteData(itemId)}
+                    disabled={isLoading}
+                  />
+                </View>
+                <View style={{flex: 1}}>
+                  <EditButton
+                    textButton="Edit"
+                    onPress={() =>
+                      navigation.navigate('EditNoteIncome', {itemId: data.id})
+                    }
                   />
                 </View>
               </View>
-            </Card>
-
-            <View style={{flexDirection: 'row', marginTop: 8}}>
               <View style={{flex: 1}}>
-                <DeleteButton
-                  onPress={() => handleDeleteData(itemId)}
-                  disabled={isLoading}
-                />
-              </View>
-              <View style={{flex: 1}}>
-                <EditButton
-                  textButton="Edit"
-                  onPress={() =>
-                    navigation.navigate('EditNoteIncome', {itemId: data.id})
-                  }
-                />
+                <BackButton />
               </View>
             </View>
-            <View style={{flex: 1}}>
-              <BackButton />
+          ) : (
+            <View
+              style={{
+                marginTop: 10,
+                justifyContent: 'center',
+              }}>
+              <ActivityIndicator size="large" color="#0284C7" />
             </View>
-          </View>
-        ) : (
-          <View
-            style={{
-              marginTop: 10,
-              justifyContent: 'center',
-            }}>
-            <ActivityIndicator size="large" color="#0284C7" />
-          </View>
-        )}
-      </ScrollView>
+          )}
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 };

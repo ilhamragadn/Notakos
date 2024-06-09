@@ -802,9 +802,10 @@ const Alokasi = ({navigation}: any) => {
                           }}>
                           <Progress.Bar
                             progress={
-                              !isNaN(section.allocationFraction) &&
-                              section.allocationFraction > 0
-                                ? section.allocationFraction
+                              !isNaN(section.allocationFraction)
+                                ? section.allocationFraction > 0
+                                  ? section.allocationFraction
+                                  : section.allocationFraction
                                 : isNaN(section.allocationFraction)
                                 ? 0
                                 : 10

@@ -3,6 +3,7 @@ import {CheckBox} from '@rneui/themed';
 import axios, {AxiosError} from 'axios';
 import React, {useCallback, useEffect, useState} from 'react';
 import {
+  ActivityIndicator,
   Alert,
   SafeAreaView,
   ScrollView,
@@ -511,33 +512,46 @@ const AddNoteIncome = ({navigation}: any) => {
           </View>
         </View>
       </View>
-      <ScrollView style={{flex: 1}}>
-        <View style={styles.container}>
-          <TextInput
-            style={{display: 'none'}}
-            value={postData.user_id?.toString()}
-          />
-          <Card>
-            <View style={styles.box}>
-              <Text style={styles.label}>Deskripsi Catatan Pemasukan</Text>
-              <TextInput
-                placeholder="Masukkan deskripsi (opsional)"
-                style={styles.input_description}
-                multiline={true}
-                numberOfLines={4}
-                value={postData.deskripsi || ''}
-                onChangeText={text =>
-                  setPostData({...postData, deskripsi: text})
-                }
-              />
-            </View>
-          </Card>
-          <LineBreak />
-          <View>
-            {sectionIncome()}
+      {isLoading ? (
+        <View
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#FFFFFF',
+          }}>
+          <ActivityIndicator size="large" color="#0284C7" />
+        </View>
+      ) : (
+        <ScrollView>
+          <View style={styles.container}>
+            <TextInput
+              style={{display: 'none'}}
+              value={postData.user_id?.toString()}
+            />
+            <Card>
+              <View style={styles.box}>
+                <Text style={styles.label}>Deskripsi Catatan Pemasukan</Text>
+                <TextInput
+                  placeholder="Masukkan deskripsi (opsional)"
+                  style={styles.input_description}
+                  multiline={true}
+                  numberOfLines={4}
+                  value={postData.deskripsi || ''}
+                  onChangeText={text =>
+                    setPostData({...postData, deskripsi: text})
+                  }
+                />
+              </View>
+            </Card>
 
-            {/* ADD SECTION BUTTON */}
-            {/* <View style={{alignItems: 'center', marginBottom: 12}}>
+            <LineBreak />
+
+            <View>
+              {sectionIncome()}
+
+              {/* ADD SECTION BUTTON */}
+              {/* <View style={{alignItems: 'center', marginBottom: 12}}>
               <TouchableOpacity onPress={addSection} style={styles.addButton}>
                 <View
                   style={{
@@ -558,33 +572,34 @@ const AddNoteIncome = ({navigation}: any) => {
                 </View>
               </TouchableOpacity>
             </View> */}
-            <Card>
-              <View style={[styles.box, {width: 360}]}>
-                <Text style={{fontSize: 16, fontWeight: 'bold'}}>Total</Text>
-                <View style={styles.card}>
-                  <TextInput
-                    style={styles.input_total}
-                    readOnly={true}
-                    value={postData.total_uang_masuk}
-                  />
+              <Card>
+                <View style={[styles.box, {width: 360}]}>
+                  <Text style={{fontSize: 16, fontWeight: 'bold'}}>Total</Text>
+                  <View style={styles.card}>
+                    <TextInput
+                      style={styles.input_total}
+                      readOnly={true}
+                      value={postData.total_uang_masuk}
+                    />
+                  </View>
                 </View>
+              </Card>
+            </View>
+            <View style={{flexDirection: 'row', marginTop: 8}}>
+              <View style={{flex: 1}}>
+                <BackButton />
               </View>
-            </Card>
-          </View>
-          <View style={{flexDirection: 'row', marginTop: 8}}>
-            <View style={{flex: 1}}>
-              <BackButton />
-            </View>
-            <View style={{flex: 1}}>
-              <SubmitButton
-                onPress={submitNoteIncome}
-                textButton="Simpan"
-                disabled={isLoading}
-              />
+              <View style={{flex: 1}}>
+                <SubmitButton
+                  onPress={submitNoteIncome}
+                  textButton="Simpan"
+                  disabled={isLoading}
+                />
+              </View>
             </View>
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 };
