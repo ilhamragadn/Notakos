@@ -46,8 +46,8 @@ export const Layout = ({notifService}: any) => {
   useEffect(() => {
     console.log('Checking authentication state');
     if (authState?.authenticated) {
-      console.log('User authenticated, scheduling notification');
-      notifService.scheduleNotif('./assets/notif_sample.mp3');
+      console.log('User authenticated, scheduling notification with sound:');
+      notifService.scheduleNotif();
     }
   }, [authState, notifService]);
 

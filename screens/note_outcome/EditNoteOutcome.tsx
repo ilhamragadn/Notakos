@@ -689,7 +689,8 @@ const styles = StyleSheet.create({
   textPath: {
     fontSize: 18,
     color: 'white',
-    padding: 30,
+    paddingVertical: 30,
+    paddingLeft: 30,
     fontWeight: '600',
   },
   container: {margin: 5},

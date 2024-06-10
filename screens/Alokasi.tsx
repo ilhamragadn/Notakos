@@ -4,6 +4,7 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Modal,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -347,6 +348,7 @@ const Alokasi = ({navigation}: any) => {
         setSaldoPerAlokasi(newSaldoTeralokasi);
 
         setIsLoading(false);
+        console.log(dataAlokasi);
       }
     } catch (error) {
       console.error('Error fetching data: ', error);
@@ -633,6 +635,8 @@ const Alokasi = ({navigation}: any) => {
     calcAllocation();
   }, [calcAllocation, savedAllocations]);
 
+  const [infoAllocation, setInfoAllocation] = useState(false);
+
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
@@ -669,16 +673,40 @@ const Alokasi = ({navigation}: any) => {
           <View style={styles.container}>
             <Card>
               <View style={{marginVertical: 8}}>
-                <Text
+                <View
                   style={{
-                    fontSize: 16,
-                    fontWeight: '500',
-                    marginHorizontal: 4,
-                    textAlign: 'center',
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
                     marginBottom: 6,
                   }}>
-                  Atur Persentase Alokasi
-                </Text>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: '500',
+                      marginHorizontal: 4,
+                      textAlign: 'center',
+                    }}>
+                    Atur Persentase Alokasi
+                  </Text>
+                  <TouchableOpacity
+                    style={{marginTop: 1}}
+                    onPress={() => setInfoAllocation(!infoAllocation)}>
+                    <Svg
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.8}
+                      stroke="#0D6EFD"
+                      width={18}
+                      height={18}>
+                      <Path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+                      />
+                    </Svg>
+                  </TouchableOpacity>
+                </View>
 
                 {fetchAllocationSection()}
 
@@ -735,6 +763,81 @@ const Alokasi = ({navigation}: any) => {
                 )}
               </View>
             </Card>
+
+            <Modal
+              transparent={true}
+              animationType="fade"
+              visible={infoAllocation}>
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  flex: 1,
+                }}>
+                <Card>
+                  <View style={{marginVertical: 2, padding: 5}}>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        backgroundColor: 'rgba(0, 163, 255, 0.1)',
+                        borderColor: '#0D6EFD',
+                        borderWidth: 1,
+                        borderRadius: 10,
+                        padding: 6,
+                      }}>
+                      <View>
+                        <Svg
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={2}
+                          stroke="#0D6EFD"
+                          width={20}
+                          height={20}>
+                          <Path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+                          />
+                        </Svg>
+                      </View>
+                      <View style={{width: 300, marginHorizontal: 4}}>
+                        <Text style={{color: '#0D6EFD', textAlign: 'justify'}}>
+                          Silahkan atur alokasi berdasarkan kebutuhan dan
+                          kisaran persentase yang akan dikeluarkan. Contoh:
+                          kebutuhan harian menghabiskan 50% dari total
+                          pemasukan, kebutuhan bulanan sebesar 30%, dan sisanya
+                          untuk kebutuhan mendesak sebesar 20%. Ingat, jangan
+                          melebihi 100% untuk total persentase dari tiap alokasi
+                          kebutuhanmu.
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                  <TouchableOpacity
+                    style={{
+                      alignItems: 'center',
+                      marginVertical: 4,
+                      paddingVertical: 6,
+                      borderRadius: 8,
+                      backgroundColor: '#DC2626',
+                    }}
+                    onPress={() => setInfoAllocation(!infoAllocation)}>
+                    <Svg
+                      width={25}
+                      height={25}
+                      viewBox="0 0 24 24"
+                      strokeWidth={2}
+                      stroke="#ffffff">
+                      <Path
+                        d="M6 18 18 6M6 6l12 12"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </Svg>
+                  </TouchableOpacity>
+                </Card>
+              </View>
+            </Modal>
 
             <View style={{marginVertical: 8}}>
               <LineBreak />

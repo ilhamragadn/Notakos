@@ -32,7 +32,7 @@ type PostDataState = {
     kategori_uang_masuk: string;
   }>;
   alokasis: Array<{
-    alokasi_id: number;
+    alokasi_id: number | undefined;
     variabel_teralokasi: string;
     saldo_teralokasi: string;
   }>;
@@ -63,7 +63,7 @@ const AddNoteIncome = ({navigation}: any) => {
     fetchUser();
   }, [fetchUser]);
 
-  console.log(userID);
+  // console.log(userID);
 
   useEffect(() => {
     if (userID !== undefined) {
@@ -80,7 +80,7 @@ const AddNoteIncome = ({navigation}: any) => {
     {
       nominal: '0',
       kategori: 'Cash',
-      kategoriAlokasi: 'Semua Alokasi',
+      kategoriAlokasi: 'var_empty',
     },
   ]);
 
@@ -325,37 +325,33 @@ const AddNoteIncome = ({navigation}: any) => {
     {id: number; variabel_alokasi: string}[]
   >([]);
 
-  const fetchAllocation = async () => {
-    try {
-      // const urlKey = 'alokasi/';
-      const res = await axios.get(`${API_URL}/alokasi`);
-      if (res.data.success) {
-        const dataAlokasi = res.data.data;
-        // console.log(dataAlokasi);
-
-        setSavedAllocation(dataAlokasi);
-      }
-    } catch (error) {}
-  };
-
-  useEffect(() => {
-    fetchAllocation();
-  }, []);
-
+  const [alokasiID, setAlokasiID] = useState<number>();
   useEffect(() => {
     const fetchAllocations = async () => {
       try {
         const res = await axios.get(`${API_URL}/alokasi`);
         if (res.data.success) {
           const dataAlokasi = res.data.data;
-          // console.log(dataAlokasi);
           setSavedAllocation(dataAlokasi);
+
+          dataAlokasi.forEach((e: any) => {
+            setAlokasiID(e.id);
+          });
         }
       } catch (error) {}
     };
 
     fetchAllocations();
   }, []);
+
+  useEffect(() => {
+    if (alokasiID !== undefined) {
+      setPostData(data => ({
+        ...data,
+        alokasis: data.alokasis.map(item => ({...item, alokasi_id: alokasiID})),
+      }));
+    }
+  }, [alokasiID]);
 
   const handleCategoryAllocation = (
     categoryAllocation: string,
@@ -439,8 +435,8 @@ const AddNoteIncome = ({navigation}: any) => {
     ],
     alokasis: [
       {
-        alokasi_id: 1,
-        variabel_teralokasi: 'Semua Alokasi',
+        alokasi_id: alokasiID,
+        variabel_teralokasi: 'var_empty',
         saldo_teralokasi: 'Rp 0',
       },
     ],
@@ -459,6 +455,14 @@ const AddNoteIncome = ({navigation}: any) => {
         )
       ) {
         Alert.alert('Error', 'Kolom nominal uang masuk masih Rp 0');
+        return;
+      } else if (
+        Array.isArray(postData.alokasis) &&
+        postData.alokasis.every(
+          (e: any) => e.variabel_teralokasi === 'var_empty',
+        )
+      ) {
+        Alert.alert('Error', 'Silahkan pilih salah satu alokasi');
         return;
       }
 
