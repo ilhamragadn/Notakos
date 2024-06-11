@@ -1,5 +1,4 @@
 /* eslint-disable react-native/no-inline-styles */
-// import axios from 'axios';
 import React, {useState} from 'react';
 import {
   ActivityIndicator,
@@ -11,6 +10,8 @@ import {
 } from 'react-native';
 import {Path, Svg} from 'react-native-svg';
 import {Card} from './Card';
+import FilterDate from './FilterDate';
+import LineBreak from './LineBreak';
 
 const List = ({navigation, data, loading}: any) => {
   const formatDateTime = (dateTimeString: string) => {
@@ -51,44 +52,86 @@ const List = ({navigation, data, loading}: any) => {
     return `${day}, ${dayOfMonth} ${month} ${year} • ${hours}:${minutes}`;
   };
 
-  const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
 
-  const [cardMonth, setCardMonth] = useState(false);
-  const toggleCardMonth = () => {
-    setCardMonth(!cardMonth);
+  const [cardFilter, setCardFilter] = useState(false);
+  const toggleCardFilter = () => {
+    setCardFilter(!cardFilter);
   };
 
-  const filterByMonth = (datas: any, month: number | null) => {
-    if (month === null) {
+  const filterByDateRange = (
+    datas: any,
+    start: Date | null,
+    end: Date | null,
+  ) => {
+    if (start === null || end === null) {
       return datas;
     }
     return datas.filter((item: any) => {
-      const itemMonth = new Date(item.created_at).getMonth() + 1;
-      return itemMonth === month;
+      const itemDate = new Date(item.created_at);
+      return itemDate >= start && itemDate <= end;
     });
   };
 
-  const filteredData = data ? filterByMonth(data, selectedMonth) : [];
+  const filteredData = data ? filterByDateRange(data, startDate, endDate) : [];
 
-  const monthNames = [
-    'Semua',
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'Mei',
-    'Juni',
-    'Juli',
-    'Ags',
-    'Sep',
-    'Okt',
-    'Nov',
-    'Des',
-  ];
+  const handleDateSelect = (type: 'start' | 'end') => (date: Date) => {
+    if (type === 'start') {
+      setStartDate(date);
+    } else {
+      setEndDate(date);
+    }
+  };
 
-  const handleMonthSelect = (month: number | null) => {
-    setSelectedMonth(month);
-    setCardMonth(false);
+  const handleReset = () => {
+    setStartDate(null);
+    setEndDate(null);
+  };
+
+  const formatDate = (date: string) => {
+    const dateObject = new Date(date);
+    const dayIndex = dateObject.getDay();
+    const dayNames = [
+      'Minggu',
+      'Senin',
+      'Selasa',
+      'Rabu',
+      'Kamis',
+      'Jumat',
+      'Sabtu',
+    ];
+    const day = dayNames[dayIndex];
+    const dayOfMonth = dateObject.getDate().toString().padStart(2, '0');
+    const monthIndex = dateObject.getMonth();
+    const year = dateObject.getFullYear();
+
+    const monthNames = [
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
+    ];
+    const month = monthNames[monthIndex];
+
+    return `${day}, ${dayOfMonth} ${month} ${year}`;
+  };
+
+  const getFilterText = () => {
+    if (startDate && endDate) {
+      return `${formatDate(startDate.toString())} - ${formatDate(
+        endDate.toString(),
+      )}`;
+    }
+    return 'Semua Catatan';
   };
 
   if (loading) {
@@ -106,15 +149,16 @@ const List = ({navigation, data, loading}: any) => {
 
   return (
     <View>
-      <View style={{marginVertical: 6, alignItems: 'flex-end'}}>
+      <View
+        style={{
+          marginVertical: 6,
+        }}>
         <TouchableOpacity
-          onPress={toggleCardMonth}
+          onPress={toggleCardFilter}
           style={{
-            width: 100,
             flexDirection: 'row',
             marginHorizontal: 24,
-            paddingVertical: 12,
-            paddingHorizontal: 8,
+            padding: 8,
             borderWidth: 1.5,
             borderRadius: 8,
             borderColor: '#0284C7',
@@ -127,20 +171,20 @@ const List = ({navigation, data, loading}: any) => {
           }}>
           <View
             style={{
-              flex: 2,
+              flex: 1,
               alignItems: 'center',
             }}>
             <Text
               style={{
                 fontWeight: 'bold',
+                textAlign: 'center',
                 color: '#0284C7',
               }}>
-              {selectedMonth === null ? 'Semua' : monthNames[selectedMonth]}
+              {getFilterText()}
             </Text>
           </View>
           <View
             style={{
-              flex: 1,
               alignItems: 'flex-end',
               justifyContent: 'center',
             }}>
@@ -151,27 +195,56 @@ const List = ({navigation, data, loading}: any) => {
         </TouchableOpacity>
       </View>
 
-      {cardMonth && (
-        <View style={{position: 'absolute', right: 22, top: 52, zIndex: 1}}>
-          <View style={{width: 105}}>
+      {cardFilter && (
+        <View style={{position: 'absolute', top: 50, left: 22, zIndex: 1}}>
+          <View style={{width: 350}}>
             <Card>
-              <View>
-                {monthNames.map((month, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    onPress={() =>
-                      handleMonthSelect(index === 0 ? null : index)
-                    }>
-                    <Text
-                      style={{
-                        marginVertical: 2,
-                        paddingVertical: 2,
-                        textAlign: 'center',
-                      }}>
-                      {month}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+              <View style={{alignItems: 'center'}}>
+                <Text
+                  style={{fontSize: 13, fontWeight: 'bold', color: '#0284C7'}}>
+                  Dari
+                </Text>
+              </View>
+              <FilterDate onDateSelect={handleDateSelect('start')} />
+              <LineBreak />
+              <View style={{alignItems: 'center', marginTop: 4}}>
+                <Text
+                  style={{fontSize: 13, fontWeight: 'bold', color: '#0284C7'}}>
+                  Sampai
+                </Text>
+              </View>
+              <FilterDate onDateSelect={handleDateSelect('end')} />
+
+              <View style={{flexDirection: 'row'}}>
+                <TouchableOpacity
+                  onPress={() => {
+                    handleReset();
+                    setCardFilter(false);
+                  }}
+                  style={{
+                    flex: 1,
+                    marginTop: 10,
+                    marginHorizontal: 4,
+                    padding: 6,
+                    backgroundColor: '#64748B',
+                    borderRadius: 4,
+                    alignItems: 'center',
+                  }}>
+                  <Text style={{color: '#FFFFFF', fontSize: 12}}>Reset</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={toggleCardFilter}
+                  style={{
+                    flex: 1,
+                    marginTop: 10,
+                    marginHorizontal: 4,
+                    padding: 6,
+                    backgroundColor: '#16A34A',
+                    borderRadius: 4,
+                    alignItems: 'center',
+                  }}>
+                  <Text style={{color: '#FFFFFF', fontSize: 12}}>Oke</Text>
+                </TouchableOpacity>
               </View>
             </Card>
           </View>

@@ -69,6 +69,30 @@ const Profil = ({navigation}: any) => {
     setCardMonth(false);
   };
 
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [cardYear, setCardYear] = useState(false);
+
+  const toggleCardYear = () => {
+    setCardYear(!cardYear);
+  };
+
+  const years = [
+    '2024',
+    '2025',
+    '2026',
+    '2027',
+    '2028',
+    '2029',
+    '2030',
+    '2031',
+    '2032',
+  ];
+
+  const handleYearSelect = (year: any) => {
+    setSelectedYear(year);
+    setCardYear(false);
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -83,7 +107,8 @@ const Profil = ({navigation}: any) => {
         dataCatatan.forEach((item: any) => {
           const itemDate = new Date(item.created_at);
           const itemMonth = itemDate.getMonth();
-          if (itemMonth === selectedMonth) {
+          const itemYear = itemDate.getFullYear();
+          if (itemMonth === selectedMonth && itemYear === selectedYear) {
             totalPemasukanVal += item.total_uang_masuk || 0;
             totalPengeluaranVal += item.total_uang_keluar || 0;
           }
@@ -98,7 +123,7 @@ const Profil = ({navigation}: any) => {
     };
 
     fetchData();
-  }, [selectedMonth]);
+  }, [selectedMonth, selectedYear]);
 
   const [visibleProfile, setVisibleProfile] = useState(false);
   const toggleVisibilityProfile = () => {
@@ -457,54 +482,108 @@ const Profil = ({navigation}: any) => {
               </Card>
             </View>
 
-            <View
-              style={{
-                marginBottom: 8,
-                marginHorizontal: 4,
-              }}>
-              <TouchableOpacity
-                onPress={toggleCardMonth}
+            <View style={{flexDirection: 'row'}}>
+              <View
                 style={{
-                  paddingVertical: 4,
-                  paddingHorizontal: 8,
-                  borderWidth: 1.5,
-                  borderRadius: 8,
-                  borderColor: '#0284C7',
-                  backgroundColor: '#F0F9FF',
-                  shadowColor: '#0284C7',
-                  shadowOpacity: 0.25,
-                  shadowRadius: 3.5,
-                  shadowOffset: {width: 0, height: 10},
-                  elevation: 3,
+                  marginBottom: 8,
+                  marginHorizontal: 4,
+                  flex: 1,
                 }}>
-                <View
+                <TouchableOpacity
+                  onPress={toggleCardMonth}
                   style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    paddingVertical: 4,
+                    paddingHorizontal: 8,
+                    borderWidth: 1.5,
+                    borderRadius: 8,
+                    borderColor: '#0284C7',
+                    backgroundColor: '#F0F9FF',
+                    shadowColor: '#0284C7',
+                    shadowOpacity: 0.25,
+                    shadowRadius: 3.5,
+                    shadowOffset: {width: 0, height: 10},
+                    elevation: 3,
                   }}>
-                  <Text
-                    style={{
-                      fontWeight: 'bold',
-                      color: '#0284C7',
-                      marginHorizontal: 4,
-                    }}>
-                    {monthNames[selectedMonth]}
-                  </Text>
                   <View
                     style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
                       justifyContent: 'center',
                     }}>
-                    <Svg
-                      viewBox="0 0 320 512"
-                      width={16}
-                      height={16}
-                      fill="#0284C7">
-                      <Path d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z" />
-                    </Svg>
+                    <Text
+                      style={{
+                        fontWeight: 'bold',
+                        color: '#0284C7',
+                        marginHorizontal: 4,
+                      }}>
+                      {monthNames[selectedMonth]}
+                    </Text>
+                    <View
+                      style={{
+                        justifyContent: 'center',
+                      }}>
+                      <Svg
+                        viewBox="0 0 320 512"
+                        width={16}
+                        height={16}
+                        fill="#0284C7">
+                        <Path d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z" />
+                      </Svg>
+                    </View>
                   </View>
-                </View>
-              </TouchableOpacity>
+                </TouchableOpacity>
+              </View>
+
+              <View
+                style={{
+                  marginBottom: 8,
+                  marginHorizontal: 4,
+                  flex: 1,
+                }}>
+                <TouchableOpacity
+                  onPress={toggleCardYear}
+                  style={{
+                    paddingVertical: 4,
+                    paddingHorizontal: 8,
+                    borderWidth: 1.5,
+                    borderRadius: 8,
+                    borderColor: '#0284C7',
+                    backgroundColor: '#F0F9FF',
+                    shadowColor: '#0284C7',
+                    shadowOpacity: 0.25,
+                    shadowRadius: 3.5,
+                    shadowOffset: {width: 0, height: 10},
+                    elevation: 3,
+                  }}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                    <Text
+                      style={{
+                        fontWeight: 'bold',
+                        color: '#0284C7',
+                        marginHorizontal: 4,
+                      }}>
+                      {selectedYear}
+                    </Text>
+                    <View
+                      style={{
+                        justifyContent: 'center',
+                      }}>
+                      <Svg
+                        viewBox="0 0 320 512"
+                        width={16}
+                        height={16}
+                        fill="#0284C7">
+                        <Path d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z" />
+                      </Svg>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              </View>
             </View>
 
             {cardMonth && (
@@ -533,6 +612,41 @@ const Profil = ({navigation}: any) => {
                               textAlign: 'center',
                             }}>
                             {month}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </Card>
+                </View>
+              </View>
+            )}
+
+            {cardYear && (
+              <View
+                style={{
+                  position: 'absolute',
+                  top: 275,
+                  marginHorizontal: 1.5,
+                  zIndex: 1,
+                }}>
+                <View style={{width: 380}}>
+                  <Card>
+                    <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+                      {years.map(year => (
+                        <TouchableOpacity
+                          key={year}
+                          onPress={() => handleYearSelect(year)}
+                          style={{
+                            width: '33%',
+                            paddingVertical: 4,
+                          }}>
+                          <Text
+                            style={{
+                              marginVertical: 2,
+                              paddingVertical: 2,
+                              textAlign: 'center',
+                            }}>
+                            {year}
                           </Text>
                         </TouchableOpacity>
                       ))}

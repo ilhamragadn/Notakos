@@ -225,7 +225,7 @@ const Alokasi = ({navigation}: any) => {
               onChangeText={text => {
                 handleVariableAllocation(text, index);
               }}
-              placeholder="Sewa Kos, Kebutuhan Kuliah"
+              placeholder="Harian, Bulanan, Darurat"
             />
           </View>
           <View style={{flexDirection: 'row', marginHorizontal: 6}}>
@@ -839,97 +839,42 @@ const Alokasi = ({navigation}: any) => {
               </View>
             </Modal>
 
-            <View style={{marginVertical: 8}}>
-              <LineBreak />
-            </View>
-
             <View>
               {resultAllocation.map((section, index) => (
                 <View key={index}>
                   {section.allocationVariable === 'Semua Alokasi' ? (
                     <View />
                   ) : (
-                    <Card>
-                      <View
-                        style={{
-                          flexDirection: 'row',
-                          margin: 6,
-                          alignItems: 'center',
-                        }}>
-                        <View
-                          style={{
-                            height: 18,
-                            width: 18,
-                            marginRight: 6,
-                            borderRadius: 4,
-                            backgroundColor: '#0284C7',
-                          }}
-                        />
-                        <Text
-                          style={{
-                            color: '#0284C7',
-                            fontWeight: 'bold',
-                            textTransform: 'capitalize',
-                          }}>
-                          {section.allocationVariable}
-                        </Text>
-
-                        <View
-                          style={{
-                            flex: 1,
-                            justifyContent: 'flex-end',
-                            alignItems: 'flex-end',
-                          }}>
-                          <Text style={{fontWeight: 'bold', marginRight: 6}}>
-                            {isNaN(section.allocationBalance)
-                              ? 'Rp 0'
-                              : section.allocationBalance.toLocaleString(
-                                  'id-ID',
-                                  {
-                                    style: 'currency',
-                                    currency: 'IDR',
-                                    minimumFractionDigits: 0,
-                                    maximumFractionDigits: 0,
-                                  },
-                                )}
-                          </Text>
-                        </View>
+                    <>
+                      <View style={{marginVertical: 8}}>
+                        <LineBreak />
                       </View>
 
-                      <View style={{margin: 6}}>
+                      <Card>
                         <View
                           style={{
-                            justifyContent: 'center',
+                            flexDirection: 'row',
+                            margin: 6,
                             alignItems: 'center',
-                            marginVertical: 2,
                           }}>
-                          <Progress.Bar
-                            progress={
-                              !isNaN(section.allocationFraction)
-                                ? section.allocationFraction > 0
-                                  ? section.allocationFraction
-                                  : section.allocationFraction
-                                : isNaN(section.allocationFraction)
-                                ? 0
-                                : 10
-                            }
-                            width={320}
-                            color="#0284C7"
-                            unfilledColor="#e9ecef"
-                          />
-                        </View>
-
-                        <View style={{flexDirection: 'row', marginVertical: 6}}>
                           <View
                             style={{
-                              flex: 1,
-                              justifyContent: 'flex-start',
-                              alignItems: 'flex-start',
+                              height: 18,
+                              width: 18,
+                              marginRight: 6,
+                              borderRadius: 4,
+                              backgroundColor: '#0284C7',
+                            }}
+                          />
+                          <Text
+                            style={{
+                              color: '#0284C7',
+                              fontWeight: 'bold',
+                              textTransform: 'capitalize',
                             }}>
-                            <Text style={{fontWeight: 'bold', marginLeft: 6}}>
-                              Rp 0
-                            </Text>
-                          </View>
+                            {section.allocationVariable}
+                          </Text>
+
                           <View
                             style={{
                               flex: 1,
@@ -937,19 +882,9 @@ const Alokasi = ({navigation}: any) => {
                               alignItems: 'flex-end',
                             }}>
                             <Text style={{fontWeight: 'bold', marginRight: 6}}>
-                              {isNaN(section.allocationRemaining)
+                              {isNaN(section.allocationBalance)
                                 ? 'Rp 0'
-                                : section.totalOutcome === 0
-                                ? section.allocationBalance.toLocaleString(
-                                    'id-ID',
-                                    {
-                                      style: 'currency',
-                                      currency: 'IDR',
-                                      minimumFractionDigits: 0,
-                                      maximumFractionDigits: 0,
-                                    },
-                                  )
-                                : section.allocationRemaining.toLocaleString(
+                                : section.allocationBalance.toLocaleString(
                                     'id-ID',
                                     {
                                       style: 'currency',
@@ -961,8 +896,77 @@ const Alokasi = ({navigation}: any) => {
                             </Text>
                           </View>
                         </View>
-                      </View>
-                    </Card>
+
+                        <View style={{margin: 6}}>
+                          <View
+                            style={{
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              marginVertical: 2,
+                            }}>
+                            <Progress.Bar
+                              progress={
+                                !isNaN(section.allocationFraction)
+                                  ? section.allocationFraction > 0
+                                    ? section.allocationFraction
+                                    : section.allocationFraction
+                                  : isNaN(section.allocationFraction)
+                                  ? 0
+                                  : 10
+                              }
+                              width={320}
+                              color="#0284C7"
+                              unfilledColor="#e9ecef"
+                            />
+                          </View>
+
+                          <View
+                            style={{flexDirection: 'row', marginVertical: 6}}>
+                            <View
+                              style={{
+                                flex: 1,
+                                justifyContent: 'flex-start',
+                                alignItems: 'flex-start',
+                              }}>
+                              <Text style={{fontWeight: 'bold', marginLeft: 6}}>
+                                Rp 0
+                              </Text>
+                            </View>
+                            <View
+                              style={{
+                                flex: 1,
+                                justifyContent: 'flex-end',
+                                alignItems: 'flex-end',
+                              }}>
+                              <Text
+                                style={{fontWeight: 'bold', marginRight: 6}}>
+                                {isNaN(section.allocationRemaining)
+                                  ? 'Rp 0'
+                                  : section.totalOutcome === 0
+                                  ? section.allocationBalance.toLocaleString(
+                                      'id-ID',
+                                      {
+                                        style: 'currency',
+                                        currency: 'IDR',
+                                        minimumFractionDigits: 0,
+                                        maximumFractionDigits: 0,
+                                      },
+                                    )
+                                  : section.allocationRemaining.toLocaleString(
+                                      'id-ID',
+                                      {
+                                        style: 'currency',
+                                        currency: 'IDR',
+                                        minimumFractionDigits: 0,
+                                        maximumFractionDigits: 0,
+                                      },
+                                    )}
+                              </Text>
+                            </View>
+                          </View>
+                        </View>
+                      </Card>
+                    </>
                   )}
                 </View>
               ))}
