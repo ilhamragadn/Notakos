@@ -98,7 +98,7 @@ const Alokasi = ({navigation}: any) => {
 
   const [savedAllocations, setSavedAllocations] = useState<Allocation[]>([]);
 
-  const [disableButton, setDisableButton] = useState(true);
+  const [disableSubmitButton, setDisableSubmitButton] = useState(true);
 
   const addAllocationSection = () => {
     setAllocationSections([
@@ -109,14 +109,13 @@ const Alokasi = ({navigation}: any) => {
         userIdValue: userID,
       },
     ]);
-    setDisableButton(false);
   };
 
   const removeAllocationSection = (index: number) => {
     const updatedAllocationSections = [...allocationSections];
     updatedAllocationSections.splice(index, 1);
     setAllocationSections(updatedAllocationSections);
-    setDisableButton(false);
+    setDisableSubmitButton(true);
   };
 
   const handleVariableAllocation = (
@@ -127,25 +126,36 @@ const Alokasi = ({navigation}: any) => {
     updatedAllocationSections[index].variableAllocationValue =
       variableAllocationVal;
     setAllocationSections(updatedAllocationSections);
-    setDisableButton(false);
+    setDisableSubmitButton(false);
   };
 
   const handlePercentageAllocation = (
     percentageAllocationVal: string,
     index: number,
   ) => {
-    const updatedAllocationSections = [...allocationSections];
     const parsedValue = parseInt(
       percentageAllocationVal.replace(/[^\d]/g, ''),
       10,
     );
-    updatedAllocationSections[index].percentageAllocationValue = isNaN(
-      parsedValue,
-    )
-      ? 0
-      : parsedValue;
-    setAllocationSections(updatedAllocationSections);
-    setDisableButton(false);
+    const newValue = isNaN(parsedValue) ? 0 : parsedValue;
+
+    const updatedAllocationSections = [...allocationSections];
+    updatedAllocationSections[index].percentageAllocationValue = newValue;
+
+    const newTotalPercentage = updatedAllocationSections.reduce(
+      (total, section) => total + section.percentageAllocationValue,
+      0,
+    );
+
+    if (newTotalPercentage > 100) {
+      setDisableSubmitButton(true);
+      setDisableUpdateButton(true);
+      Alert.alert('Error', 'Harap masukkan nilai yang valid');
+      return;
+    } else {
+      setAllocationSections(updatedAllocationSections);
+      setDisableSubmitButton(false);
+    }
   };
 
   const preparePostAllocationData = () => {
@@ -174,10 +184,29 @@ const Alokasi = ({navigation}: any) => {
         return;
       }
 
+      const totalPersenSementara = postAllocationData.reduce(
+        (total, allocation) => total + allocation.persentase_alokasi,
+        totalPercentage,
+      );
+      if (totalPersenSementara > 100) {
+        setDisableSubmitButton(true);
+        setAllocationSections([
+          {
+            variableAllocationValue: '',
+            percentageAllocationValue: 0,
+            userIdValue: userID,
+          },
+        ]);
+        Alert.alert(
+          'Error',
+          'Jumlah persentase alokasi tidak boleh lebih dari 100%',
+        );
+        return;
+      }
+
       console.log(postAllocationData);
 
       setIsLoading(true);
-
       const response = await axios.post(
         `${API_URL}/alokasi`,
         postAllocationData,
@@ -189,10 +218,9 @@ const Alokasi = ({navigation}: any) => {
       );
 
       setIsLoading(false);
-
       console.log('Success post data: ', response.data);
       Alert.alert('Berhasil', 'Data Berhasil Disimpan');
-      setDisableButton(true);
+      setDisableSubmitButton(true);
       fetchAllocation();
 
       setAllocationSections([
@@ -216,10 +244,10 @@ const Alokasi = ({navigation}: any) => {
           <View style={{marginHorizontal: 4, flex: 1}}>
             <TextInput
               style={{
-                height: 45,
-                borderWidth: 1.5,
-                borderRadius: 10,
+                height: 40,
+                borderRadius: 8,
                 paddingHorizontal: 12,
+                backgroundColor: '#f2f2f2',
               }}
               value={section.variableAllocationValue}
               onChangeText={text => {
@@ -228,15 +256,18 @@ const Alokasi = ({navigation}: any) => {
               placeholder="Harian, Bulanan, Darurat"
             />
           </View>
-          <View style={{flexDirection: 'row', marginHorizontal: 6}}>
+          <View
+            style={{
+              flexDirection: 'row',
+              marginHorizontal: 6,
+              backgroundColor: '#f2f2f2',
+              borderRadius: 8,
+            }}>
             <TextInput
               style={{
-                height: 45,
-                width: 50,
-                borderWidth: 1.5,
-                borderTopLeftRadius: 10,
-                borderBottomLeftRadius: 10,
-                paddingHorizontal: 12,
+                height: 40,
+                width: 40,
+                marginLeft: 6,
                 textAlign: 'center',
               }}
               value={
@@ -252,15 +283,10 @@ const Alokasi = ({navigation}: any) => {
             />
             <View
               style={{
-                backgroundColor: '#dddddd',
+                marginRight: 6,
                 paddingVertical: 4,
-                paddingHorizontal: 6,
                 justifyContent: 'center',
                 alignItems: 'center',
-                borderTopRightRadius: 10,
-                borderBottomRightRadius: 10,
-                borderWidth: 1.5,
-                borderLeftWidth: 0,
               }}>
               <Text style={{fontSize: 20, fontWeight: 'bold'}}>%</Text>
             </View>
@@ -359,6 +385,7 @@ const Alokasi = ({navigation}: any) => {
     fetchAllocation();
   }, [fetchAllocation]);
 
+  const [disableUpdateButton, setDisableUpdateButton] = useState(true);
   const handleUpdateAllocation = async (allocation: Allocation) => {
     try {
       if (allocation.variabel_alokasi === '') {
@@ -377,6 +404,7 @@ const Alokasi = ({navigation}: any) => {
       });
 
       setIsLoading(false);
+      setDisableUpdateButton(true);
       Alert.alert('Berhasil', 'Alokasi telah diperbarui!');
       fetchAllocation();
       console.log('Success update: ', response.data);
@@ -412,28 +440,32 @@ const Alokasi = ({navigation}: any) => {
             <View style={{marginHorizontal: 4, flex: 1}}>
               <TextInput
                 style={{
-                  height: 45,
-                  borderWidth: 1.5,
-                  borderRadius: 10,
+                  height: 40,
+                  borderRadius: 8,
                   paddingHorizontal: 12,
+                  backgroundColor: '#f2f2f2',
                 }}
                 value={allocation.variabel_alokasi}
                 onChangeText={text => {
                   const updatedAllocations = [...savedAllocations];
                   updatedAllocations[index].variabel_alokasi = text;
                   setSavedAllocations(updatedAllocations);
+                  setDisableUpdateButton(false);
                 }}
               />
             </View>
-            <View style={{flexDirection: 'row', marginHorizontal: 6}}>
+            <View
+              style={{
+                flexDirection: 'row',
+                marginHorizontal: 6,
+                backgroundColor: '#f2f2f2',
+                borderRadius: 8,
+              }}>
               <TextInput
                 style={{
-                  height: 45,
-                  width: 50,
-                  borderWidth: 1.5,
-                  borderTopLeftRadius: 10,
-                  borderBottomLeftRadius: 10,
-                  paddingHorizontal: 12,
+                  height: 40,
+                  width: 40,
+                  marginLeft: 6,
                   textAlign: 'center',
                 }}
                 value={(allocation.persentase_alokasi !== undefined
@@ -445,51 +477,51 @@ const Alokasi = ({navigation}: any) => {
                   updatedAllocations[index].persentase_alokasi =
                     parseInt(text, 10) || 0;
                   setSavedAllocations(updatedAllocations);
+                  setDisableUpdateButton(false);
                 }}
                 placeholder="50"
                 inputMode="numeric"
               />
               <View
                 style={{
-                  backgroundColor: '#dddddd',
+                  marginRight: 6,
                   paddingVertical: 4,
-                  paddingHorizontal: 6,
                   justifyContent: 'center',
                   alignItems: 'center',
-                  borderTopRightRadius: 10,
-                  borderBottomRightRadius: 10,
-                  borderWidth: 1.5,
-                  borderLeftWidth: 0,
                 }}>
                 <Text style={{fontSize: 20, fontWeight: 'bold'}}>%</Text>
               </View>
             </View>
 
             {/* tombol update */}
-            <TouchableOpacity
-              onPress={() => handleUpdateAllocation(allocation)}
-              style={{
-                marginHorizontal: 4,
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: '#16A34A',
-                paddingHorizontal: 8,
-                borderRadius: 10,
-              }}>
-              <Svg
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="#FFFFFF"
-                width={24}
-                height={24}>
-                <Path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
-                />
-              </Svg>
-            </TouchableOpacity>
+            {disableUpdateButton ? (
+              <View />
+            ) : (
+              <TouchableOpacity
+                onPress={() => handleUpdateAllocation(allocation)}
+                style={{
+                  marginHorizontal: 4,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: '#16A34A',
+                  paddingHorizontal: 8,
+                  borderRadius: 10,
+                }}>
+                <Svg
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="#FFFFFF"
+                  width={24}
+                  height={24}>
+                  <Path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
+                  />
+                </Svg>
+              </TouchableOpacity>
+            )}
 
             {/* tombol sampah */}
             <TouchableOpacity
@@ -616,7 +648,8 @@ const Alokasi = ({navigation}: any) => {
               };
             }
           } else {
-            return Alert.alert('Gagal', 'Total persentase lebih dari seratus');
+            setDisableUpdateButton(true);
+            return Alert.alert('Gagal', 'Harap masukkan nilai yang valid');
           }
         })
         .filter(result => result !== undefined) as resultAllocation[];
@@ -749,7 +782,7 @@ const Alokasi = ({navigation}: any) => {
                       </View>
                     </TouchableOpacity>
                     <View>
-                      {disableButton ? (
+                      {disableSubmitButton ? (
                         <View />
                       ) : (
                         <SubmitButton
@@ -922,7 +955,7 @@ const Alokasi = ({navigation}: any) => {
 
                           <View
                             style={{flexDirection: 'row', marginVertical: 6}}>
-                            <View
+                            {/* <View
                               style={{
                                 flex: 1,
                                 justifyContent: 'flex-start',
@@ -931,7 +964,7 @@ const Alokasi = ({navigation}: any) => {
                               <Text style={{fontWeight: 'bold', marginLeft: 6}}>
                                 Rp 0
                               </Text>
-                            </View>
+                            </View> */}
                             <View
                               style={{
                                 flex: 1,

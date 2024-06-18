@@ -204,6 +204,14 @@ const Profil = ({navigation}: any) => {
 
   const handleUpdateProfile = async (profil: Profil) => {
     try {
+      if (profileData.name === '') {
+        Alert.alert('Error', 'Kolom nama tidak boleh kosong');
+        return;
+      } else if (profileData.email === '') {
+        Alert.alert('Error', 'Kolom email tidak boleh kosong');
+        return;
+      }
+
       setIsLoadingUpdateProfile(true);
       const res = await axios.put(`${API_URL}/profil`, {
         name: profil.name,
@@ -217,6 +225,7 @@ const Profil = ({navigation}: any) => {
       console.log('Success update: ', res.data);
     } catch (error) {
       setIsLoadingUpdateProfile(false);
+      Alert.alert('Gagal', 'Profil gagal diperbarui!');
       console.error(error);
     }
   };
@@ -225,6 +234,11 @@ const Profil = ({navigation}: any) => {
 
   const handleUpdatePassword = async (profil: Profil) => {
     try {
+      if (profileData.password !== profileData.password_confirmation) {
+        Alert.alert('Error', 'Password dan Konfirmasi Password tidak sama');
+        return;
+      }
+
       setIsLoadingUpdatePassword(true);
       const res = await axios.put(`${API_URL}/profil/password`, {
         password: profil.password,
@@ -237,6 +251,7 @@ const Profil = ({navigation}: any) => {
       console.log('Success update password: ', res.data);
     } catch (error) {
       setIsLoadingUpdatePassword(false);
+      Alert.alert('Berhasil', 'Password gagal diperbarui!');
       console.error(error);
     }
   };
