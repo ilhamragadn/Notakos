@@ -168,8 +168,11 @@ const EditNoteIncome = ({navigation, route}: any) => {
         i === sectionIndex
           ? {
               ...item,
-              variabel_teralokasi: categoryAllocation,
-              alokasi_id: allocationData[allocationIndex].id,
+              pivot: {
+                ...item.pivot,
+                variabel_teralokasi: categoryAllocation,
+                alokasi_id: allocationData[allocationIndex].id,
+              },
             }
           : item,
       );
@@ -246,18 +249,23 @@ const EditNoteIncome = ({navigation, route}: any) => {
       );
 
       const updatedSaldoTeralokasi = prevData.alokasis.map(
-        (item: any, i: any) =>
-          i === index
-            ? {
-                ...item,
+        (item: any, i: any) => {
+          if (i === index) {
+            return {
+              ...item,
+              pivot: {
+                ...item.pivot,
                 saldo_teralokasi: new Intl.NumberFormat('id-ID', {
                   style: 'currency',
                   currency: 'IDR',
                   minimumFractionDigits: 0,
                   maximumFractionDigits: 0,
                 }).format(nominalValue),
-              }
-            : item,
+              },
+            };
+          }
+          return item;
+        },
       );
 
       return {
@@ -427,7 +435,7 @@ const EditNoteIncome = ({navigation, route}: any) => {
     ));
   };
 
-  console.log(data);
+  console.log(data?.alokasis.map(e => e.pivot.variabel_teralokasi));
   // console.log(itemId);
 
   const [isLoading, setIsLoading] = useState(false);

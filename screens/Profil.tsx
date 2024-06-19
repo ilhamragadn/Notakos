@@ -221,6 +221,9 @@ const Profil = ({navigation}: any) => {
 
       setIsLoadingUpdateProfile(false);
       setDisableSaveButtonProfile(true);
+      setEditableName(false);
+      setEditableEmail(false);
+      setEditableParentEmail(false);
       Alert.alert('Berhasil', 'Profil telah diperbarui!');
       console.log('Success update: ', res.data);
     } catch (error) {
