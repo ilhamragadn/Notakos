@@ -459,7 +459,7 @@ const EditNoteIncome = ({navigation, route}: any) => {
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
-        barStyle={isDarkMode ? 'dark-content' : 'light-content'}
+        barStyle={'light-content'}
         backgroundColor={
           isDarkMode ? backgroundStyle.backgroundColor : '#0284C7'
         }
@@ -471,9 +471,19 @@ const EditNoteIncome = ({navigation, route}: any) => {
             : [{backgroundColor: '#0284C7'}, styles.boxPath],
         ]}>
         <View style={{flexDirection: 'row'}}>
-          <Text style={styles.textPath}>Edit Catatan Pemasukan</Text>
+          <Text
+            style={[
+              styles.textPath,
+              {color: isDarkMode ? '#0284C7' : Colors.lighter},
+            ]}>
+            Edit Catatan Pemasukan
+          </Text>
           <View style={{justifyContent: 'center', marginHorizontal: 6}}>
-            <Svg fill="white" viewBox="0 0 24 24" width={20} height={20}>
+            <Svg
+              fill={isDarkMode ? '#0284C7' : Colors.lighter}
+              viewBox="0 0 24 24"
+              width={20}
+              height={20}>
               <Path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z" />
               <Path d="M5.25 5.25a3 3 0 0 0-3 3v10.5a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3V13.5a.75.75 0 0 0-1.5 0v5.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5V8.25a1.5 1.5 0 0 1 1.5-1.5h5.25a.75.75 0 0 0 0-1.5H5.25Z" />
             </Svg>
@@ -522,7 +532,7 @@ const EditNoteIncome = ({navigation, route}: any) => {
               <View>{sectionIncome()}</View>
 
               <Card>
-                <View style={[styles.box, {width: 360}]}>
+                <View style={styles.box}>
                   <Text style={{fontSize: 16, fontWeight: 'bold'}}>Total</Text>
                   <View style={styles.card}>
                     <TextInput
@@ -564,15 +574,10 @@ const EditNoteIncome = ({navigation, route}: any) => {
 
 const styles = StyleSheet.create({
   boxPath: {
-    shadowColor: '#0284C7',
-    shadowOpacity: 0.25,
-    shadowOffset: {width: 0, height: 10},
-    shadowRadius: 4,
-    elevation: 3,
+    flexDirection: 'row',
   },
   textPath: {
     fontSize: 18,
-    color: 'white',
     paddingVertical: 30,
     paddingLeft: 30,
     fontWeight: '600',
@@ -593,26 +598,6 @@ const styles = StyleSheet.create({
     borderBottomColor: '#0284C7',
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
-  },
-  input_primary: {
-    height: 40,
-    width: 340,
-    margin: 5,
-    padding: 10,
-    borderBottomWidth: 2,
-    borderBottomColor: '#0284C7',
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
-    color: '#000000',
-  },
-  input_secondary: {
-    height: 40,
-    width: 160,
-    borderBottomWidth: 2,
-    borderBottomColor: '#0284C7',
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
-    color: '#000000',
   },
   input_deskripsi: {
     margin: 5,
@@ -639,10 +624,9 @@ const styles = StyleSheet.create({
   input_total: {
     flex: 1,
     height: 40,
-    marginRight: 8,
     color: '#000000',
     fontSize: 17,
-    textAlign: 'right',
+    textAlign: 'center',
     fontWeight: 'bold',
   },
 });

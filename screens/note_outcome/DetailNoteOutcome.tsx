@@ -168,7 +168,7 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
-        barStyle={isDarkMode ? 'dark-content' : 'light-content'}
+        barStyle={'light-content'}
         backgroundColor={
           isDarkMode ? backgroundStyle.backgroundColor : '#0284C7'
         }
@@ -180,7 +180,13 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
             : [{backgroundColor: '#0284C7'}, styles.boxPath],
         ]}>
         <View style={{flexDirection: 'row'}}>
-          <Text style={styles.textPath}>Detail Catatan Pengeluaran</Text>
+          <Text
+            style={[
+              styles.textPath,
+              {color: isDarkMode ? '#0284C7' : Colors.lighter},
+            ]}>
+            Detail Catatan Pengeluaran
+          </Text>
           <View style={{justifyContent: 'center', marginHorizontal: 6}}>
             <Svg
               fill="none"
@@ -188,7 +194,7 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
               width={20}
               height={20}
               strokeWidth={1.5}
-              stroke="#ffffff">
+              stroke={isDarkMode ? '#0284C7' : Colors.lighter}>
               <Path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -240,35 +246,40 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
                     </View>
                   </Card>
                   <View style={{flexDirection: 'row'}}>
-                    <Card>
-                      <View style={styles.box}>
-                        <Text style={styles.label}>Harga</Text>
-                        <TextInput
-                          style={styles.input_secondary}
-                          editable={false}
-                          value={formatCurrency(item.harga_barang)}
-                        />
-                      </View>
-                    </Card>
-                    <Card>
-                      <View style={styles.box}>
-                        <Text style={styles.label}>Satuan</Text>
-                        <TextInput
-                          style={[
-                            styles.input_secondary,
-                            {textAlign: 'center'},
-                          ]}
-                          readOnly={true}
-                          defaultValue={item.satuan_barang.toLocaleString(
-                            'id-ID',
-                            {
-                              minimumFractionDigits: 0,
-                              maximumFractionDigits: 0,
-                            },
-                          )}
-                        />
-                      </View>
-                    </Card>
+                    <View style={{flex: 1}}>
+                      <Card>
+                        <View style={styles.box}>
+                          <Text style={styles.label}>Harga</Text>
+                          <TextInput
+                            style={styles.input_secondary}
+                            editable={false}
+                            value={formatCurrency(item.harga_barang)}
+                          />
+                        </View>
+                      </Card>
+                    </View>
+
+                    <View style={{flex: 1}}>
+                      <Card>
+                        <View style={styles.box}>
+                          <Text style={styles.label}>Satuan</Text>
+                          <TextInput
+                            style={[
+                              styles.input_secondary,
+                              {textAlign: 'center'},
+                            ]}
+                            readOnly={true}
+                            defaultValue={item.satuan_barang.toLocaleString(
+                              'id-ID',
+                              {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 0,
+                              },
+                            )}
+                          />
+                        </View>
+                      </Card>
+                    </View>
                   </View>
                   <View style={{flexDirection: 'row'}}>
                     <View style={{flex: 1}}>
@@ -420,7 +431,7 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
                       <Text style={styles.label}>Jumlah Harga</Text>
                       <TextInput
                         placeholder="Jumlah Harga"
-                        style={[styles.input_primary, {textAlign: 'center'}]}
+                        style={[styles.input_primary, {paddingLeft: 12}]}
                         readOnly={true}
                         defaultValue={formatCurrency(item.nominal_uang_keluar)}
                       />
@@ -479,15 +490,10 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
 
 const styles = StyleSheet.create({
   boxPath: {
-    shadowColor: '#0284C7',
-    shadowOpacity: 0.25,
-    shadowOffset: {width: 0, height: 10},
-    shadowRadius: 4,
-    elevation: 3,
+    flexDirection: 'row',
   },
   textPath: {
     fontSize: 18,
-    color: 'white',
     paddingVertical: 30,
     paddingLeft: 30,
     fontWeight: '600',
@@ -529,7 +535,6 @@ const styles = StyleSheet.create({
   },
   input_primary: {
     height: 40,
-    width: 340,
     margin: 5,
     padding: 10,
     borderBottomWidth: 2,
@@ -540,7 +545,6 @@ const styles = StyleSheet.create({
   },
   input_secondary: {
     height: 40,
-    width: 150,
     borderBottomWidth: 2,
     borderBottomColor: '#0284C7',
     borderBottomLeftRadius: 10,
@@ -558,27 +562,15 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
     color: '#000000',
   },
-  input_source: {
-    height: 80,
-    width: 150,
-    margin: 5,
-    padding: 10,
-    borderWidth: 2,
-    borderColor: '#0284C7',
-    borderRadius: 10,
-    textAlignVertical: 'top',
-    color: '#000000',
-  },
   input_category: {
     height: 32,
   },
   input_total: {
     flex: 1,
     height: 40,
-    marginRight: 8,
     color: '#000000',
     fontSize: 17,
-    textAlign: 'right',
+    textAlign: 'center',
     fontWeight: 'bold',
   },
 });

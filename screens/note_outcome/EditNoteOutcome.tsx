@@ -371,32 +371,39 @@ const EditNoteOutcome = ({navigation, route}: any) => {
           </View>
         </Card>
         <View style={{flexDirection: 'row'}}>
-          <Card>
-            <View style={styles.box}>
-              <Text style={styles.label}>Harga</Text>
-              <TextInput
-                style={styles.input_secondary}
-                inputMode="numeric"
-                value={formatCurrency(section.harga)}
-                onChangeText={text => {
-                  calcJumlahHarga(index, text, section.satuan.toString());
-                }}
-              />
-            </View>
-          </Card>
-          <Card>
-            <View style={styles.box}>
-              <Text style={styles.label}>Satuan</Text>
-              <TextInput
-                style={[styles.input_secondary, {textAlign: 'center'}]}
-                inputMode="numeric"
-                value={!isNaN(section.satuan) ? section.satuan.toString() : '0'}
-                onChangeText={text => {
-                  calcJumlahHarga(index, section.harga.toString(), text);
-                }}
-              />
-            </View>
-          </Card>
+          <View style={{flex: 1}}>
+            <Card>
+              <View style={styles.box}>
+                <Text style={styles.label}>Harga</Text>
+                <TextInput
+                  style={styles.input_secondary}
+                  inputMode="numeric"
+                  value={formatCurrency(section.harga)}
+                  onChangeText={text => {
+                    calcJumlahHarga(index, text, section.satuan.toString());
+                  }}
+                />
+              </View>
+            </Card>
+          </View>
+
+          <View style={{flex: 1}}>
+            <Card>
+              <View style={styles.box}>
+                <Text style={styles.label}>Satuan</Text>
+                <TextInput
+                  style={[styles.input_secondary, {textAlign: 'center'}]}
+                  inputMode="numeric"
+                  value={
+                    !isNaN(section.satuan) ? section.satuan.toString() : '0'
+                  }
+                  onChangeText={text => {
+                    calcJumlahHarga(index, section.harga.toString(), text);
+                  }}
+                />
+              </View>
+            </Card>
+          </View>
         </View>
 
         <View style={{flexDirection: 'row'}}>
@@ -539,7 +546,7 @@ const EditNoteOutcome = ({navigation, route}: any) => {
             <Text style={styles.label}>Jumlah Harga</Text>
             <TextInput
               placeholder="Jumlah Harga"
-              style={[styles.input_primary, {textAlign: 'center'}]}
+              style={[styles.input_primary, {paddingLeft: 12}]}
               editable={false}
               value={formatCurrency(section.jumlahHarga)}
             />
@@ -574,7 +581,7 @@ const EditNoteOutcome = ({navigation, route}: any) => {
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
-        barStyle={isDarkMode ? 'dark-content' : 'light-content'}
+        barStyle={'light-content'}
         backgroundColor={
           isDarkMode ? backgroundStyle.backgroundColor : '#0284C7'
         }
@@ -586,9 +593,19 @@ const EditNoteOutcome = ({navigation, route}: any) => {
             : [{backgroundColor: '#0284C7'}, styles.boxPath],
         ]}>
         <View style={{flexDirection: 'row'}}>
-          <Text style={styles.textPath}>Edit Catatan Pengeluaran</Text>
+          <Text
+            style={[
+              styles.textPath,
+              {color: isDarkMode ? '#0284C7' : Colors.lighter},
+            ]}>
+            Edit Catatan Pengeluaran
+          </Text>
           <View style={{justifyContent: 'center', marginHorizontal: 6}}>
-            <Svg fill="white" viewBox="0 0 24 24" width={20} height={20}>
+            <Svg
+              fill={isDarkMode ? '#0284C7' : Colors.lighter}
+              viewBox="0 0 24 24"
+              width={20}
+              height={20}>
               <Path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z" />
               <Path d="M5.25 5.25a3 3 0 0 0-3 3v10.5a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3V13.5a.75.75 0 0 0-1.5 0v5.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5V8.25a1.5 1.5 0 0 1 1.5-1.5h5.25a.75.75 0 0 0 0-1.5H5.25Z" />
             </Svg>
@@ -680,15 +697,10 @@ const EditNoteOutcome = ({navigation, route}: any) => {
 
 const styles = StyleSheet.create({
   boxPath: {
-    shadowColor: '#0284C7',
-    shadowOpacity: 0.25,
-    shadowOffset: {width: 0, height: 10},
-    shadowRadius: 4,
-    elevation: 3,
+    flexDirection: 'row',
   },
   textPath: {
     fontSize: 18,
-    color: 'white',
     paddingVertical: 30,
     paddingLeft: 30,
     fontWeight: '600',
@@ -721,7 +733,6 @@ const styles = StyleSheet.create({
   },
   input_primary: {
     height: 40,
-    width: 340,
     margin: 5,
     padding: 10,
     borderBottomWidth: 2,
@@ -732,7 +743,8 @@ const styles = StyleSheet.create({
   },
   input_secondary: {
     height: 40,
-    width: 160,
+    margin: 5,
+    padding: 10,
     borderBottomWidth: 2,
     borderBottomColor: '#0284C7',
     borderBottomLeftRadius: 10,
@@ -761,10 +773,9 @@ const styles = StyleSheet.create({
   input_total: {
     flex: 1,
     height: 40,
-    marginRight: 8,
     color: '#000000',
     fontSize: 17,
-    textAlign: 'right',
+    textAlign: 'center',
     fontWeight: 'bold',
   },
 });

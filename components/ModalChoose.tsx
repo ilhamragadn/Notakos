@@ -86,12 +86,12 @@ const ModalChoose = ({navigation}: any) => {
             borderRadius: 30,
             backgroundColor: '#0284C7',
             shadowColor: '#0284C7',
-            zIndex: 100,
+            zIndex: 2,
             shadowOffset: {
               width: 0,
               height: 10,
             },
-            shadowOpacity: 0.25,
+            shadowOpacity: 0.5,
             shadowRadius: 4,
             elevation: 5,
           }}>
@@ -134,9 +134,9 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 10,
     },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.5,
     shadowRadius: 4,
     elevation: 5,
   },
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 10,
     marginHorizontal: 5,
-    elevation: 2,
+    elevation: 4,
     backgroundColor: '#0284C7',
   },
   modalText: {

@@ -66,7 +66,7 @@ const Login = ({navigation}: any) => {
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
-        barStyle={isDarkMode ? 'dark-content' : 'light-content'}
+        barStyle={'light-content'}
         backgroundColor={
           isDarkMode ? backgroundStyle.backgroundColor : '#0284C7'
         }
@@ -202,13 +202,13 @@ const Login = ({navigation}: any) => {
                         padding: 12,
                         marginVertical: 10,
                         marginHorizontal: 5,
-                        elevation: 3,
+                        elevation: 4,
                         shadowColor: '#000000',
                         shadowOpacity: 0.5,
                         shadowRadius: 4,
                         shadowOffset: {
                           width: 0,
-                          height: 2,
+                          height: 10,
                         },
                       }}>
                       <Text

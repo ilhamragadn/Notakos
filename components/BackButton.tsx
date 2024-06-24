@@ -22,13 +22,13 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     marginVertical: 10,
     marginHorizontal: 5,
-    elevation: 3,
+    elevation: 4,
     shadowColor: '#000000',
     shadowOpacity: 0.5,
     shadowRadius: 4,
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 10,
     },
   },
   buttonText: {

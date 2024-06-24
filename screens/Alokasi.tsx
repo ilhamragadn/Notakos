@@ -18,8 +18,9 @@ import {
 import * as Progress from 'react-native-progress';
 import {Path, Svg} from 'react-native-svg';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-import {BottomNavbar} from '../components/BottomNavbar';
+import BottomNav from '../components/BottomNav';
 import {Card} from '../components/Card';
+import Footer from '../components/Footer';
 import LineBreak from '../components/LineBreak';
 import SubmitButton from '../components/SubmitButton';
 import {API_URL} from '../context/AuthContext';
@@ -52,7 +53,7 @@ interface resultAllocation {
   totalOutcome: number;
 }
 
-const Alokasi = ({navigation}: any) => {
+const Alokasi = () => {
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
@@ -386,6 +387,7 @@ const Alokasi = ({navigation}: any) => {
   }, [fetchAllocation]);
 
   const [disableUpdateButton, setDisableUpdateButton] = useState(true);
+  const [updatedIndices, setUpdatedIndices] = useState<any[]>([]);
   const handleUpdateAllocation = async (allocation: Allocation) => {
     try {
       if (allocation.variabel_alokasi === '') {
@@ -404,6 +406,9 @@ const Alokasi = ({navigation}: any) => {
       });
 
       setIsLoading(false);
+      setUpdatedIndices(
+        updatedIndices.filter(index => index !== allocation.id),
+      );
       setDisableUpdateButton(true);
       Alert.alert('Berhasil', 'Alokasi telah diperbarui!');
       fetchAllocation();
@@ -451,6 +456,9 @@ const Alokasi = ({navigation}: any) => {
                   updatedAllocations[index].variabel_alokasi = text;
                   setSavedAllocations(updatedAllocations);
                   setDisableUpdateButton(false);
+                  if (!updatedIndices.includes(index)) {
+                    setUpdatedIndices([...updatedIndices, index]);
+                  }
                 }}
               />
             </View>
@@ -478,6 +486,9 @@ const Alokasi = ({navigation}: any) => {
                     parseInt(text, 10) || 0;
                   setSavedAllocations(updatedAllocations);
                   setDisableUpdateButton(false);
+                  if (!updatedIndices.includes(index)) {
+                    setUpdatedIndices([...updatedIndices, index]);
+                  }
                 }}
                 placeholder="50"
                 inputMode="numeric"
@@ -506,6 +517,7 @@ const Alokasi = ({navigation}: any) => {
                   backgroundColor: '#16A34A',
                   paddingHorizontal: 8,
                   borderRadius: 10,
+                  display: updatedIndices.includes(index) ? 'flex' : 'none',
                 }}>
                 <Svg
                   fill="none"
@@ -584,7 +596,7 @@ const Alokasi = ({navigation}: any) => {
 
     if (savedAllocations && savedAllocations.length > 0) {
       const results = savedAllocations
-        .map(section => {
+        .map((section, index) => {
           const variabelAlokasi = section.variabel_alokasi;
           const persentaseAlokasi = section.persentase_alokasi;
           let saldoTeralokasiAkhir = 0;
@@ -648,8 +660,12 @@ const Alokasi = ({navigation}: any) => {
               };
             }
           } else {
+            if (!updatedIndices.includes(index)) {
+              setUpdatedIndices([...updatedIndices, index]);
+            }
             setDisableUpdateButton(true);
-            return Alert.alert('Gagal', 'Harap masukkan nilai yang valid');
+            Alert.alert('Gagal', 'Harap masukkan nilai yang valid');
+            return undefined;
           }
         })
         .filter(result => result !== undefined) as resultAllocation[];
@@ -662,6 +678,7 @@ const Alokasi = ({navigation}: any) => {
     saldoKeSemua,
     saldoPerAlokasi,
     savedAllocations,
+    updatedIndices,
   ]);
 
   useEffect(() => {
@@ -673,7 +690,7 @@ const Alokasi = ({navigation}: any) => {
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
-        barStyle={isDarkMode ? 'dark-content' : 'light-content'}
+        barStyle={'light-content'}
         backgroundColor={
           isDarkMode ? backgroundStyle.backgroundColor : '#0284C7'
         }
@@ -687,7 +704,7 @@ const Alokasi = ({navigation}: any) => {
         <Text
           style={[
             styles.textPath,
-            isDarkMode ? {color: '#0284C7'} : {color: '#ffffff'},
+            {color: isDarkMode ? '#0284C7' : Colors.lighter},
           ]}>
           Alokasi
         </Text>
@@ -759,10 +776,9 @@ const Alokasi = ({navigation}: any) => {
                       }}>
                       <View
                         style={{
-                          borderWidth: 2,
+                          backgroundColor: '#0284C7',
+                          borderRadius: 8,
                           padding: 6,
-                          borderRadius: 5,
-                          borderStyle: 'dashed',
                           justifyContent: 'center',
                           alignItems: 'center',
                         }}>
@@ -770,7 +786,7 @@ const Alokasi = ({navigation}: any) => {
                           fill="none"
                           viewBox="0 0 24 24"
                           strokeWidth={2}
-                          stroke="#000000"
+                          stroke="#FFFFFF"
                           width={24}
                           height={24}>
                           <Path
@@ -1011,20 +1027,7 @@ const Alokasi = ({navigation}: any) => {
           <LineBreak />
         </View>
 
-        <View
-          style={{
-            alignItems: 'center',
-            paddingTop: 10,
-            paddingHorizontal: 20,
-            backgroundColor: '#f2f2f2',
-            height: 200,
-          }}>
-          <Text style={{textAlign: 'center'}}>
-            Kelola uang jadi seru dan mudah dengan{' '}
-            <Text style={{fontWeight: 'bold', color: '#0284C7'}}>NOTAKOS.</Text>
-            Yuk, mulai catat sekarang!
-          </Text>
-        </View>
+        <Footer />
       </ScrollView>
       <View
         style={{
@@ -1033,7 +1036,7 @@ const Alokasi = ({navigation}: any) => {
           left: 0,
           right: 0,
         }}>
-        <BottomNavbar navigation={navigation} />
+        <BottomNav />
       </View>
     </SafeAreaView>
   );
@@ -1041,11 +1044,7 @@ const Alokasi = ({navigation}: any) => {
 
 const styles = StyleSheet.create({
   boxPath: {
-    shadowColor: '#0284C7',
-    shadowOpacity: 0.25,
-    shadowOffset: {width: 0, height: 10},
-    shadowRadius: 4,
-    elevation: 3,
+    flexDirection: 'row',
   },
   textPath: {fontSize: 18, fontWeight: 'bold', padding: 30},
   container: {margin: 5},

@@ -179,7 +179,7 @@ const DetailNoteIncome = ({navigation, route}: any) => {
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
-        barStyle={isDarkMode ? 'dark-content' : 'light-content'}
+        barStyle={'light-content'}
         backgroundColor={
           isDarkMode ? backgroundStyle.backgroundColor : '#0284C7'
         }
@@ -191,7 +191,13 @@ const DetailNoteIncome = ({navigation, route}: any) => {
             : [{backgroundColor: '#0284C7'}, styles.boxPath],
         ]}>
         <View style={{flexDirection: 'row'}}>
-          <Text style={styles.textPath}>Detail Catatan Pemasukan</Text>
+          <Text
+            style={[
+              styles.textPath,
+              {color: isDarkMode ? '#0284C7' : Colors.lighter},
+            ]}>
+            Detail Catatan Pemasukan
+          </Text>
           <View style={{justifyContent: 'center', marginHorizontal: 6}}>
             <Svg
               fill="none"
@@ -199,7 +205,7 @@ const DetailNoteIncome = ({navigation, route}: any) => {
               width={20}
               height={20}
               strokeWidth={1.5}
-              stroke="#ffffff">
+              stroke={isDarkMode ? '#0284C7' : Colors.lighter}>
               <Path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -339,7 +345,7 @@ const DetailNoteIncome = ({navigation, route}: any) => {
               </View>
 
               <Card>
-                <View style={[styles.box, {width: 360}]}>
+                <View style={styles.box}>
                   <Text style={{fontSize: 16, fontWeight: 'bold'}}>Total</Text>
                   <View style={styles.card}>
                     <TextInput
@@ -388,15 +394,10 @@ const DetailNoteIncome = ({navigation, route}: any) => {
 
 const styles = StyleSheet.create({
   boxPath: {
-    shadowColor: '#0284C7',
-    shadowOpacity: 0.25,
-    shadowOffset: {width: 0, height: 10},
-    shadowRadius: 4,
-    elevation: 3,
+    flexDirection: 'row',
   },
   textPath: {
     fontSize: 18,
-    color: 'white',
     paddingVertical: 30,
     paddingLeft: 30,
     fontWeight: '600',
@@ -417,28 +418,6 @@ const styles = StyleSheet.create({
     borderBottomColor: '#0284C7',
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
-  },
-  input_primary: {
-    height: 40,
-    width: 340,
-    margin: 5,
-    padding: 10,
-    borderBottomWidth: 2,
-    borderBottomColor: '#0284C7',
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
-    color: '#000000',
-  },
-  input_secondary: {
-    height: 40,
-    width: 150,
-    borderBottomWidth: 2,
-    borderBottomColor: '#0284C7',
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
-    color: '#000000',
-    margin: 5,
-    padding: 10,
   },
   input_deskripsi: {
     margin: 5,
@@ -465,10 +444,9 @@ const styles = StyleSheet.create({
   input_total: {
     flex: 1,
     height: 40,
-    marginRight: 8,
     color: '#000000',
     fontSize: 17,
-    textAlign: 'right',
+    textAlign: 'center',
     fontWeight: 'bold',
   },
   cardInfo: {

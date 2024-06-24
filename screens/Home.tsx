@@ -12,9 +12,11 @@ import {
 } from 'react-native';
 import {Path, Svg} from 'react-native-svg';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-import {BottomNavbar} from '../components/BottomNavbar';
+import BottomNav from '../components/BottomNav';
+import Footer from '../components/Footer';
 import LineBreak from '../components/LineBreak';
 import List from '../components/List';
+import ModalChoose from '../components/ModalChoose';
 import {API_URL} from '../context/AuthContext';
 
 const Home = ({navigation}: any) => {
@@ -75,10 +77,15 @@ const Home = ({navigation}: any) => {
     return unsubscribe;
   }, [navigation]);
 
+  const [cardFilter, setCardFilter] = useState(false);
+  const toggleCardFilter = () => {
+    setCardFilter(!cardFilter);
+  };
+
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
-        barStyle={isDarkMode ? 'dark-content' : 'light-content'}
+        barStyle={'light-content'}
         backgroundColor={
           isDarkMode ? backgroundStyle.backgroundColor : '#0284C7'
         }
@@ -167,29 +174,26 @@ const Home = ({navigation}: any) => {
         </View>
       </View>
       <ScrollView>
-        <View>
-          <List navigation={navigation} data={datas} loading={isLoading} />
+        <View style={{zIndex: cardFilter ? 1 : 0}}>
+          <List
+            navigation={navigation}
+            data={datas}
+            loading={isLoading}
+            cardFilter={cardFilter}
+            setCardFilter={setCardFilter}
+            toggleCardFilter={toggleCardFilter}
+          />
         </View>
 
         <View style={{marginVertical: 8}}>
           <LineBreak />
         </View>
 
-        <View
-          style={{
-            alignItems: 'center',
-            paddingTop: 10,
-            paddingHorizontal: 20,
-            backgroundColor: '#f2f2f2',
-            height: 300,
-          }}>
-          <Text style={{textAlign: 'center'}}>
-            Kelola uang jadi seru dan mudah dengan{' '}
-            <Text style={{fontWeight: 'bold', color: '#0284C7'}}>NOTAKOS.</Text>
-            Yuk, mulai catat sekarang!
-          </Text>
-        </View>
+        <Footer />
       </ScrollView>
+      <View style={{bottom: 64, right: 12}}>
+        <ModalChoose navigation={navigation} />
+      </View>
       <View
         style={{
           position: 'absolute',
@@ -197,7 +201,7 @@ const Home = ({navigation}: any) => {
           left: 0,
           right: 0,
         }}>
-        <BottomNavbar navigation={navigation} />
+        <BottomNav />
       </View>
     </SafeAreaView>
   );
@@ -205,11 +209,6 @@ const Home = ({navigation}: any) => {
 
 const styles = StyleSheet.create({
   boxPath: {
-    shadowColor: '#0284C7',
-    shadowOpacity: 0.25,
-    shadowOffset: {width: 0, height: 10},
-    shadowRadius: 4,
-    elevation: 3,
     flexDirection: 'row',
   },
   textPath: {fontSize: 18, fontWeight: 'bold', padding: 30},

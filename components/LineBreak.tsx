@@ -1,8 +1,18 @@
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet, View, useColorScheme} from 'react-native';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 
 const LineBreak = () => {
-  return <View style={styles.lineBreak} />;
+  const isDarkMode = useColorScheme() === 'dark';
+
+  return (
+    <View
+      style={[
+        styles.lineBreak,
+        {backgroundColor: isDarkMode ? Colors.darker : Colors.lighter},
+      ]}
+    />
+  );
 };
 
 const styles = StyleSheet.create({
@@ -10,7 +20,7 @@ const styles = StyleSheet.create({
     borderWidth: 0.3,
     borderColor: '#64748B',
     borderRadius: 10,
-    // marginVertical: 6,
   },
 });
+
 export default LineBreak;

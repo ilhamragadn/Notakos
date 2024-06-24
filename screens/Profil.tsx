@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import {Path, Svg} from 'react-native-svg';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-import {BottomNavbar} from '../components/BottomNavbar';
+import BottomNav from '../components/BottomNav';
 import {Card} from '../components/Card';
 import LineBreak from '../components/LineBreak';
 import SubmitButton from '../components/SubmitButton';
@@ -31,7 +31,7 @@ type Profil = {
   password_confirmation: string;
 };
 
-const Profil = ({navigation}: any) => {
+const Profil = () => {
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
@@ -262,7 +262,7 @@ const Profil = ({navigation}: any) => {
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
-        barStyle={isDarkMode ? 'dark-content' : 'light-content'}
+        barStyle={'light-content'}
         backgroundColor={
           isDarkMode ? backgroundStyle.backgroundColor : '#0284C7'
         }
@@ -298,10 +298,11 @@ const Profil = ({navigation}: any) => {
               },
             ]}>
             <Text
-              style={[
-                isDarkMode ? {color: '#FFFFFF'} : {color: '#DC2626'},
-                {marginHorizontal: 8, fontWeight: 'bold'},
-              ]}>
+              style={{
+                marginHorizontal: 8,
+                fontWeight: 'bold',
+                color: isDarkMode ? '#FFFFFF' : '#DC2626',
+              }}>
               Keluar
             </Text>
           </View>
@@ -348,6 +349,7 @@ const Profil = ({navigation}: any) => {
                     textTransform: 'capitalize',
                     fontSize: 18,
                     fontWeight: 'bold',
+                    color: isDarkMode ? Colors.lighter : Colors.darker,
                   }}>
                   {profileData?.name}
                 </Text>
@@ -358,146 +360,103 @@ const Profil = ({navigation}: any) => {
                   alignItems: 'center',
                   paddingVertical: 2,
                 }}>
-                <Text style={{fontStyle: 'italic'}}>{profileData?.email}</Text>
+                <Text
+                  style={{
+                    fontStyle: 'italic',
+                    color: isDarkMode ? Colors.lighter : Colors.darker,
+                  }}>
+                  {profileData?.email}
+                </Text>
               </View>
             </View>
 
-            <View>
-              <Card>
-                <View style={[styles.box, {flexDirection: 'row'}]}>
-                  <View
-                    style={{
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}>
-                    <View
-                      style={{
-                        margin: 2,
-                        padding: 8,
-                        borderRadius: 9999,
-                        backgroundColor: '#DC2626',
-                      }}>
-                      <Svg
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        width={22}
-                        height={22}
-                        strokeWidth={2}
-                        stroke="#FFFFFF">
-                        <Path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18"
-                        />
-                      </Svg>
-                    </View>
-                  </View>
-                  <View
-                    style={{
-                      flex: 1,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      marginRight: 0.5,
-                      borderRightWidth: 0.5,
-                    }}>
+            <View style={{flexDirection: 'row'}}>
+              <View style={{flex: 1}}>
+                <Card>
+                  <View style={[styles.box, {flexDirection: 'row'}]}>
                     <View
                       style={{
                         flex: 1,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        borderBottomWidth: 0.5,
                       }}>
-                      <Text
+                      <View
                         style={{
-                          fontWeight: 'bold',
+                          flex: 1,
+                          marginBottom: 2,
                         }}>
-                        Total Pengeluaran
-                      </Text>
-                    </View>
-                    <View
-                      style={{
-                        flex: 1,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}>
-                      <Text style={{fontSize: 12}}>
-                        {totalPengeluaran.toLocaleString('id-ID', {
-                          style: 'currency',
-                          currency: 'IDR',
-                          minimumFractionDigits: 0,
-                          maximumFractionDigits: 0,
-                        })}
-                      </Text>
+                        <Text
+                          style={{
+                            fontSize: 12,
+                            fontWeight: '500',
+                            textAlign: 'center',
+                          }}>
+                          Pengeluaran
+                        </Text>
+                      </View>
+                      <View style={{flex: 1}}>
+                        <Text
+                          style={{
+                            textAlign: 'center',
+                            fontWeight: 'bold',
+                            fontSize: 16,
+                            color: '#DC2626',
+                          }}>
+                          {`- ${totalPengeluaran.toLocaleString('id-ID', {
+                            style: 'currency',
+                            currency: 'IDR',
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0,
+                          })}`}
+                        </Text>
+                      </View>
                     </View>
                   </View>
+                </Card>
+              </View>
 
-                  <View
-                    style={{
-                      flex: 1,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      marginLeft: 0.5,
-                      borderLeftWidth: 0.5,
-                    }}>
+              <View style={{flex: 1}}>
+                <Card>
+                  <View style={[styles.box, {flexDirection: 'row'}]}>
                     <View
                       style={{
                         flex: 1,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        borderBottomWidth: 0.5,
                       }}>
-                      <Text
+                      <View
                         style={{
-                          fontWeight: 'bold',
+                          flex: 1,
+                          marginBottom: 2,
                         }}>
-                        Total Pemasukan
-                      </Text>
-                    </View>
-                    <View
-                      style={{
-                        flex: 1,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}>
-                      <Text style={{fontSize: 12}}>
-                        {totalPemasukan.toLocaleString('id-ID', {
-                          style: 'currency',
-                          currency: 'IDR',
-                          minimumFractionDigits: 0,
-                          maximumFractionDigits: 0,
-                        })}
-                      </Text>
-                    </View>
-                  </View>
-                  <View
-                    style={{
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}>
-                    <View
-                      style={{
-                        margin: 2,
-                        padding: 8,
-                        borderRadius: 9999,
-                        backgroundColor: '#16A34A',
-                      }}>
-                      <Svg
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        width={22}
-                        height={22}
-                        strokeWidth={2}
-                        stroke="#FFFFFF">
-                        <Path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3"
-                        />
-                      </Svg>
+                        <Text
+                          style={{
+                            fontSize: 12,
+                            fontWeight: '500',
+                            textAlign: 'center',
+                          }}>
+                          Pemasukan
+                        </Text>
+                      </View>
+                      <View
+                        style={{
+                          flex: 1,
+                        }}>
+                        <Text
+                          style={{
+                            textAlign: 'center',
+                            fontSize: 16,
+                            fontWeight: 'bold',
+                            color: '#16A34A',
+                          }}>
+                          {`+ ${totalPemasukan.toLocaleString('id-ID', {
+                            style: 'currency',
+                            currency: 'IDR',
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0,
+                          })}`}
+                        </Text>
+                      </View>
                     </View>
                   </View>
-                </View>
-              </Card>
+                </Card>
+              </View>
             </View>
 
             <View style={{flexDirection: 'row'}}>
@@ -517,10 +476,10 @@ const Profil = ({navigation}: any) => {
                     borderColor: '#0284C7',
                     backgroundColor: '#F0F9FF',
                     shadowColor: '#0284C7',
-                    shadowOpacity: 0.25,
-                    shadowRadius: 3.5,
+                    shadowOpacity: 0.5,
+                    shadowRadius: 4,
                     shadowOffset: {width: 0, height: 10},
-                    elevation: 3,
+                    elevation: 4,
                   }}>
                   <View
                     style={{
@@ -565,13 +524,13 @@ const Profil = ({navigation}: any) => {
                     paddingHorizontal: 8,
                     borderWidth: 1.5,
                     borderRadius: 8,
-                    borderColor: '#0284C7',
                     backgroundColor: '#F0F9FF',
+                    borderColor: '#0284C7',
                     shadowColor: '#0284C7',
-                    shadowOpacity: 0.25,
-                    shadowRadius: 3.5,
+                    shadowOpacity: 0.5,
+                    shadowRadius: 4,
                     shadowOffset: {width: 0, height: 10},
-                    elevation: 3,
+                    elevation: 4,
                   }}>
                   <View
                     style={{
@@ -608,11 +567,10 @@ const Profil = ({navigation}: any) => {
               <View
                 style={{
                   position: 'absolute',
-                  top: 275,
-                  marginHorizontal: 1.5,
+                  top: 270,
                   zIndex: 1,
                 }}>
-                <View style={{width: 380}}>
+                <View style={{width: 320}}>
                   <Card>
                     <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
                       {monthNames.map((month, index) => (
@@ -620,7 +578,7 @@ const Profil = ({navigation}: any) => {
                           key={index}
                           onPress={() => handleMonthSelect(index)}
                           style={{
-                            width: '33%',
+                            width: '50%',
                             paddingVertical: 4,
                           }}>
                           <Text
@@ -643,11 +601,11 @@ const Profil = ({navigation}: any) => {
               <View
                 style={{
                   position: 'absolute',
-                  top: 275,
-                  marginHorizontal: 1.5,
+                  top: 270,
                   zIndex: 1,
+                  right: 0,
                 }}>
-                <View style={{width: 380}}>
+                <View style={{width: 320}}>
                   <Card>
                     <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
                       {years.map(year => (
@@ -655,7 +613,7 @@ const Profil = ({navigation}: any) => {
                           key={year}
                           onPress={() => handleYearSelect(year)}
                           style={{
-                            width: '33%',
+                            width: '50%',
                             paddingVertical: 4,
                           }}>
                           <Text
@@ -1488,7 +1446,7 @@ const Profil = ({navigation}: any) => {
             alignItems: 'center',
             paddingTop: 10,
             paddingHorizontal: 20,
-            backgroundColor: '#f2f2f2',
+            backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
             height: 200,
           }}>
           <Text style={{fontWeight: 'bold', color: '#0284C7', marginTop: 40}}>
@@ -1503,7 +1461,7 @@ const Profil = ({navigation}: any) => {
           left: 0,
           right: 0,
         }}>
-        <BottomNavbar navigation={navigation} />
+        <BottomNav />
       </View>
     </SafeAreaView>
   );
@@ -1511,18 +1469,13 @@ const Profil = ({navigation}: any) => {
 
 const styles = StyleSheet.create({
   boxPath: {
-    shadowColor: '#0284C7',
-    shadowOpacity: 0.25,
-    shadowOffset: {width: 0, height: 10},
-    shadowRadius: 4,
-    elevation: 3,
     flexDirection: 'row',
   },
   textPath: {fontSize: 18, fontWeight: 'bold', padding: 30, flex: 1},
   container: {margin: 5},
   box: {
     marginVertical: 2,
-    padding: 5,
+    padding: 4,
   },
 });
 

@@ -7,13 +7,22 @@ import {
   Text,
   TouchableOpacity,
   View,
+  useColorScheme,
 } from 'react-native';
 import {Path, Svg} from 'react-native-svg';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {Card} from './Card';
 import FilterDate from './FilterDate';
 import LineBreak from './LineBreak';
 
-const List = ({navigation, data, loading}: any) => {
+const List = ({
+  navigation,
+  data,
+  loading,
+  cardFilter,
+  setCardFilter,
+  toggleCardFilter,
+}: any) => {
   const formatDateTime = (dateTimeString: string) => {
     const dateObject = new Date(dateTimeString);
     const dayIndex = dateObject.getDay();
@@ -54,11 +63,6 @@ const List = ({navigation, data, loading}: any) => {
 
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
-
-  const [cardFilter, setCardFilter] = useState(false);
-  const toggleCardFilter = () => {
-    setCardFilter(!cardFilter);
-  };
 
   const filterByDateRange = (
     datas: any,
@@ -134,6 +138,12 @@ const List = ({navigation, data, loading}: any) => {
     return 'Semua Catatan';
   };
 
+  const isDarkMode = useColorScheme() === 'dark';
+
+  const backgroundStyle = {
+    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+  };
+
   if (loading) {
     return (
       <View
@@ -148,7 +158,7 @@ const List = ({navigation, data, loading}: any) => {
   }
 
   return (
-    <View>
+    <View style={backgroundStyle}>
       <View
         style={{
           marginVertical: 6,
@@ -161,13 +171,13 @@ const List = ({navigation, data, loading}: any) => {
             padding: 8,
             borderWidth: 1.5,
             borderRadius: 8,
-            borderColor: '#0284C7',
             backgroundColor: '#F0F9FF',
+            borderColor: '#0284C7',
             shadowColor: '#0284C7',
-            shadowOpacity: 0.25,
-            shadowRadius: 3.5,
+            shadowOpacity: 0.5,
+            shadowRadius: 4,
             shadowOffset: {width: 0, height: 10},
-            elevation: 3,
+            elevation: 4,
           }}>
           <View
             style={{
@@ -196,12 +206,23 @@ const List = ({navigation, data, loading}: any) => {
       </View>
 
       {cardFilter && (
-        <View style={{position: 'absolute', top: 50, left: 22, zIndex: 1}}>
-          <View style={{width: 350}}>
+        <View
+          style={{
+            position: 'absolute',
+            top: 44,
+            left: '50%',
+            zIndex: 1,
+            transform: [{translateX: -160}],
+          }}>
+          <View style={{width: 320}}>
             <Card>
               <View style={{alignItems: 'center'}}>
                 <Text
-                  style={{fontSize: 13, fontWeight: 'bold', color: '#0284C7'}}>
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 'bold',
+                    color: '#0284C7',
+                  }}>
                   Dari
                 </Text>
               </View>
@@ -209,7 +230,11 @@ const List = ({navigation, data, loading}: any) => {
               <LineBreak />
               <View style={{alignItems: 'center', marginTop: 4}}>
                 <Text
-                  style={{fontSize: 13, fontWeight: 'bold', color: '#0284C7'}}>
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 'bold',
+                    color: '#0284C7',
+                  }}>
                   Sampai
                 </Text>
               </View>
@@ -256,7 +281,15 @@ const List = ({navigation, data, loading}: any) => {
           <Pressable
             key={item.id}
             style={({pressed}) => [
-              {backgroundColor: pressed ? '#ffffff' : '#f2f2f2'},
+              {
+                backgroundColor: pressed
+                  ? isDarkMode
+                    ? Colors.dark
+                    : Colors.light
+                  : isDarkMode
+                  ? Colors.darker
+                  : Colors.lighter,
+              },
             ]}
             onPress={
               item.kategori === 'Catatan Pemasukan'
@@ -291,14 +324,23 @@ const List = ({navigation, data, loading}: any) => {
                         maximumFractionDigits: 0,
                       })}
                 </Text>
-                <Text style={{fontSize: 11}} numberOfLines={1}>
+                <Text
+                  style={{
+                    fontSize: 11,
+                    color: isDarkMode ? Colors.lighter : Colors.darker,
+                  }}
+                  numberOfLines={1}>
                   {item.deskripsi !== null
                     ? item.deskripsi
                     : 'Tidak ada deskripsi'}
                 </Text>
               </View>
               <View style={[styles.listItem, {width: 120}]}>
-                <Text style={{textAlign: 'left'}}>
+                <Text
+                  style={{
+                    textAlign: 'left',
+                    color: isDarkMode ? Colors.lighter : Colors.darker,
+                  }}>
                   {formatDateTime(item.created_at)}
                 </Text>
               </View>
@@ -341,7 +383,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 2,
     padding: 5,
   },
-  bgIconIncome: {backgroundColor: '#00d008', borderRadius: 20, padding: 5},
+
   nominal: {
     fontWeight: 'bold',
     fontSize: 16,
