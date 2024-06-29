@@ -287,7 +287,7 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
                         <View style={styles.box}>
                           <View style={{flexDirection: 'row'}}>
                             <Text style={[styles.label, {flex: 1}]}>
-                              Jenis Kebutuhan
+                              Pakai Alokasi Uang
                             </Text>
                             <TouchableOpacity
                               onPress={() => setIsInfoType(!isInfoType)}>
@@ -400,7 +400,7 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
                             </View>
                             <View style={{width: 300, marginHorizontal: 4}}>
                               <Text style={styles.text}>
-                                Berikut ini adalah jenis kebutuhan Anda
+                                Berikut ini adalah pilihan alokasi uang Anda
                                 berdasarkan dari alokasi yang sudah Anda buat
                                 sebelumnya.
                               </Text>
@@ -456,7 +456,22 @@ const DetailNoteOutcome = ({navigation, route}: any) => {
               <View style={{flexDirection: 'row', marginTop: 8}}>
                 <View style={{flex: 1}}>
                   <DeleteButton
-                    onPress={() => handleDeleteData(itemId)}
+                    onPress={() =>
+                      Alert.alert(
+                        'Perhatian',
+                        'Apakah Anda yakin ingin menghapus data ini?',
+                        [
+                          {
+                            text: 'Batal',
+                          },
+                          {
+                            text: 'OK',
+                            onPress: () => handleDeleteData(itemId),
+                          },
+                        ],
+                        {cancelable: false},
+                      )
+                    }
                     disabled={isLoading}
                   />
                 </View>

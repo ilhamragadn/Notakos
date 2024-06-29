@@ -273,18 +273,39 @@ const Profil = () => {
             ? [backgroundStyle.backgroundColor, styles.boxPath]
             : [{backgroundColor: '#0284C7'}, styles.boxPath],
         ]}>
-        <Text
-          style={[
-            {flex: 1},
-            styles.textPath,
-            isDarkMode ? {color: '#0284C7'} : {color: '#ffffff'},
-          ]}>
-          Profil
-        </Text>
+        <View
+          style={{
+            justifyContent: 'center',
+            marginLeft: 24,
+            paddingHorizontal: 8,
+          }}>
+          <Text
+            style={[
+              styles.textPath,
+              {color: isDarkMode ? '#0284C7' : Colors.lighter},
+            ]}>
+            Profil
+          </Text>
+        </View>
 
         <TouchableOpacity
-          onPress={onLogout}
-          style={{justifyContent: 'center', alignItems: 'center'}}>
+          onPress={() =>
+            Alert.alert(
+              'Perhatian',
+              'Apakah Anda yakin ingin keluar dari NOTAKOS?',
+              [
+                {
+                  text: 'Batal',
+                },
+                {
+                  text: 'OK',
+                  onPress: onLogout,
+                },
+              ],
+              {cancelable: false},
+            )
+          }
+          style={{flex: 1, justifyContent: 'center', alignItems: 'flex-end'}}>
           <View
             style={[
               isDarkMode
@@ -1470,8 +1491,10 @@ const Profil = () => {
 const styles = StyleSheet.create({
   boxPath: {
     flexDirection: 'row',
+    paddingVertical: 18,
+    marginBottom: 4,
   },
-  textPath: {fontSize: 18, fontWeight: 'bold', padding: 30, flex: 1},
+  textPath: {fontSize: 20, fontWeight: 'bold'},
   container: {margin: 5},
   box: {
     marginVertical: 2,

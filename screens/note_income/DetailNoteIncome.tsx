@@ -360,7 +360,22 @@ const DetailNoteIncome = ({navigation, route}: any) => {
               <View style={{flexDirection: 'row', marginTop: 8}}>
                 <View style={{flex: 1}}>
                   <DeleteButton
-                    onPress={() => handleDeleteData(itemId)}
+                    onPress={() =>
+                      Alert.alert(
+                        'Perhatian',
+                        'Apakah Anda yakin ingin menghapus data ini?',
+                        [
+                          {
+                            text: 'Batal',
+                          },
+                          {
+                            text: 'OK',
+                            onPress: () => handleDeleteData(itemId),
+                          },
+                        ],
+                        {cancelable: false},
+                      )
+                    }
                     disabled={isLoading}
                   />
                 </View>

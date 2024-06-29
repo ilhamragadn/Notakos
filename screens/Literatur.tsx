@@ -85,13 +85,20 @@ const Literatur = ({navigation}: any) => {
             ? [backgroundStyle.backgroundColor, styles.boxPath]
             : [{backgroundColor: '#0284C7'}, styles.boxPath],
         ]}>
-        <Text
-          style={[
-            styles.textPath,
-            isDarkMode ? {color: '#0284C7'} : {color: '#ffffff'},
-          ]}>
-          Literatur
-        </Text>
+        <View
+          style={{
+            justifyContent: 'center',
+            marginLeft: 24,
+            paddingHorizontal: 8,
+          }}>
+          <Text
+            style={[
+              styles.textPath,
+              {color: isDarkMode ? '#0284C7' : Colors.lighter},
+            ]}>
+            Literatur
+          </Text>
+        </View>
       </View>
       <ScrollView>
         {isLoading ? (
@@ -195,8 +202,10 @@ const Literatur = ({navigation}: any) => {
 const styles = StyleSheet.create({
   boxPath: {
     flexDirection: 'row',
+    paddingVertical: 36,
+    marginBottom: 4,
   },
-  textPath: {fontSize: 18, fontWeight: 'bold', padding: 30},
+  textPath: {fontSize: 20, fontWeight: 'bold'},
   list: {
     flex: 1,
     flexDirection: 'row',

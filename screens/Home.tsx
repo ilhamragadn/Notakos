@@ -96,15 +96,26 @@ const Home = ({navigation}: any) => {
             ? [backgroundStyle.backgroundColor, styles.boxPath]
             : [{backgroundColor: '#0284C7'}, styles.boxPath],
         ]}>
-        <Text
-          style={[
-            styles.textPath,
-            isDarkMode ? {color: '#0284C7'} : {color: '#ffffff'},
-          ]}>
-          Beranda
-        </Text>
         <View
-          style={{flex: 1, alignItems: 'flex-end', justifyContent: 'center'}}>
+          style={{
+            justifyContent: 'center',
+            marginLeft: 24,
+            paddingHorizontal: 8,
+          }}>
+          <Text
+            style={[
+              styles.textPath,
+              {color: isDarkMode ? '#0284C7' : Colors.lighter},
+            ]}>
+            Beranda
+          </Text>
+        </View>
+        <View
+          style={{
+            flex: 1,
+            alignItems: 'flex-end',
+            justifyContent: 'center',
+          }}>
           <View
             style={{
               marginRight: 10,
@@ -130,8 +141,9 @@ const Home = ({navigation}: any) => {
                   color: '#ffffff',
                   fontWeight: '500',
                   textAlignVertical: 'center',
+                  fontSize: 16,
                 }}>
-                Cash: {''}
+                Cash. {''}
                 {saldoCash.toLocaleString('id-ID', {
                   style: 'currency',
                   currency: 'IDR',
@@ -160,8 +172,9 @@ const Home = ({navigation}: any) => {
                   color: '#ffffff',
                   fontWeight: '500',
                   textAlignVertical: 'center',
+                  fontSize: 16,
                 }}>
-                Cashless: {''}
+                Cashless. {''}
                 {saldoCashless.toLocaleString('id-ID', {
                   style: 'currency',
                   currency: 'IDR',
@@ -210,8 +223,13 @@ const Home = ({navigation}: any) => {
 const styles = StyleSheet.create({
   boxPath: {
     flexDirection: 'row',
+    paddingVertical: 18,
+    marginBottom: 4,
   },
-  textPath: {fontSize: 18, fontWeight: 'bold', padding: 30},
+  textPath: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
 });
 
 export default Home;

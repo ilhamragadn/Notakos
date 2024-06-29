@@ -537,7 +537,22 @@ const Alokasi = () => {
 
             {/* tombol sampah */}
             <TouchableOpacity
-              onPress={() => handleDeleteAllocation(allocation.id)}
+              onPress={() =>
+                Alert.alert(
+                  'Perhatian',
+                  'Apakah Anda yakin ingin menghapus data ini?',
+                  [
+                    {
+                      text: 'Batal',
+                    },
+                    {
+                      text: 'OK',
+                      onPress: () => handleDeleteAllocation(allocation.id),
+                    },
+                  ],
+                  {cancelable: false},
+                )
+              }
               style={{
                 marginHorizontal: 4,
                 justifyContent: 'center',
@@ -701,13 +716,39 @@ const Alokasi = () => {
             ? [backgroundStyle.backgroundColor, styles.boxPath]
             : [{backgroundColor: '#0284C7'}, styles.boxPath],
         ]}>
-        <Text
-          style={[
-            styles.textPath,
-            {color: isDarkMode ? '#0284C7' : Colors.lighter},
-          ]}>
-          Alokasi
-        </Text>
+        <View
+          style={{
+            justifyContent: 'center',
+            marginLeft: 24,
+            paddingHorizontal: 8,
+          }}>
+          <Text
+            style={[
+              styles.textPath,
+              {color: isDarkMode ? '#0284C7' : Colors.lighter},
+            ]}>
+            Alokasi
+          </Text>
+        </View>
+        <TouchableOpacity
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+          onPress={() => setInfoAllocation(!infoAllocation)}>
+          <Svg
+            fill={isDarkMode ? '#0284C7' : Colors.lighter}
+            viewBox="0 0 24 24"
+            width={22}
+            height={22}>
+            <Path
+              fillRule="evenodd"
+              clipRule="evenodd"
+              strokeLinejoin="round"
+              d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm8.706-1.442c1.146-.573 2.437.463 2.126 1.706l-.709 2.836.042-.02a.75.75 0 0 1 .67 1.34l-.04.022c-1.147.573-2.438-.463-2.127-1.706l.71-2.836-.042.02a.75.75 0 1 1-.671-1.34l.041-.022ZM12 9a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z"
+            />
+          </Svg>
+        </TouchableOpacity>
       </View>
       <ScrollView>
         {isLoading ? (
@@ -725,7 +766,6 @@ const Alokasi = () => {
               <View style={{marginVertical: 8}}>
                 <View
                   style={{
-                    flexDirection: 'row',
                     justifyContent: 'center',
                     alignItems: 'center',
                     marginBottom: 6,
@@ -734,28 +774,10 @@ const Alokasi = () => {
                     style={{
                       fontSize: 16,
                       fontWeight: '500',
-                      marginHorizontal: 4,
                       textAlign: 'center',
                     }}>
-                    Atur Persentase Alokasi
+                    Kelola Alokasi
                   </Text>
-                  <TouchableOpacity
-                    style={{marginTop: 1}}
-                    onPress={() => setInfoAllocation(!infoAllocation)}>
-                    <Svg
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.8}
-                      stroke="#0D6EFD"
-                      width={18}
-                      height={18}>
-                      <Path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
-                      />
-                    </Svg>
-                  </TouchableOpacity>
                 </View>
 
                 {fetchAllocationSection()}
@@ -971,16 +993,6 @@ const Alokasi = () => {
 
                           <View
                             style={{flexDirection: 'row', marginVertical: 6}}>
-                            {/* <View
-                              style={{
-                                flex: 1,
-                                justifyContent: 'flex-start',
-                                alignItems: 'flex-start',
-                              }}>
-                              <Text style={{fontWeight: 'bold', marginLeft: 6}}>
-                                Rp 0
-                              </Text>
-                            </View> */}
                             <View
                               style={{
                                 flex: 1,
@@ -1045,8 +1057,10 @@ const Alokasi = () => {
 const styles = StyleSheet.create({
   boxPath: {
     flexDirection: 'row',
+    paddingVertical: 36,
+    marginBottom: 4,
   },
-  textPath: {fontSize: 18, fontWeight: 'bold', padding: 30},
+  textPath: {fontSize: 20, fontWeight: 'bold'},
   container: {margin: 5},
 });
 

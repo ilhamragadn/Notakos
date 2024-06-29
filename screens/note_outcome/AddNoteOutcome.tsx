@@ -428,7 +428,9 @@ const AddNoteOutcome = ({navigation}: any) => {
             <Card>
               <View style={styles.box}>
                 <View style={{flexDirection: 'row'}}>
-                  <Text style={[styles.label, {flex: 1}]}>Jenis Kebutuhan</Text>
+                  <Text style={[styles.label, {flex: 1}]}>
+                    Pakai Alokasi Uang
+                  </Text>
                   <TouchableOpacity onPress={() => setIsInfoType(!isInfoType)}>
                     <Svg
                       fill="none"
@@ -526,9 +528,9 @@ const AddNoteOutcome = ({navigation}: any) => {
                   </View>
                   <View style={{width: 300, marginHorizontal: 4}}>
                     <Text style={styles.text}>
-                      Silahkan pilih jenis kebutuhan di bawah ini sesuai dengan
-                      alokasi kebutuhan yang sudah dibuat sebelumnya di halaman
-                      alokasi.
+                      Silahkan pilih kolom pakai alokasi uang di bawah ini
+                      sesuai dengan alokasi kebutuhan yang sudah dibuat
+                      sebelumnya di halaman alokasi.
                     </Text>
                   </View>
                 </View>
@@ -619,7 +621,7 @@ const AddNoteOutcome = ({navigation}: any) => {
         Array.isArray(postData.catatan_pengeluaran) &&
         postData.catatan_pengeluaran.every(e => e.jenis_kebutuhan === '')
       ) {
-        Alert.alert('Error', 'Kolom jenis kebutuhan harus diisi');
+        Alert.alert('Error', 'Kolom alokasi uang harus diisi');
         return;
       }
 
